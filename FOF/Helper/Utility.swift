@@ -1,7 +1,6 @@
-////
-////  Utility.swift
-//
-//
+
+
+
 import UIKit
 struct Utility{
     static func UIColorFromHex(_ rgbValue: UInt) -> UIColor

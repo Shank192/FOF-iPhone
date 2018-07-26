@@ -63,10 +63,10 @@ class nearByFriendsScreenVC: UIViewController,UICollectionViewDelegate,UICollect
         cell.viewMatchProfileRate.value = 50
         return cell
     }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return CGSize(width: 260, height:  self.collectionViewNearByFrnds.frame.height)
-//        
-//    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 300, height:  self.collectionViewNearByFrnds.frame.height)
+    
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

@@ -9,16 +9,22 @@ import UIKit
 import Firebase
 import FirebaseCore
 import GoogleMaps
+import FBSDKLoginKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var isFbSignIn = false
+    var fbLoginManager = FBSDKLoginManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
         GMSServices.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
+       
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+
+        
         //GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         // Override point for customization after application launch.
         return true
@@ -45,7 +51,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
+    func application(_ app: UIApplication, open url: URL,
+                     options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        if isFbSignIn == true {
+            //fb
+            return FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        }
+        return true
+    }
 
 }
 

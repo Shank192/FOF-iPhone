@@ -6,7 +6,9 @@
 
 import UIKit
 
-class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource {
+class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {
+
+@IBOutlet weak var collectionViewNearByRestaurants: UICollectionView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,8 +64,8 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         cell.imgViewRestaurants.image = UIImage(named: "Restro.jpg")
         return cell
     }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return CGSize(width: 260, height:  self.collectionViewNearByFrnds.frame.height)
-//        
-//    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 260, height:  self.collectionViewNearByRestaurants.frame.height)
+        
+    }
 }

@@ -23,10 +23,29 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+                <string>fb1675746376078653</string>
 				<string>com.googleusercontent.apps.682718107954-ofvnrnhh5s018dir4t73oi8gkfdh12ge</string>
 			</array>
 		</dict>
 	</array>
+    <key>FacebookAppID</key>
+    <string>1675746376078653</string>
+    <key>FacebookDisplayName</key>
+    <string>FOF</string>
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <false/>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>uber</string>
+        <string>uberauth</string>
+        <string>fbauth2</string>
+        <string>fbapi</string>
+        <string>fb-messenger-api</string>
+        <string>fbshareextension</string>
+        <string>fb</string>
+    </array>
 	<key>CFBundleVersion</key>
 	<string>5.2</string>
 	<key>LSRequiresIPhoneOS</key>

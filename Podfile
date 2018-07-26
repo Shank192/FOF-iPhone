@@ -13,6 +13,8 @@ pod "MBCircularProgressBar"
 
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
+pod 'MBProgressHUD', '~> 0.9.2'
+pod 'FacebookLogin'
 
   # Pods for FOF
 
