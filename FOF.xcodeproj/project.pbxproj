@@ -22,7 +22,11 @@
 		821D802A2100694F00B02E94 /* selectedRestaurantDeatilsScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821D80292100694F00B02E94 /* selectedRestaurantDeatilsScreenVC.swift */; };
 		8222F9CA2100C739005F8EA4 /* contactScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8222F9C92100C739005F8EA4 /* contactScreenVC.swift */; };
 		8222F9CD2100CAD6005F8EA4 /* chatTableviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8222F9CC2100CAD5005F8EA4 /* chatTableviewCell.swift */; };
-		824EC40B2109A23600FB52AC /* WebService in Resources */ = {isa = PBXBuildFile; fileRef = 824EC40A2109A23600FB52AC /* WebService */; };
+		824EC4102109AEE800FB52AC /* SSKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 824EC40F2109AEE800FB52AC /* SSKeychain.m */; };
+		824EC4132109AEF700FB52AC /* SSKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4122109AEF700FB52AC /* SSKeychainQuery.m */; };
+		824EC4172109C82100FB52AC /* userProfileDetailScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4162109C82100FB52AC /* userProfileDetailScreenVC.swift */; };
+		824EC41A2109CCAB00FB52AC /* conversationScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */; };
+		824EC41C2109D5F800FB52AC /* WebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC41B2109D5F800FB52AC /* WebService.swift */; };
 		8278A0B920F8BF3600CF04B3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8278A0B820F8BF3600CF04B3 /* AppDelegate.swift */; };
 		8278A0BE20F8BF3600CF04B3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BC20F8BF3600CF04B3 /* Main.storyboard */; };
 		8278A0C020F8BF3700CF04B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BF20F8BF3700CF04B3 /* Assets.xcassets */; };
@@ -81,7 +85,15 @@
 		821D80292100694F00B02E94 /* selectedRestaurantDeatilsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = selectedRestaurantDeatilsScreenVC.swift; sourceTree = "<group>"; };
 		8222F9C92100C739005F8EA4 /* contactScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = contactScreenVC.swift; sourceTree = "<group>"; };
 		8222F9CC2100CAD5005F8EA4 /* chatTableviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chatTableviewCell.swift; sourceTree = "<group>"; };
-		824EC40A2109A23600FB52AC /* WebService */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WebService; sourceTree = "<group>"; };
+		824EC40E2109AEE700FB52AC /* FOF-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FOF-Bridging-Header.h"; sourceTree = "<group>"; };
+		824EC40F2109AEE800FB52AC /* SSKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychain.m; sourceTree = "<group>"; };
+		824EC4112109AEF100FB52AC /* SSKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSKeychainQuery.h; sourceTree = "<group>"; };
+		824EC4122109AEF700FB52AC /* SSKeychainQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychainQuery.m; sourceTree = "<group>"; };
+		824EC4152109AEFF00FB52AC /* SSKeychain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SSKeychain.h; sourceTree = "<group>"; };
+		824EC4162109C82100FB52AC /* userProfileDetailScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userProfileDetailScreenVC.swift; sourceTree = "<group>"; };
+		824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conversationScreenVC.swift; sourceTree = "<group>"; };
+		824EC41B2109D5F800FB52AC /* WebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebService.swift; sourceTree = "<group>"; };
+		824EC41D2109D89A00FB52AC /* FOF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FOF.entitlements; sourceTree = "<group>"; };
 		8278A0B520F8BF3600CF04B3 /* FOF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FOF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8278A0B820F8BF3600CF04B3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8278A0BD20F8BF3600CF04B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -194,6 +206,7 @@
 			children = (
 				821D80292100694F00B02E94 /* selectedRestaurantDeatilsScreenVC.swift */,
 				820ACBBD2100AF4E00F203B9 /* userDetailScreenVC.swift */,
+				824EC4162109C82100FB52AC /* userProfileDetailScreenVC.swift */,
 			);
 			path = DetailsScreen;
 			sourceTree = "<group>";
@@ -202,11 +215,31 @@
 			isa = PBXGroup;
 			children = (
 				8222F9C92100C739005F8EA4 /* contactScreenVC.swift */,
+				824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */,
 				820EECBE2101BBBC0011F909 /* inviteFriendsChatScreenVC.swift */,
 				820EECC42101D7D90011F909 /* groupScreenVC.swift */,
 				8222F9CC2100CAD5005F8EA4 /* chatTableviewCell.swift */,
 			);
 			path = "Chat screens";
+			sourceTree = "<group>";
+		};
+		824EC4142109AEFE00FB52AC /* KeyChain */ = {
+			isa = PBXGroup;
+			children = (
+				824EC4122109AEF700FB52AC /* SSKeychainQuery.m */,
+				824EC40F2109AEE800FB52AC /* SSKeychain.m */,
+				824EC4112109AEF100FB52AC /* SSKeychainQuery.h */,
+				824EC4152109AEFF00FB52AC /* SSKeychain.h */,
+			);
+			path = KeyChain;
+			sourceTree = "<group>";
+		};
+		824EC4182109CC7E00FB52AC /* FilterScreen */ = {
+			isa = PBXGroup;
+			children = (
+				820EECC62101EA4A0011F909 /* filterScreenVC.swift */,
+			);
+			path = FilterScreen;
 			sourceTree = "<group>";
 		};
 		8278A0AC20F8BF3600CF04B3 = {
@@ -235,9 +268,10 @@
 		8278A0B720F8BF3600CF04B3 /* FOF */ = {
 			isa = PBXGroup;
 			children = (
+				824EC41D2109D89A00FB52AC /* FOF.entitlements */,
 				8204DE3220FF511A004B321B /* Images */,
 				8278A0B820F8BF3600CF04B3 /* AppDelegate.swift */,
-				820EECC62101EA4A0011F909 /* filterScreenVC.swift */,
+				824EC4182109CC7E00FB52AC /* FilterScreen */,
 				8222F9CB2100C73E005F8EA4 /* Chat screens */,
 				821D802B21006C1C00B02E94 /* DetailsScreen */,
 				829EE59A20F8DD0100F7C52D /* Login */,
@@ -290,9 +324,11 @@
 		829EE59C20F8DD1A00F7C52D /* Helper */ = {
 			isa = PBXGroup;
 			children = (
-				824EC40A2109A23600FB52AC /* WebService */,
+				824EC4142109AEFE00FB52AC /* KeyChain */,
+				824EC41B2109D5F800FB52AC /* WebService.swift */,
 				8204DE2020FF28D2004B321B /* Constants.swift */,
 				829EE59220F8D8A100F7C52D /* Utility.swift */,
+				824EC40E2109AEE700FB52AC /* FOF-Bridging-Header.h */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -396,6 +432,15 @@
 				TargetAttributes = {
 					8278A0B420F8BF3600CF04B3 = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 0940;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					8278A0C820F8BF3700CF04B3 = {
 						CreatedOnToolsVersion = 9.3;
@@ -436,7 +481,6 @@
 				828EB161210875EF00906230 /* res.jpg in Resources */,
 				8278A0C320F8BF3700CF04B3 /* LaunchScreen.storyboard in Resources */,
 				828EB1662108760100906230 /* rachel.jpg in Resources */,
-				824EC40B2109A23600FB52AC /* WebService in Resources */,
 				8278A0C020F8BF3700CF04B3 /* Assets.xcassets in Resources */,
 				828EB160210875EF00906230 /* Restro.jpg in Resources */,
 				828EB162210875EF00906230 /* rest.jpg in Resources */,
@@ -556,6 +600,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-FOF/Pods-FOF-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
@@ -569,6 +614,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
@@ -645,12 +691,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				8204DE2720FF389A004B321B /* FoFTabBarScreenVC.swift in Sources */,
+				824EC4172109C82100FB52AC /* userProfileDetailScreenVC.swift in Sources */,
 				829EE59720F8DBFC00F7C52D /* loginScreenVC.swift in Sources */,
+				824EC41A2109CCAB00FB52AC /* conversationScreenVC.swift in Sources */,
+				824EC4102109AEE800FB52AC /* SSKeychain.m in Sources */,
 				8204DE2320FF3858004B321B /* nearByFriendsScreenVC.swift in Sources */,
 				8209951C20FC9374005EE071 /* interestedScreenVC.swift in Sources */,
 				8204DE2520FF3872004B321B /* nearByRestaurantsScreenVC.swift in Sources */,
 				829EE59520F8DBE200F7C52D /* testBudsScreenVC.swift in Sources */,
 				820EECBF2101BBBC0011F909 /* inviteFriendsChatScreenVC.swift in Sources */,
+				824EC41C2109D5F800FB52AC /* WebService.swift in Sources */,
 				8222F9CD2100CAD6005F8EA4 /* chatTableviewCell.swift in Sources */,
 				829EE59920F8DCC800F7C52D /* testBudsCollectionViewCell.swift in Sources */,
 				8278A0B920F8BF3600CF04B3 /* AppDelegate.swift in Sources */,
@@ -659,6 +709,7 @@
 				820ACBBE2100AF4E00F203B9 /* userDetailScreenVC.swift in Sources */,
 				829EE59320F8D8A100F7C52D /* Utility.swift in Sources */,
 				8204DE3A20FF78E2004B321B /* foodSearchScreenVC.swift in Sources */,
+				824EC4132109AEF700FB52AC /* SSKeychainQuery.m in Sources */,
 				8204DE2120FF28D2004B321B /* Constants.swift in Sources */,
 				820EECC52101D7D90011F909 /* groupScreenVC.swift in Sources */,
 				8222F9CA2100C739005F8EA4 /* contactScreenVC.swift in Sources */,
@@ -835,6 +886,8 @@
 			baseConfigurationReference = 3BD6138705034830954CD0EA /* Pods-FOF.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = FOF/FOF.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9VZWVJ654Y;
 				INFOPLIST_FILE = FOF/Info.plist;
@@ -845,6 +898,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.entrega.FOF;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "FOF/Helper/FOF-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -855,6 +910,8 @@
 			baseConfigurationReference = 354F612CC2A0DE324BF26FDF /* Pods-FOF.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = FOF/FOF.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9VZWVJ654Y;
 				INFOPLIST_FILE = FOF/Info.plist;
@@ -865,6 +922,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.entrega.FOF;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "FOF/Helper/FOF-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

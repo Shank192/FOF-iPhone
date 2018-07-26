@@ -10,7 +10,7 @@ pod 'GooglePlaces'
 pod 'GooglePlacePicker'
 
 pod "MBCircularProgressBar"
-
+pod 'Alamofire', '~> 4.5'
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'MBProgressHUD', '~> 0.9.2'

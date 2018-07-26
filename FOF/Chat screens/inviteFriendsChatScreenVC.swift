@@ -17,7 +17,7 @@ class chatScreenVC: UIViewController,UITableViewDelegate,UITableViewDataSource {
     }
 
     @IBAction func btnBackAct(_ sender: Any) {
-        self.navigationController?.popViewController(animated: true)
+self.navigationController?.popViewController(animated: true)
     }
     @IBAction func btnStartChatAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "groupScreenVC") as! groupScreenVC

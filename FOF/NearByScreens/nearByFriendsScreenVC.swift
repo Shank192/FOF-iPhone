@@ -15,7 +15,9 @@ class nearByFriendsScreenVC: UIViewController,UICollectionViewDelegate,UICollect
         // Do any additional setup after loading the view.
     }
 
-    
+    override func viewWillAppear(_ animated: Bool) {
+         wsSetFriendsList()
+    }
     
      // MARK: - Button Actions
     @IBAction func btnFoodAct(_ sender: Any) {
@@ -67,21 +69,30 @@ class nearByFriendsScreenVC: UIViewController,UICollectionViewDelegate,UICollect
         return CGSize(width: 300, height:  self.collectionViewNearByFrnds.frame.height)
     
     }
-    
+    // MARK: - webService
+    func wsSetFriendsList(){
+            let param = ["action":"myfriends","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID)]
+        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param as NSDictionary, CompletionHandler: { (success, response) -> () in
+                //MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                if success == true {
+                    if (response.object(forKey: "data") != nil)  {
+                        
+                        
+                        
+                    }
+                } else if response.object(forKey: "message") != nil {
+                    //self.view.makeToast(response.object(forKey: "message") as! String)
+                }
+                    
+                else {
+                    if response.object(forKey: "message") != nil {
+                        //self.view.makeToast(response.object(forKey: "message") as! String)
+                    }
+                }})}
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
 
-    /*
-   
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

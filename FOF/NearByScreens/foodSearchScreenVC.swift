@@ -28,9 +28,8 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
         cell.lblSearchFood.text = "Le Bernardin"
-    cell.btnFoodDistanceOut.setTitle("15 km", for: .normal)
+        cell.btnFoodDistanceOut.setTitle("15 km", for: .normal)
         cell.btnFoodDistanceForCarOut.setTitle("15 km", for: .normal)
-        
         cell.imgViewFoodRestro.image = UIImage(named: "rest.jpg")
         return cell
     }

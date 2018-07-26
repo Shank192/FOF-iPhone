@@ -67,7 +67,11 @@ self.navigationController?.isNavigationBarHidden = true
         }
         return cell
     }
-
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let obj = self.storyboard?.instantiateViewController(withIdentifier: "userProfileDetailScreenVC") as! userProfileDetailScreenVC
+        
+        self.navigationController?.pushViewController(obj, animated: false)
+    }
    
 
 }

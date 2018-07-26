@@ -10,20 +10,28 @@ import Firebase
 import FirebaseCore
 import GoogleMaps
 import FBSDKLoginKit
+import UserNotifications
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
     var isFbSignIn = false
     var fbLoginManager = FBSDKLoginManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
+        if launchedBefore  {
+        }
+        else {
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
+            UserDefaults.standard.set(true, forKey: "launchedBefore")
+        }
         FirebaseApp.configure()
         GMSServices.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
        
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-
+        registerRemoteNotification()
         
         //GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         // Override point for customization after application launch.
@@ -51,6 +59,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    //MARK:- Register RemoteNotification
+    func registerRemoteNotification()
+    {
+        let appli = UIApplication.shared
+        
+        if #available(iOS 10.0, *){
+            UNUserNotificationCenter.current().delegate = self
+            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .sound, .alert], completionHandler: {(granted, error) in
+                if (granted)
+                {
+                    let settings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+                    DispatchQueue.main.async { // Correct
+                        appli.registerUserNotificationSettings(settings)
+                        appli.registerForRemoteNotifications()
+                    }
+                    
+                }
+                else{
+                    
+                    print("Do stuff if unsuccessful...")
+                    //Do stuff if unsuccessful...
+                }
+            })
+        } else {
+            
+            appli.registerUserNotificationSettings(UIUserNotificationSettings(types: [.sound, .alert, .badge], categories: nil))
+            UIApplication.shared.registerForRemoteNotifications()
+        }
+        
+    }
+    //MARK:- didRegisterForRemoteNotificationsWithDeviceToken
+    func application(_ application: UIApplication,didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        
+        let tokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
+        UserDefaults.standard.set(tokenString, forKey: Constants.UserDefaults.deviceToken)
+        UserDefaults.standard.synchronize()
+        print("Token : \(tokenString)")
+        print("Device Id : \(getUUID())")
+    }
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register for notifications: \(error.localizedDescription)")
+    }
     func application(_ app: UIApplication, open url: URL,
                      options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         if isFbSignIn == true {
@@ -59,6 +109,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         return true
     }
-
+    //MARK:- Set Root
+    func SetMyRootBy() {
+        
+        let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        if UserDefaults.standard.bool(forKey: Constants.UserDefaults.alreadyLogin){
+            let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+            nextVC.selectedIndex = 1
+            self.window?.rootViewController = nextVC
+        } else {
+            UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+            UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+            let nextVC  = storyboard.instantiateViewController(withIdentifier: "loginScreenVC") as! loginScreenVC
+            let navig : UINavigationController = UINavigationController(rootViewController: nextVC)
+            navig.isNavigationBarHidden = true
+            self.window?.rootViewController = navig
+        }
+        self.window?.makeKeyAndVisible()
+    }
+    //MARK:- Get UUID
+    func getUUID() -> String
+    {
+        let appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
+        var strApplicationUUID = SSKeychain.password(forService: appName, account: "incoding")
+        
+        if strApplicationUUID == nil
+        {
+            strApplicationUUID = UIDevice.current.identifierForVendor?.uuidString
+            UserDefaults.standard.set(strApplicationUUID, forKey: Constants.UserDefaults.deviceID)
+            SSKeychain.password(forService: strApplicationUUID, account: "incoding")
+        }
+        return strApplicationUUID!
+    }
 }
 
