@@ -7,16 +7,33 @@
 
 import UIKit
 import FBSDKLoginKit
-
+import CoreLocation
 
 
 
 class loginScreenVC: UIViewController {
 
+    
+    let locationManager = CLLocationManager()
+    var userCurrentLocation : CLLocationCoordinate2D?
+
+    let app = UIApplication.shared.delegate as! AppDelegate
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
-        // Do any additional setup after loading the view.
+       
+        self.locationManager.requestAlwaysAuthorization()
+        
+        // For use in foreground
+        self.locationManager.requestWhenInUseAuthorization()
+        
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+        }
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -49,7 +66,7 @@ class loginScreenVC: UIViewController {
         if FBSDKAccessToken.current() != nil {
     let request = FBSDKGraphRequest(graphPath: "me", parameters: ["fields" : "id,first_name,last_name,picture.width(400).height(400),email,age_range"])
             //,user_gender,user_link, locale,user_birthday
-            request?.start(completionHandler: { (_ , result , error ) -> Void in
+            _ = request?.start(completionHandler: { (_ , result , error ) -> Void in
                 if error == nil {
                     
                     if let response : NSDictionary = result as? NSDictionary {
@@ -61,6 +78,7 @@ class loginScreenVC: UIViewController {
                         var lastName = ""
                         var birthDay = ""
                         var gender = ""
+                        
                         
                         if response.object(forKey: "email") != nil {
                             email = response.object(forKey: "email") as! String
@@ -80,6 +98,7 @@ class loginScreenVC: UIViewController {
                         if response.object(forKey: "gender") != nil {
                             gender = response.object(forKey: "gender") as! String
                         }
+                       
                         
                         if let picture : NSDictionary = response.object(forKey: "picture") as? NSDictionary {
                             
@@ -134,6 +153,9 @@ class loginScreenVC: UIViewController {
                         //UserDefaults.standard.set(data, forKey: Constants.UserDefaults.LoginData)
                         let id_str = "\(data.object(forKey: "id")!)"
                         let id_session = "\(data.object(forKey: "sessionid")!)"
+                        
+                        
+                        UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
                         UserDefaults.standard.set(data.object(forKey: "last_name") as! String, forKey: Constants.UserDefaults.User_Last_Name)
                         UserDefaults.standard.set((data.object(forKey: "first_name") as AnyObject) as! String, forKey: Constants.UserDefaults.User_First_Name)
                         UserDefaults.standard.set(data.object(forKey: "email") as! String, forKey: Constants.UserDefaults.User_Email)
@@ -151,11 +173,17 @@ class loginScreenVC: UIViewController {
 //                            })
 //                        }
                        UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
-                        let obj = self.storyboard?.instantiateViewController(withIdentifier: "testBudsScreenVC") as! testBudsScreenVC
+                        let obj = self.storyboard?.instantiateViewController(withIdentifier: "interestedScreenVC")  as! interestedScreenVC //as! testBudsScreenVC
+                        if self.userCurrentLocation != nil
+                        {
+                            obj.userLocation = self.userCurrentLocation!
+                        }
                         
                         self.navigationController?.pushViewController(obj, animated: false)
                         UserDefaults.standard.synchronize()
-                    Constants.GlobalConstants.appDelegate.isFbSignIn = true }
+                    Constants.GlobalConstants.appDelegate.isFbSignIn = true
+                        
+                }
                 //}
                 } else if response.object(forKey: "message") != nil {
                     //self.view.makeToast(response.object(forKey: "message") as! String)
@@ -170,6 +198,18 @@ class loginScreenVC: UIViewController {
     
     @IBAction func btnExploreAct(_ sender: Any) {
         UIApplication.shared.open(URL(string: "http://friendsoverfoods.com/")!, options: [:], completionHandler: nil)
+    }
+    
+}
+
+//MARK:- Location Delegate
+extension loginScreenVC : CLLocationManagerDelegate
+{
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+        self.userCurrentLocation = locValue
+        manager.stopUpdatingLocation()
+        
     }
     
 }

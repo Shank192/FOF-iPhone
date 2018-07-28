@@ -12,13 +12,25 @@ import GoogleMaps
 import FBSDKLoginKit
 import UserNotifications
 
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
     var isFbSignIn = false
     var fbLoginManager = FBSDKLoginManager()
-
+    var IsGoSingle = false
+    @objc var userDetail = UserDetail()
+    var strSearchedPlace = ""
+    var locationManager = CLLocationManager()
+    
+    
+    
+    @objc var userLocation = CLLocationCoordinate2D()
+    @objc var searchedLocation =  CLLocationCoordinate2D()
+    
+    var strCurrentPlace = ""
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
         if launchedBefore  {
@@ -32,6 +44,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
        
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         registerRemoteNotification()
+        
+       self.SetMyRootBy()
+        
         
         //GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         // Override point for customization after application launch.
@@ -116,8 +131,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         
         if UserDefaults.standard.bool(forKey: Constants.UserDefaults.alreadyLogin){
             let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
-            nextVC.selectedIndex = 1
+            let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "interestedScreenVC") as! interestedScreenVC
             self.window?.rootViewController = nextVC
         } else {
             UNUserNotificationCenter.current().removeAllDeliveredNotifications()
@@ -143,5 +157,69 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         }
         return strApplicationUUID!
     }
+    
+    func locateLocationManager(view : UIViewController)
+    {
+        
+        self.locationManager.requestAlwaysAuthorization()
+        
+        // For use in foreground
+        self.locationManager.requestWhenInUseAuthorization()
+        
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+        }
+    
+        if locationManager.location != nil
+        {
+            self.userLocation = locationManager.location!.coordinate
+        }
+        
+    
+        GooglemapCall.getLocationFromLat(CGFloat(self.userLocation.latitude), long: CGFloat(self.userLocation.longitude)) { (dictPlaceDetail, errorMessage) in
+            
+            if dictPlaceDetail != nil
+            {
+                if let status = dictPlaceDetail!["status"] as? String
+                {
+                    if status != "OK" || (errorMessage != nil)
+                    {
+                        return
+                    }
+                }
+                
+                
+                 var strCurrentAddress = ""
+                if let dataArray = dictPlaceDetail!["results"] as? NSArray
+                {
+                    if let dataDict = dataArray.object(at: 0) as? NSDictionary
+                    {
+                        if let formatted_address = dataDict.object(forKey:"formatted_address") as? String
+                        {
+                            strCurrentAddress = formatted_address
+                        }
+                    }
+                }
+                
+                self.strCurrentPlace = strCurrentAddress
+                
+            }
+            else
+            {
+                return
+            }
+            
+        }
+    
+    }
+    
+    
+}
+
+extension AppDelegate : CLLocationManagerDelegate
+{
+    
 }
 

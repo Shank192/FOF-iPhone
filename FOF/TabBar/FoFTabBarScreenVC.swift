@@ -8,8 +8,14 @@ import UIKit
 
 class FoFTabBarScreenVC: UITabBarController {
 
+    var issingle = false
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        
         
         let item1 : UITabBarItem = self.tabBar.items![0]
         item1.image = UIImage(named: "tab_Profile_gray")?.withRenderingMode(UIImageRenderingMode.alwaysOriginal)

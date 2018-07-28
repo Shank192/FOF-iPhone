@@ -74,6 +74,10 @@ struct Constants {
         static let User_Email = "User_Email"
         static let email_ID = "email_ID"
         static let alreadyLogin = "alreadyLogin"
+        static let isregistered = "isregistered"
+        static let isLoging = "isUserLoging"
+        static let MyTestBuds = "MyTestBuds"
+        
         
     }
     struct Font{

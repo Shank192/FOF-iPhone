@@ -13,12 +13,15 @@ class testBudsCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var lblTestbudsName: UILabel!
     
     //NearByFriendsScreen
+    @IBOutlet weak var viewBack: UIView!
     @IBOutlet weak var imgViewFriendProfile: UIImageView!
     @IBOutlet weak var lblFriendName: UILabel!
     @IBOutlet weak var lblDistance: UIButton!
     @IBOutlet weak var imgViewMutualFriend: UIImageView!
     @IBOutlet weak var viewMatchProfileRate: MBCircularProgressBarView!
-   
+    @IBOutlet weak var lblMutualFriend: UILabel!
+    @IBOutlet weak var btnMEssage: UIButton!
+    
     //NearByRestaurants
     @IBOutlet weak var imgViewRestaurants: UIImageView!
     @IBOutlet weak var lblRestroName: UILabel!

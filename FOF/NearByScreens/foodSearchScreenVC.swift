@@ -27,6 +27,12 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
+        
+        cell.viewBack.layer.shadowOpacity = 0.7
+        cell.viewBack.layer.shadowOffset = CGSize.zero
+        cell.viewBack.layer.shadowRadius = 3.0
+        cell.viewBack.layer.shadowColor = UIColor.lightGray.cgColor
+       
         cell.lblSearchFood.text = "Le Bernardin"
         cell.btnFoodDistanceOut.setTitle("15 km", for: .normal)
         cell.btnFoodDistanceForCarOut.setTitle("15 km", for: .normal)
@@ -35,8 +41,8 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collectionViewFoodSearch.frame.width
-            / 6 * 2.8, height: 197)
+        return CGSize(width: (self.collectionViewFoodSearch.frame.width
+            / 2) - 15, height: 197)
         
     }
     @IBDesignable

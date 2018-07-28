@@ -12,8 +12,24 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
     @IBOutlet weak var nslcHightOfCollView: NSLayoutConstraint!
     @IBOutlet weak var collectionViewProfileImages: UICollectionView!
     @IBOutlet weak var collectionViewCuisine: UICollectionView!
-    var arrTestBudsData = ["Italian","Chienese","Punjabi","Continetal","Goan","Greek","Backery","American","Cafe","Dessert","Coffee and Tea"]
-    var arrOfImages = ["rachel.jpg","Mens.jpg"]
+    
+    
+    @IBOutlet weak var lblRelationShipStatus: UITextField!
+    @IBOutlet weak var lblOccupation: UITextField!
+    @IBOutlet weak var lblGender: UITextField!
+    @IBOutlet weak var lblEducation: UITextField!
+    @IBOutlet weak var lblLocation: UILabel!
+    @IBOutlet weak var lblImageCount: UILabel!
+    
+    @IBOutlet weak var lblAbout: UILabel!
+    
+    @IBOutlet weak var lblName: UILabel!
+   
+    var isShowRecomended = false
+    var arrTestBudsData = [String]()
+    var arrOfImages = [String]()
+    
+    let app = UIApplication.shared.delegate as! AppDelegate
     
     // MARK: - Life Cycle
     override func viewDidLoad() {
@@ -22,8 +38,73 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
         startTimer()
         collectionViewCuisine.layoutIfNeeded()
         nslcHightOfCollView.constant = self.collectionViewCuisine.contentSize.height + 10
-        // Do any additional setup after loading the view.
+        
+        arrTestBudsData = (self.app.userDetail.testbuds as NSString).components(separatedBy: ",")
+        
+        
+        if self.app.userDetail.profilepic1 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic1)
+        }
+        else if self.app.userDetail.profilepic2 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic2)
+        }
+        else if self.app.userDetail.profilepic3 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic3)
+        }
+        else if self.app.userDetail.profilepic4 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic4)
+        }
+        else if self.app.userDetail.profilepic5 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic5)
+        }
+        else if self.app.userDetail.profilepic6 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic6)
+        }
+        else if self.app.userDetail.profilepic7 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic7)
+        }
+        else if self.app.userDetail.profilepic8 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic8)
+        }
+        else if self.app.userDetail.profilepic9 != ""
+        {
+            self.arrOfImages.append(self.app.userDetail.profilepic9)
+        }
+        else
+        {
+            if arrOfImages.count == 0
+            {
+                arrOfImages.append("NoImage")
+            }
+        }
+            
+        
+        
+        
+        self.lblName.text = "\(self.app.userDetail.firstName!) \(self.app.userDetail.lastName!)"
+        self.lblEducation.text = self.app.userDetail.education
+        self.lblGender.text = self.app.userDetail.gender
+        self.lblOccupation.text = self.app.userDetail.occupation
+        self.lblLocation.text = self.app.userDetail.locationString
+        self.lblAbout.text = self.app.userDetail.aboutMe
+        
     }
+    
+    override func viewDidLayoutSubviews() {
+        
+        print(self.collectionViewCuisine.contentSize.height)
+        nslcHightOfCollView.constant = self.collectionViewCuisine.contentSize.height + 10
+        
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         startTime.invalidate()
     }
@@ -42,7 +123,16 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
         if collectionView == collectionViewProfileImages{
-             cell.imgViewOfProfilePic.image = UIImage(named: arrOfImages[indexPath.row])
+            if arrOfImages[indexPath.row] == "NoImage" || arrOfImages[indexPath.row] == ""
+            {
+                cell.imgViewOfProfilePic.image = UIImage.init(named: "male")
+            }
+            else
+            {
+                cell.imgViewOfProfilePic.sd_setImage(with: URL.init(string: arrOfImages[indexPath.row]), placeholderImage: UIImage.init(named: "male"), options: .continueInBackground)
+            }
+            
+            
         }else{
              cell.lblCuisineName.text =  arrTestBudsData[indexPath.row]
         }
@@ -70,6 +160,10 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
         } else {
             collectionViewProfileImages.scrollRectToVisible(CGRect(x: contentOffset.x + cellSize.width, y: contentOffset.y, width: cellSize.width, height: cellSize.height), animated: true);
         }
+        
+        let numOf = collectionViewProfileImages.contentOffset.x/self.collectionViewProfileImages.frame.size.width
+        
+        self.lblImageCount.text = "\(Int(numOf)+1)/\(self.arrOfImages.count)"
     }
     
     

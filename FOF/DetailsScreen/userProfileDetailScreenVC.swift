@@ -8,17 +8,110 @@ class userProfileDetailScreenVC: UIViewController
     ,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource,UICollectionViewDelegate {
     
     var startTime = Timer()
+    @IBOutlet weak var viewRecomendedRest: UIView!
+    @IBOutlet weak var constHeightOfViewRecomendedRest: NSLayoutConstraint!
     @IBOutlet weak var nslcHightOfCollView: NSLayoutConstraint!
     @IBOutlet weak var collectionViewProfileImages: UICollectionView!
     @IBOutlet weak var collectionViewTestBuds: UICollectionView!
     @IBOutlet weak var collectionViewFood: UICollectionView!
-    var arrTestBudsData = ["Italian","Chienese","Punjabi","Continetal","Goan","Greek","Backery","American","Cafe","Dessert","Coffee and Tea"]
-    var arrOfImages = ["rachel.jpg","Mens.jpg"]
+    
+    @IBOutlet weak var lblRelationShipStatus: UITextField!
+    @IBOutlet weak var lblOccupation: UITextField!
+    @IBOutlet weak var lblGender: UITextField!
+    @IBOutlet weak var lblEducation: UITextField!
+    @IBOutlet weak var lblLocation: UILabel!
+    @IBOutlet weak var lblImageCount: UILabel!
+    
+    @IBOutlet weak var lblAbout: UILabel!
+    
+    var isShowRecomended = false
+    var arrTestBudsData = [String]()
+    var arrOfImages = [String]()
+    var UserDetailData = NSDictionary()
+    @IBOutlet weak var lblName: UILabel!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionViewTestBuds.layoutIfNeeded()
+        nslcHightOfCollView.constant = 0
+        
+        if isShowRecomended == true
+        {
+            self.constHeightOfViewRecomendedRest.constant = 230
+            self.viewRecomendedRest.isHidden = false
+        }
+        else
+        {
+            self.constHeightOfViewRecomendedRest.constant = 0
+            self.viewRecomendedRest.isHidden = true
+        }
+        
+        if let testbuds = UserDetailData.object(forKey: "testbuds") as? String
+        {
+            arrTestBudsData = (testbuds as NSString).components(separatedBy: ",")
+            self.collectionViewTestBuds.reloadData()
+            
+        }
+        
+        for i in 0..<9 {
+            
+            //  NSLog(@"%d",i);
+            let keyName = "profilepic\(i+1)"
+            if let imageName = UserDetailData.object(forKey: keyName) as? String
+            {
+                if !((imageName as NSString).isKind(of: NSNull.self)) && imageName != ""
+                {
+                    self.arrOfImages.append(imageName)
+                }
+            }
+            
+            self.collectionViewProfileImages.reloadData()
+        }
+        
+        
+        
+        self.startTimer()
+        
+        if let about_me = UserDetailData.object(forKey: "about_me") as? String
+        {
+            self.lblAbout.text = about_me
+        }
+        
+        if let education = UserDetailData.object(forKey: "education") as? String
+        {
+            self.lblEducation.text = education
+        }
+        
+        if let gender = UserDetailData.object(forKey: "gender") as? String
+        {
+            self.lblGender.text = gender
+        }
+        
+        if let first_name = UserDetailData.object(forKey: "first_name") as? String,let last_name = UserDetailData.object(forKey: "last_name") as? String
+        {
+            self.lblName.text = "\(first_name) \(last_name)"
+        }
+        
+        if let relationship = UserDetailData.object(forKey: "relationship") as? String
+        {
+            self.lblRelationShipStatus.text = relationship
+        }
+        
+        if let location_string = UserDetailData.object(forKey: "location_string") as? String
+        {
+            self.lblLocation.text = location_string
+        }
+        
+        
+        
+    }
+    
+    override func viewDidLayoutSubviews() {
+        
+        print(self.collectionViewTestBuds.contentSize.height)
         nslcHightOfCollView.constant = self.collectionViewTestBuds.contentSize.height + 10
-        // Do any additional setup after loading the view.
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -44,7 +137,7 @@ self.navigationController?.popViewController(animated: true)
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
         if collectionView == collectionViewProfileImages{
-            cell.imgViewOtherUserProfilePic.image = UIImage(named: arrOfImages[indexPath.row])
+            cell.imgViewOtherUserProfilePic.sd_setImage(with: URL.init(string: arrOfImages[indexPath.row]), placeholderImage: UIImage.init(named: "male"), options: .continueInBackground)
         }else if collectionView == collectionViewTestBuds{
             cell.lblOtherPersonTestbudName.text =  arrTestBudsData[indexPath.row]
         }else{
@@ -77,6 +170,10 @@ self.navigationController?.popViewController(animated: true)
         } else {
             collectionViewProfileImages.scrollRectToVisible(CGRect(x: contentOffset.x + cellSize.width, y: contentOffset.y, width: cellSize.width, height: cellSize.height), animated: true);
         }
+        
+        let numOf = collectionViewProfileImages.contentOffset.x/self.collectionViewProfileImages.frame.size.width
+        
+        self.lblImageCount.text = "\(Int(numOf)+1)/\(self.arrOfImages.count)"
     }
     func startTimer() {
         Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(scrollToNextCell), userInfo: nil, repeats: true);
