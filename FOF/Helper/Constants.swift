@@ -57,7 +57,7 @@ struct Constants {
         static let InvalidCommentRange = "Please enter comment minimum 20 characters!"
     }
     struct GoogleKey {
-        static let kGoogle_Key = "AIzaSyDOnJYTrItjnk3HPg9n1OswyLpRkDwWU4A"        
+        static let kGoogle_Key = "AIzaSyCCmgwexZk3S_kThFZXxZbxRcCJwElEPDw"        
     }
     
     struct UserDefaults{
@@ -78,6 +78,8 @@ struct Constants {
         static let isLoging = "isUserLoging"
         static let MyTestBuds = "MyTestBuds"
         
+        static let currentLatitude = "currentLatitude"
+        static let currentLongitude = "currentLongitude"
         
     }
     struct Font{

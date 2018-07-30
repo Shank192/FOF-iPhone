@@ -6,6 +6,7 @@
 
 import UIKit
 import CoreLocation
+import MBProgressHUD
 
 class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UICollectionViewDataSource {
     @IBOutlet weak var collectionViewIntresetedTestBuds: UICollectionView!

@@ -2,6 +2,9 @@
 
 
 import UIKit
+import MBProgressHUD
+var hud:MBProgressHUD = MBProgressHUD()
+
 struct Utility{
     static func UIColorFromHex(_ rgbValue: UInt) -> UIColor
     {
@@ -15,7 +18,19 @@ struct Utility{
     }
 //    
 //    // MARK:- MBProgress Indicator Methods
-   
+//    func showLoader() {
+//        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+//        hud = MBProgressHUD.showAdded(to: UIApplication.shared.keyWindow!, animated: true)
+//        UIApplication.shared.keyWindow?.addSubview(hud)
+//        hud.mode = .indeterminate
+//    }
+//    
+//    func hideLoader() {
+//        if UIApplication.shared.isNetworkActivityIndicatorVisible {
+//            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+//        }
+//        hud.removeFromSuperview()
+//    }
 }
 //
 //    // MARK:- Bottom Border UITextField

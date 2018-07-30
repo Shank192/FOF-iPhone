@@ -12,11 +12,13 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     var startTime = Timer()
     @IBOutlet weak var imgPrsnGiveReview: UIImageView!
     var arrOfImages = ["res.jpeg","rest.jpg","Restro.jpg","res.jpg"]
+    var arrOfRestaurantData = [String:AnyObject]()
     override func viewDidLoad() {
         super.viewDidLoad()
         imgPrsnGiveReview.cornerRadius = imgPrsnGiveReview.frame.width/2
         imgPrsnGiveReview.clipsToBounds = true
         imgPrsnGiveReview.image = UIImage(named: "Mens.jpg")
+        print(arrOfRestaurantData)
         // Do any additional setup after loading the view.
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -42,6 +44,9 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     }
     
    
+    @IBAction func btnBackAct(_ sender: Any) {
+        self.navigationController?.popViewController(animated: true)
+    }
     @IBAction func btnInviteFrndAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "chatScreenVC") as! chatScreenVC
         self.navigationController?.pushViewController(obj, animated: true)

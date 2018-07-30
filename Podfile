@@ -5,15 +5,13 @@ target 'FOF' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
 pod 'GoogleMaps'
-
 pod 'GooglePlaces'
 pod 'GooglePlacePicker'
-
+pod 'MBProgressHUD', '~> 1.1.0'
 pod "MBCircularProgressBar"
 pod 'Alamofire', '~> 4.5'
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
-pod 'MBProgressHUD', '~> 0.9.2'
 pod 'FacebookLogin'
 
   # Pods for FOF

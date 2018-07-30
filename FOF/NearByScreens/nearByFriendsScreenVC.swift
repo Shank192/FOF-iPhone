@@ -6,6 +6,7 @@
 
 import UIKit
 import GoogleMaps
+import MBProgressHUD
 
 class nearByFriendsScreenVC: UIViewController {
 

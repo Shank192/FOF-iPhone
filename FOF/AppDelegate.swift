@@ -11,11 +11,11 @@ import FirebaseCore
 import GoogleMaps
 import FBSDKLoginKit
 import UserNotifications
-
+import GooglePlaces
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDelegate {
-
+    
     var window: UIWindow?
     var isFbSignIn = false
     var fbLoginManager = FBSDKLoginManager()
@@ -24,7 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var strSearchedPlace = ""
     var locationManager = CLLocationManager()
     
-    
+    var currentLatitude : String = ""
+    var currentLongitude : String = ""
+    var curLocation : CLLocation?
     
     @objc var userLocation = CLLocationCoordinate2D()
     @objc var searchedLocation =  CLLocationCoordinate2D()
@@ -41,36 +43,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         }
         FirebaseApp.configure()
         GMSServices.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
-       
+        GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
+
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         registerRemoteNotification()
         
-       self.SetMyRootBy()
+        self.SetMyRootBy()
         
         
         //GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         // Override point for customization after application launch.
         return true
     }
-
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
     }
-
+    
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     }
-
+    
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     }
-
+    
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
-
+    
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
@@ -160,66 +163,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     func locateLocationManager(view : UIViewController)
     {
-        
         self.locationManager.requestAlwaysAuthorization()
-        
         // For use in foreground
         self.locationManager.requestWhenInUseAuthorization()
-        
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
             locationManager.startUpdatingLocation()
         }
-    
         if locationManager.location != nil
         {
             self.userLocation = locationManager.location!.coordinate
         }
-        
-    
-        GooglemapCall.getLocationFromLat(CGFloat(self.userLocation.latitude), long: CGFloat(self.userLocation.longitude)) { (dictPlaceDetail, errorMessage) in
-            
-            if dictPlaceDetail != nil
-            {
-                if let status = dictPlaceDetail!["status"] as? String
-                {
-                    if status != "OK" || (errorMessage != nil)
-                    {
-                        return
-                    }
-                }
-                
-                
-                 var strCurrentAddress = ""
-                if let dataArray = dictPlaceDetail!["results"] as? NSArray
-                {
-                    if let dataDict = dataArray.object(at: 0) as? NSDictionary
-                    {
-                        if let formatted_address = dataDict.object(forKey:"formatted_address") as? String
-                        {
-                            strCurrentAddress = formatted_address
-                        }
-                    }
-                }
-                
-                self.strCurrentPlace = strCurrentAddress
-                
-            }
-            else
-            {
-                return
-            }
-            
-        }
-    
     }
-    
-    
 }
 
 extension AppDelegate : CLLocationManagerDelegate
 {
     
-}
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if curLocation != nil {
+            
+            let newLoc = manager.location
+            
+            let meters : CLLocationDistance = (newLoc?.distance(from: curLocation!))!
+            
+           // if meters > 25 {
+                currentLatitude = NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String
+                currentLongitude = NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String
+                UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey: Constants.UserDefaults.currentLatitude)
+                UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String, forKey: Constants.UserDefaults.currentLongitude)
+                
+                curLocation = manager.location
+                
+              NotificationCenter.default.post(name: Notification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+                manager.stopUpdatingLocation()
+           // }
+        } else {
+            currentLatitude = NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String
+            currentLongitude = NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String
+            UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey: Constants.UserDefaults.currentLatitude)
+            UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String, forKey: Constants.UserDefaults.currentLongitude)
+            
+            curLocation = manager.location
+           NotificationCenter.default.post(name: Notification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+            manager.stopUpdatingLocation()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        NSLog("location failes : \(error.localizedDescription)")
+    }}
 

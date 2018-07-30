@@ -49,13 +49,8 @@
 		8233A4AA210C4FB50013FB48 /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8233A48A210C4FB40013FB48 /* Montserrat-Italic.ttf */; };
 		8233A4AB210C4FB50013FB48 /* Montserrat-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8233A48B210C4FB40013FB48 /* Montserrat-SemiBoldItalic.ttf */; };
 		8233A4AC210C4FB50013FB48 /* Montserrat-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8233A48C210C4FB40013FB48 /* Montserrat-ExtraBoldItalic.ttf */; };
-		8233A4FC210C79420013FB48 /* GooglemapCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A4FB210C79420013FB48 /* GooglemapCall.m */; };
 		8233A503210C79F40013FB48 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A501210C79F40013FB48 /* Reachability.m */; };
-		8233A50B210C7A540013FB48 /* TimestampUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A506210C7A530013FB48 /* TimestampUtility.m */; };
-		8233A50C210C7A540013FB48 /* DistanceConversion.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A507210C7A530013FB48 /* DistanceConversion.m */; };
-		8233A50D210C7A540013FB48 /* NSDate+NVTimeAgo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A50A210C7A540013FB48 /* NSDate+NVTimeAgo.m */; };
 		8233A512210C966D0013FB48 /* UserDetail.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A50F210C8CE70013FB48 /* UserDetail.m */; };
-		8233A513210C9F4F0013FB48 /* RestDistanceManage.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A4AE210C77F20013FB48 /* RestDistanceManage.m */; };
 		8233A514210C9F5C0013FB48 /* ReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A4FE210C799B0013FB48 /* ReachabilityManager.m */; };
 		8233A560210CA5FD0013FB48 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 8233A517210CA5FC0013FB48 /* LICENSE */; };
 		8233A561210CA5FD0013FB48 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8233A518210CA5FC0013FB48 /* README.md */; };
@@ -83,7 +78,6 @@
 		8233A577210CA5FD0013FB48 /* GMUGeoJSONParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A556210CA5FC0013FB48 /* GMUGeoJSONParser.m */; };
 		8233A578210CA5FD0013FB48 /* GQTPointQuadTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A559210CA5FC0013FB48 /* GQTPointQuadTree.m */; };
 		8233A579210CA5FD0013FB48 /* GQTPointQuadTreeChild.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A55B210CA5FC0013FB48 /* GQTPointQuadTreeChild.m */; };
-		8242C2AE210B7C7900B3F171 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 8242C2AC210B7C7800B3F171 /* MBProgressHUD.m */; };
 		824C4522210B42E700D273A9 /* NearbyNavigationVCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */; };
 		824C4556210B691100D273A9 /* UIImage+WebP.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C4527210B691100D273A9 /* UIImage+WebP.m */; };
 		824C4557210B691100D273A9 /* MKAnnotationView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C4528210B691100D273A9 /* MKAnnotationView+WebCache.m */; };
@@ -197,20 +191,10 @@
 		8233A48A210C4FB40013FB48 /* Montserrat-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-Italic.ttf"; sourceTree = "<group>"; };
 		8233A48B210C4FB40013FB48 /* Montserrat-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		8233A48C210C4FB40013FB48 /* Montserrat-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
-		8233A4AD210C77F20013FB48 /* RestDistanceManage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RestDistanceManage.h; sourceTree = "<group>"; };
-		8233A4AE210C77F20013FB48 /* RestDistanceManage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RestDistanceManage.m; sourceTree = "<group>"; };
-		8233A4FA210C79410013FB48 /* GooglemapCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GooglemapCall.h; sourceTree = "<group>"; };
-		8233A4FB210C79420013FB48 /* GooglemapCall.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GooglemapCall.m; sourceTree = "<group>"; };
 		8233A4FD210C799B0013FB48 /* ReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachabilityManager.h; sourceTree = "<group>"; };
 		8233A4FE210C799B0013FB48 /* ReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachabilityManager.m; sourceTree = "<group>"; };
 		8233A501210C79F40013FB48 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		8233A502210C79F40013FB48 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		8233A505210C7A530013FB48 /* TimestampUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimestampUtility.h; sourceTree = "<group>"; };
-		8233A506210C7A530013FB48 /* TimestampUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimestampUtility.m; sourceTree = "<group>"; };
-		8233A507210C7A530013FB48 /* DistanceConversion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DistanceConversion.m; sourceTree = "<group>"; };
-		8233A508210C7A530013FB48 /* DistanceConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DistanceConversion.h; sourceTree = "<group>"; };
-		8233A509210C7A530013FB48 /* NSDate+NVTimeAgo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+NVTimeAgo.h"; sourceTree = "<group>"; };
-		8233A50A210C7A540013FB48 /* NSDate+NVTimeAgo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+NVTimeAgo.m"; sourceTree = "<group>"; };
 		8233A50F210C8CE70013FB48 /* UserDetail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDetail.m; sourceTree = "<group>"; };
 		8233A510210C8CE70013FB48 /* UserDetail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDetail.h; sourceTree = "<group>"; };
 		8233A515210CA1AE0013FB48 /* CommonCFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonCFile.h; sourceTree = "<group>"; };
@@ -279,8 +263,6 @@
 		8233A55D210CA5FC0013FB48 /* GQTPointQuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTPointQuadTree.h; sourceTree = "<group>"; };
 		8233A55E210CA5FC0013FB48 /* GQTPointQuadTreeChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTPointQuadTreeChild.h; sourceTree = "<group>"; };
 		8233A55F210CA5FC0013FB48 /* GQTBounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTBounds.h; sourceTree = "<group>"; };
-		8242C2AC210B7C7800B3F171 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
-		8242C2AD210B7C7800B3F171 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyNavigationVCViewController.swift; sourceTree = "<group>"; };
 		824C4527210B691100D273A9 /* UIImage+WebP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+WebP.m"; sourceTree = "<group>"; };
 		824C4528210B691100D273A9 /* MKAnnotationView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKAnnotationView+WebCache.m"; sourceTree = "<group>"; };
@@ -413,13 +395,8 @@
 		8204DE2820FF38A3004B321B /* NearByScreens */ = {
 			isa = PBXGroup;
 			children = (
-				8233A504210C7A480013FB48 /* ModelForFriend */,
 				8204DE2220FF3858004B321B /* nearByFriendsScreenVC.swift */,
 				8204DE2420FF3872004B321B /* nearByRestaurantsScreenVC.swift */,
-				8233A4AD210C77F20013FB48 /* RestDistanceManage.h */,
-				8233A4AE210C77F20013FB48 /* RestDistanceManage.m */,
-				8233A4FA210C79410013FB48 /* GooglemapCall.h */,
-				8233A4FB210C79420013FB48 /* GooglemapCall.m */,
 				8233A4FD210C799B0013FB48 /* ReachabilityManager.h */,
 				8233A4FE210C799B0013FB48 /* ReachabilityManager.m */,
 				8204DE3920FF78E2004B321B /* foodSearchScreenVC.swift */,
@@ -536,19 +513,6 @@
 				8233A502210C79F40013FB48 /* Reachability.h */,
 			);
 			path = Reachability;
-			sourceTree = "<group>";
-		};
-		8233A504210C7A480013FB48 /* ModelForFriend */ = {
-			isa = PBXGroup;
-			children = (
-				8233A508210C7A530013FB48 /* DistanceConversion.h */,
-				8233A507210C7A530013FB48 /* DistanceConversion.m */,
-				8233A509210C7A530013FB48 /* NSDate+NVTimeAgo.h */,
-				8233A50A210C7A540013FB48 /* NSDate+NVTimeAgo.m */,
-				8233A505210C7A530013FB48 /* TimestampUtility.h */,
-				8233A506210C7A530013FB48 /* TimestampUtility.m */,
-			);
-			path = ModelForFriend;
 			sourceTree = "<group>";
 		};
 		8233A50E210C8CE70013FB48 /* UserData */ = {
@@ -696,22 +660,12 @@
 			path = QuadTree;
 			sourceTree = "<group>";
 		};
-		8242C2AB210B7C7800B3F171 /* MBProgressHUD */ = {
-			isa = PBXGroup;
-			children = (
-				8242C2AC210B7C7800B3F171 /* MBProgressHUD.m */,
-				8242C2AD210B7C7800B3F171 /* MBProgressHUD.h */,
-			);
-			path = MBProgressHUD;
-			sourceTree = "<group>";
-		};
 		824C4525210B690800D273A9 /* ThirdPartyClass */ = {
 			isa = PBXGroup;
 			children = (
 				8233A516210CA5FC0013FB48 /* Google-Maps-iOS-Utils */,
 				8233A500210C79F40013FB48 /* Reachability */,
 				8233A45A210C45700013FB48 /* StatusAlert */,
-				8242C2AB210B7C7800B3F171 /* MBProgressHUD */,
 				824C4526210B691100D273A9 /* SDWebImage */,
 			);
 			path = ThirdPartyClass;
@@ -1280,15 +1234,12 @@
 				8233A56D210CA5FD0013FB48 /* GMUKMLParser.m in Sources */,
 				8233A461210C45700013FB48 /* UIDevice+Blur.swift in Sources */,
 				824EC4172109C82100FB52AC /* userProfileDetailScreenVC.swift in Sources */,
-				8233A50B210C7A540013FB48 /* TimestampUtility.m in Sources */,
 				824C4569210B691100D273A9 /* UIView+WebCacheOperation.m in Sources */,
 				824C4556210B691100D273A9 /* UIImage+WebP.m in Sources */,
 				8233A579210CA5FD0013FB48 /* GQTPointQuadTreeChild.m in Sources */,
 				824C4522210B42E700D273A9 /* NearbyNavigationVCViewController.swift in Sources */,
 				8233A566210CA5FD0013FB48 /* GMUNonHierarchicalDistanceBasedAlgorithm.m in Sources */,
-				8242C2AE210B7C7900B3F171 /* MBProgressHUD.m in Sources */,
 				829EE59720F8DBFC00F7C52D /* loginScreenVC.swift in Sources */,
-				8233A50D210C7A540013FB48 /* NSDate+NVTimeAgo.m in Sources */,
 				8233A570210CA5FD0013FB48 /* GMUPlacemark.m in Sources */,
 				8233A463210C45700013FB48 /* StatusAlertUtils.swift in Sources */,
 				824EC41A2109CCAB00FB52AC /* conversationScreenVC.swift in Sources */,
@@ -1316,14 +1267,12 @@
 				8233A562210CA5FD0013FB48 /* GMUClusterManager.m in Sources */,
 				824C4558210B691100D273A9 /* SDWebImageManager.m in Sources */,
 				8233A460210C45700013FB48 /* StatusAlert.swift in Sources */,
-				8233A50C210C7A540013FB48 /* DistanceConversion.m in Sources */,
 				824C455F210B691100D273A9 /* UIImage+GIF.m in Sources */,
 				8233A56C210CA5FD0013FB48 /* GMUHeatmapTileLayer.m in Sources */,
 				8233A577210CA5FD0013FB48 /* GMUGeoJSONParser.m in Sources */,
 				8233A575210CA5FD0013FB48 /* GMUPoint.m in Sources */,
 				824C4560210B691100D273A9 /* UIImage+MultiFormat.m in Sources */,
 				824EC41C2109D5F800FB52AC /* WebService.swift in Sources */,
-				8233A513210C9F4F0013FB48 /* RestDistanceManage.m in Sources */,
 				8222F9CD2100CAD6005F8EA4 /* chatTableviewCell.swift in Sources */,
 				8233A574210CA5FD0013FB48 /* GMUStyle.m in Sources */,
 				8233A56E210CA5FD0013FB48 /* GMUGeometryRenderer.m in Sources */,
@@ -1346,7 +1295,6 @@
 				824EC4132109AEF700FB52AC /* SSKeychainQuery.m in Sources */,
 				824C4563210B691100D273A9 /* SDImageCache.m in Sources */,
 				8233A56B210CA5FD0013FB48 /* GMUGradient.m in Sources */,
-				8233A4FC210C79420013FB48 /* GooglemapCall.m in Sources */,
 				8204DE2120FF28D2004B321B /* Constants.swift in Sources */,
 				8233A572210CA5FD0013FB48 /* GMUFeature.m in Sources */,
 				824C456A210B691100D273A9 /* UIView+WebCache.m in Sources */,
