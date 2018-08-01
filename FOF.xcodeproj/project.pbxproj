@@ -107,6 +107,7 @@
 		824EC4172109C82100FB52AC /* userProfileDetailScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4162109C82100FB52AC /* userProfileDetailScreenVC.swift */; };
 		824EC41A2109CCAB00FB52AC /* conversationScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */; };
 		824EC41C2109D5F800FB52AC /* WebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC41B2109D5F800FB52AC /* WebService.swift */; };
+		824F9EB221104EE700145B59 /* allReviewsScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */; };
 		8278A0B920F8BF3600CF04B3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8278A0B820F8BF3600CF04B3 /* AppDelegate.swift */; };
 		8278A0BE20F8BF3600CF04B3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BC20F8BF3600CF04B3 /* Main.storyboard */; };
 		8278A0C020F8BF3700CF04B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BF20F8BF3700CF04B3 /* Assets.xcassets */; };
@@ -319,6 +320,7 @@
 		824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conversationScreenVC.swift; sourceTree = "<group>"; };
 		824EC41B2109D5F800FB52AC /* WebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebService.swift; sourceTree = "<group>"; };
 		824EC41D2109D89A00FB52AC /* FOF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FOF.entitlements; sourceTree = "<group>"; };
+		824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = allReviewsScreenVC.swift; sourceTree = "<group>"; };
 		8278A0B520F8BF3600CF04B3 /* FOF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FOF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8278A0B820F8BF3600CF04B3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8278A0BD20F8BF3600CF04B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -397,8 +399,6 @@
 			children = (
 				8204DE2220FF3858004B321B /* nearByFriendsScreenVC.swift */,
 				8204DE2420FF3872004B321B /* nearByRestaurantsScreenVC.swift */,
-				8233A4FD210C799B0013FB48 /* ReachabilityManager.h */,
-				8233A4FE210C799B0013FB48 /* ReachabilityManager.m */,
 				8204DE3920FF78E2004B321B /* foodSearchScreenVC.swift */,
 				824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */,
 			);
@@ -432,6 +432,7 @@
 			isa = PBXGroup;
 			children = (
 				821D80292100694F00B02E94 /* selectedRestaurantDeatilsScreenVC.swift */,
+				824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */,
 				820ACBBD2100AF4E00F203B9 /* userDetailScreenVC.swift */,
 				824EC4162109C82100FB52AC /* userProfileDetailScreenVC.swift */,
 			);
@@ -663,6 +664,7 @@
 		824C4525210B690800D273A9 /* ThirdPartyClass */ = {
 			isa = PBXGroup;
 			children = (
+				824F9EB32110761900145B59 /* reachablity */,
 				8233A516210CA5FC0013FB48 /* Google-Maps-iOS-Utils */,
 				8233A500210C79F40013FB48 /* Reachability */,
 				8233A45A210C45700013FB48 /* StatusAlert */,
@@ -749,6 +751,15 @@
 				820EECC62101EA4A0011F909 /* filterScreenVC.swift */,
 			);
 			path = FilterScreen;
+			sourceTree = "<group>";
+		};
+		824F9EB32110761900145B59 /* reachablity */ = {
+			isa = PBXGroup;
+			children = (
+				8233A4FD210C799B0013FB48 /* ReachabilityManager.h */,
+				8233A4FE210C799B0013FB48 /* ReachabilityManager.m */,
+			);
+			path = reachablity;
 			sourceTree = "<group>";
 		};
 		8278A0AC20F8BF3600CF04B3 = {
@@ -1260,6 +1271,7 @@
 				8204DE2520FF3872004B321B /* nearByRestaurantsScreenVC.swift in Sources */,
 				824C4561210B691100D273A9 /* SDWebImageCompat.m in Sources */,
 				824C4568210B691100D273A9 /* SDImageCacheConfig.m in Sources */,
+				824F9EB221104EE700145B59 /* allReviewsScreenVC.swift in Sources */,
 				824C4564210B691100D273A9 /* SDWebImageDownloaderOperation.m in Sources */,
 				829EE59520F8DBE200F7C52D /* testBudsScreenVC.swift in Sources */,
 				820EECBF2101BBBC0011F909 /* inviteFriendsChatScreenVC.swift in Sources */,

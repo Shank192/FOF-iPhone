@@ -20,27 +20,23 @@ class POIItem: NSObject, GMUClusterItem {
 }
 
 class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,GMSMapViewDelegate {
-
-@IBOutlet weak var collectionViewNearByRestaurants: UICollectionView!
-
+    
+    @IBOutlet weak var collectionViewNearByRestaurants: UICollectionView!
+    
     
     @IBOutlet weak var aMapView: GMSMapView!
     var latitude = String()
     var longitude = String()
     var arrForRestaurantData = [[String:AnyObject]]()
     var clusterManager: GMUClusterManager!
-
-    
-    
-    
-    
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         let obj = nearByRestaurantsScreenVC()
         Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
         NotificationCenter.default.addObserver(self, selector: #selector(retriveDataForRestaurant), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
     }
-  
+    
     override func viewWillAppear(_ animated: Bool) {
         //print(Constants.UserDefaults.currentLongitude + Constants.UserDefaults.currentLatitude)
     }
@@ -68,16 +64,16 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
         let camera = GMSCameraPosition.camera(withTarget: userLoacation, zoom: 14)
         aMapView.camera = camera
-       let arrBuckets = NSMutableArray()
+        let arrBuckets = NSMutableArray()
         let arrPins = NSMutableArray()
         for i in 0..<arrForRestaurantData.count{
             arrBuckets.add(i+1)
-            arrPins.add(UIImage(named: "redPin") as Any)
+            arrPins.add(UIImage(named: "pinkPin") as Any)
         }
         let iconGenerator = GMUDefaultClusterIconGenerator.init(buckets: arrBuckets as! [NSNumber], backgroundImages: arrPins as! [UIImage])
         // Set up the cluster manager with default icon generator and renderer.
-       
-       
+        
+        
         let algorithm = GMUNonHierarchicalDistanceBasedAlgorithm()
         let renderer = GMUDefaultClusterRenderer(mapView: aMapView, clusterIconGenerator: iconGenerator)
         clusterManager = GMUClusterManager(map: aMapView, algorithm: algorithm, renderer: renderer)
@@ -133,7 +129,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         }
         
         
-       
+        
     }
     @IBAction func btnFilterAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "filterScreenVC") as! filterScreenVC
@@ -141,27 +137,27 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     }
     @objc func retriveDataForRestaurant(){
         
-    if latitude == UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String{
-        
-    }else{
-        MBProgressHUD.showAdded(to: self.view, animated: true)
-        latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
-        longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
-        
-        var myUrl = String()
+        if latitude == UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String{
+            
+        }else{
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+            latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
+            longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+            
+            var myUrl = String()
             myUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(latitude),\(longitude)&radius=20000&type=\("restaurant")&key=\(Constants.GoogleKey.kGoogle_Key)"
-        WebService.CallRequestUrl(myUrl) { (success, response) -> () in
-            print(response)
-            if success == true {
-                let token = response["next_page_token"] as? String
-                let arr = response["results"]! as! NSArray
+            WebService.CallRequestUrl(myUrl) { (success, response) -> () in
+                print(response)
+                if success == true {
+                    let token = response["next_page_token"] as? String
+                    let arr = response["results"]! as! NSArray
                     self.arrForRestaurantData = arr as! [[String : AnyObject]]
-                print(token as Any)
+                    print(token as Any)
                     self.collectionViewNearByRestaurants.reloadData()
                     self.setmap()
                     MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-        }}}
-}
+                }}}
+    }
     // MARK: - CollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return arrForRestaurantData.count
@@ -179,20 +175,19 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         cell.lblRestroName.text = arrForRestaurantData[indexPath.row]["name"] as? String
         cell.lblAwayTiming.text = "5 Min from you"
         if let dict = arrForRestaurantData[indexPath.row]["opening_hours"] as? NSDictionary{
-        if dict["open_now"] as! Bool == true{
-            cell.lblOpenOrClose.text = "Open"
-    }else{
-            cell.lblOpenOrClose.text = "Close"
+            if dict["open_now"] as! Bool == true{
+                cell.lblOpenOrClose.text = "Open"
+            }else{
+                cell.lblOpenOrClose.text = "Close"
             }}else{
             cell.lblOpenOrClose.text = "Open"
         }
         cell.lblDistanceFromRestro.setTitle(arrForRestaurantData[indexPath.row]["vicinity"] as? String, for: .normal)
-       
+        
         if let photos = arrForRestaurantData[indexPath.row]["photos"] as? [[String:Any]]{
             let strRefre = photos.first
             let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
-            print(url)
-            cell.imgViewRestaurants.sd_setImage(with: url)
+            cell.imgViewRestaurants.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
             
         }
         return cell
@@ -206,11 +201,11 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         self.navigationController?.pushViewController(obj, animated: false)
     }
     func reloadTableWithRestDetailArray(restDetailArray  : NSArray){
-
+        
     }
     
     
-   
+    
     
 }
 extension nearByRestaurantsScreenVC : GMUClusterManagerDelegate,GMUClusterRendererDelegate{
@@ -236,18 +231,14 @@ extension nearByRestaurantsScreenVC : GMUClusterManagerDelegate,GMUClusterRender
         return false
     }
     
-    func renderer(_ renderer: GMUClusterRenderer, willRenderMarker marker: GMSMarker) {
-        marker.iconView = UIImageView(image: UIImage(named: "redPin"))
 
-    }
-    /// Randomly generates cluster items within some extent of the camera and adds them to the
     /// cluster manager.
     private func generateClusterItems() {
         for index in 0..<arrForRestaurantData.count {
             print(index)
             print(arrForRestaurantData[index])
-           if let dict = arrForRestaurantData[index]["geometry"] as? NSDictionary{
-                 if let loc = dict["location"] as? NSDictionary{
+            if let dict = arrForRestaurantData[index]["geometry"] as? NSDictionary{
+                if let loc = dict["location"] as? NSDictionary{
                     let lat = loc["lat"] as! Double
                     let lng = loc["lng"] as! Double
                     let name = "Item \(index)"
@@ -255,15 +246,9 @@ extension nearByRestaurantsScreenVC : GMUClusterManagerDelegate,GMUClusterRender
                     clusterManager.add(item)
                 }
             }
-          
+            
         }
     }
-    
-    /// Returns a random value between -1.0 and 1.0.
-    private func randomScale() -> Double {
-        return Double(arc4random()) / Double(UINT32_MAX) * 2.0 - 1.0
-    }
-
 }
 
 

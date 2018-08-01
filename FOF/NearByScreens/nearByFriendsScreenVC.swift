@@ -8,12 +8,16 @@ import UIKit
 import GoogleMaps
 import MBProgressHUD
 
-class nearByFriendsScreenVC: UIViewController {
+class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
 
     @IBOutlet weak var collectionViewNearByFrnds: UICollectionView!
     @IBOutlet weak var aMapView: GMSMapView!
     
     var ArrayFriendData = NSMutableArray()
+    var clusterManager: GMUClusterManager!
+    
+    var latitude = String()
+    var longitude = String()
     
     private func showStatusAlert(
         withImage image: UIImage?,
@@ -45,8 +49,9 @@ class nearByFriendsScreenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
-        // Do any additional setup after loading the view.
-        
+        let obj = nearByFriendsScreenVC()
+        Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
+        NotificationCenter.default.addObserver(self, selector: #selector(retriveLocation), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
         
     }
 
@@ -77,7 +82,37 @@ class nearByFriendsScreenVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
          self.GetSuggestedFriend()
     }
-    
+    @objc func retriveLocation(){
+        latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
+        longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+    }
+    func setmap(){
+        let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
+        let camera = GMSCameraPosition.camera(withTarget: userLoacation, zoom: 14)
+        aMapView.camera = camera
+        let arrBuckets = NSMutableArray()
+        let arrPins = NSMutableArray()
+        for i in 0..<ArrayFriendData.count{
+            arrBuckets.add(i+1)
+            arrPins.add(UIImage(named: "pinkPin") as Any)
+        }
+        let iconGenerator = GMUDefaultClusterIconGenerator.init(buckets: arrBuckets as! [NSNumber], backgroundImages: arrPins as! [UIImage])
+        // Set up the cluster manager with default icon generator and renderer.
+        
+        
+        let algorithm = GMUNonHierarchicalDistanceBasedAlgorithm()
+        let renderer = GMUDefaultClusterRenderer(mapView: aMapView, clusterIconGenerator: iconGenerator)
+        clusterManager = GMUClusterManager(map: aMapView, algorithm: algorithm, renderer: renderer)
+        
+        // Generate and add random items to the cluster manager.
+        generateClusterItems()
+        
+        // Call cluster() after items have been added to perform the clustering and rendering on map.
+        clusterManager.cluster()
+        
+        // Register self to listen to both GMUClusterManagerDelegate and GMSMapViewDelegate events.
+        clusterManager.setDelegate(self, mapDelegate: self)
+    }
      // MARK: - Button Actions
     @IBAction func btnFoodAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "foodSearchScreenVC") as! foodSearchScreenVC
@@ -335,7 +370,7 @@ class nearByFriendsScreenVC: UIViewController {
             self.collectionViewHeight.constant = 180
             self.collectionViewNearByFrnds.isHidden = false
         }
-        
+        setmap()
         self.collectionViewNearByFrnds.reloadData()
         MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
         
@@ -488,10 +523,54 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
         }
         
     }
+}
+extension nearByFriendsScreenVC : GMUClusterManagerDelegate,GMUClusterRendererDelegate{
+    
+    // MARK: - GMUClusterManagerDelegate
+    
+    func clusterManager(_ clusterManager: GMUClusterManager, didTap cluster: GMUCluster) -> Bool {
+        let newCamera = GMSCameraPosition.camera(withTarget: cluster.position,
+                                                 zoom: aMapView.camera.zoom + 1)
+        let update = GMSCameraUpdate.setCamera(newCamera)
+        aMapView.moveCamera(update)
+        return false
+    }
+    
+    // MARK: - GMUMapViewDelegate
+    
+    func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+        if let poiItem = marker.userData as? POIItem {
+            NSLog("Did tap marker for cluster item \(poiItem.name)")
+        } else {
+            NSLog("Did tap a normal marker")
+        }
+        return false
+    }
+    
+    
+    /// cluster manager.
+    private func generateClusterItems() {
+        for index in 0..<ArrayFriendData.count {
+            print(index)
+            print(ArrayFriendData[index])
+            if let dict = ArrayFriendData.object(at: index) as? NSDictionary{
+                if let loc = dict["location"] as? String{
+                  let parts = loc.components(separatedBy: ",")
+                    let lat = Double(parts[0])
+                    let lng = Double(parts[1])
+                    let name = "Item \(index)"
+                    let item = POIItem(position: CLLocationCoordinate2DMake(lat!, lng!), name: name)
+                    clusterManager.add(item)
+                }
+            }
+            
+        }
+    }
+    
+    /// Returns a random value between -1.0 and 1.0.
+    private func randomScale() -> Double {
+        return Double(arc4random()) / Double(UINT32_MAX) * 2.0 - 1.0
+    }
     
 }
 
-extension nearByFriendsScreenVC : GMSMapViewDelegate
-{
-    
-}

@@ -209,7 +209,6 @@ extension loginScreenVC : CLLocationManagerDelegate
         guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
         self.userCurrentLocation = locValue
         manager.stopUpdatingLocation()
-        
     }
     
 }

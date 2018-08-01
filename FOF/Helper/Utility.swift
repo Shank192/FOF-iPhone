@@ -260,15 +260,12 @@ extension UIView {
             return layer.shadowRadius
         }
         set {
-            //layer.cornerRadius = cornerRadius1
             let shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: 5)
-            
             layer.shadowColor = UIColor.gray.cgColor
             layer.shadowOffset = CGSize(width: 0, height: 3)
             layer.shadowOpacity = 0.1
-           // layer.shadowRadius = shadowRadius/2
-          // layer.shadowPath = shadowPath.cgPath
         }
     }
 }
+
 

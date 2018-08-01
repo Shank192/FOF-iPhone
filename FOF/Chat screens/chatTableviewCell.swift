@@ -25,6 +25,21 @@ class chatTableviewCell: UITableViewCell {
     @IBOutlet weak var lblContactNameGroup: UILabel!
     @IBOutlet weak var btnCrossOut: UIButton!
     
+    
+    //Review screen
+    
+    @IBOutlet weak var lblReviewrName: UILabel!
+    @IBOutlet weak var lblReviews: UILabel!
+    @IBOutlet weak var imgViewReviewer: UIImageView!
+    @IBOutlet weak var btnStar1Out: UIButton!
+    
+    @IBOutlet weak var btnStar2Out: UIButton!
+    
+    @IBOutlet weak var btnStar3Out: UIButton!
+    
+    @IBOutlet weak var btnStar4Out: UIButton!
+    
+    @IBOutlet weak var btnStar5Out: UIButton!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

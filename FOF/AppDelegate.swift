@@ -1,9 +1,6 @@
 //
 //  AppDelegate.swift
 //  FOF
-//
-
-//
 
 import UIKit
 import Firebase

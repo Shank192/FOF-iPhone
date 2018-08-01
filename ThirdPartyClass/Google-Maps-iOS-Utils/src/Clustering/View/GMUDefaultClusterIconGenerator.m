@@ -152,8 +152,8 @@ static NSArray<UIColor *> *kGMUBucketBackgroundColors;
     NSForegroundColorAttributeName : [UIColor whiteColor]
   };
   CGSize textSize = [text sizeWithAttributes:attributes];
-  CGRect textRect = CGRectInset(rect, (rect.size.width - textSize.width) / 2,
-                                (rect.size.height - textSize.height) / 2);
+  CGRect textRect = CGRectInset(rect, (rect.size.width - textSize.width) / 3,
+                                (rect.size.height - textSize.height) / 3);
   [text drawInRect:CGRectIntegral(textRect) withAttributes:attributes];
 
   UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
