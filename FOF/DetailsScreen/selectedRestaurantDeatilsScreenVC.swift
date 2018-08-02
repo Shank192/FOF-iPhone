@@ -17,7 +17,7 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     var arrOfRestaurantData = [String:AnyObject]()
     var arrResponseForDetail = [[String:AnyObject]]()
     var arrResponseForReviews = [[String:AnyObject]]()
-   
+   var strTime = String()
     @IBOutlet weak var lblRestaurantName: UILabel!
     @IBOutlet weak var lblReviewerName: UILabel!
     @IBOutlet weak var lblRestaurantNumber: UIButton!
@@ -33,6 +33,10 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
         
         print(arrOfRestaurantData)
         lblRestaurantName.text = arrOfRestaurantData["name"] as? String
+        if let str = strTime as? String{
+            btnTimeOut.setTitle(" \(str)", for: .normal)}else{
+           btnTimeOut.setTitle("18 mins", for: .normal)
+        }
         getplaceDetails(placeId: arrOfRestaurantData["place_id"] as! String)
     }
     override func viewWillAppear(_ animated: Bool) {

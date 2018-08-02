@@ -165,7 +165,7 @@ class WebService: NSObject {
         
         Alamofire.request(serverlink, method: .get, parameters: nil, encoding: URLEncoding.httpBody, headers: nil).responseJSON { (response) in
             
-            print("Google Link Response: \(response)")
+            //print("Google Link Response: \(response)")
             if let TempresponseDict:NSDictionary = response.result.value as? NSDictionary
             {
                 print("Google Link Response Success: \(response)")

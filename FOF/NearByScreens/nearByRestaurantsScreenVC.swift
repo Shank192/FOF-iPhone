@@ -29,7 +29,8 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     var longitude = String()
     var arrForRestaurantData = [[String:AnyObject]]()
     var clusterManager: GMUClusterManager!
-  
+    var arrPlaces = NSMutableArray()
+    var arrDuration = NSMutableArray()
     override func viewDidLoad() {
         super.viewDidLoad()
         let obj = nearByRestaurantsScreenVC()
@@ -153,10 +154,63 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
                     let arr = response["results"]! as! NSArray
                     self.arrForRestaurantData = arr as! [[String : AnyObject]]
                     print(token as Any)
-                    self.collectionViewNearByRestaurants.reloadData()
+                    self.retriveDataForRestaurantByCarAndWalking()
                     self.setmap()
-                    MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                   // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
                 }}}
+    }
+    func retriveDataForRestaurantByCarAndWalking(){
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        arrDuration.removeAllObjects()
+        arrPlaces.removeAllObjects()
+        for i in arrForRestaurantData{
+            arrPlaces.add(i)
+        }
+        for (index,_) in self.arrPlaces.enumerated() {
+            
+            if let dict : NSDictionary = self.arrPlaces.object(at: index) as? NSDictionary {
+                
+                let newData = NSMutableDictionary(dictionary: dict)
+                newData.setObject("\(index+1)", forKey: "IndexNumber" as NSCopying)
+                self.arrPlaces.replaceObject(at: index, with: newData)
+                
+                self.arrDuration.add(NSDictionary())
+                
+                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lat")! as AnyObject).doubleValue)!)
+                
+                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lng")! as AnyObject).doubleValue)!)
+                
+                var firstStartLat = ""
+                var firstStartLong = ""
+                var secondStartLat = ""
+                var secondStartLong = ""
+                var myURL = ""
+                firstStartLat = latitude
+                firstStartLong = longitude
+                secondStartLat = latOfPlace
+                secondStartLong = longOfPlace
+                
+                myURL = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=\(firstStartLat),\(firstStartLong)&destinations=\(secondStartLat),\(secondStartLong)&mode=driving&language=EN&key=\(Constants.GoogleKey.kGoogle_Key)"
+                WebService.CallRequestUrl(myURL) { (success, response) in
+                    if success == true {
+                        if let tempData : NSDictionary = self.arrDuration.object(at: index) as? NSDictionary {
+                            if let rows : NSArray = response.object(forKey: "rows") as? NSArray {
+                                if rows.count > 0 {
+                                    if let elements : NSArray = (rows.object(at: 0) as AnyObject).object(forKey: "elements") as? NSArray {
+                                        if elements.count > 0 {
+                                            
+                                            if let durationDict : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "duration") as? NSDictionary {
+                                                if let differ : String = durationDict.object(forKey: "text") as? String {
+                                                    let dict = ["Difference":differ]
+                                                    let myData = NSMutableDictionary(dictionary: tempData)
+                                                    myData.setObject(dict, forKey: "CarFirst" as NSCopying)
+                                                    self.arrDuration.replaceObject(at: index, with: myData)
+                                                    self.perform(#selector(self.tempFuncForDelay), with: nil, afterDelay: 2)
+
+                                                }}}}}}}}}}}}
+    @objc func tempFuncForDelay(){
+        MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+        self.collectionViewNearByRestaurants.reloadData()
     }
     // MARK: - CollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -170,10 +224,10 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         cell.viewBack.layer.shadowOffset = CGSize.zero
         cell.viewBack.layer.shadowRadius = 3.0
         cell.viewBack.layer.shadowColor = UIColor.lightGray.cgColor
-        
-        
         cell.lblRestroName.text = arrForRestaurantData[indexPath.row]["name"] as? String
-        cell.lblAwayTiming.text = "5 Min from you"
+        if let dict = (arrDuration.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
+            if let str = dict["Difference"] as? String{
+        cell.lblAwayTiming.text = "\(str) from you"}}
         if let dict = arrForRestaurantData[indexPath.row]["opening_hours"] as? NSDictionary{
             if dict["open_now"] as! Bool == true{
                 cell.lblOpenOrClose.text = "Open"
@@ -197,6 +251,9 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
+        if let dict = (arrDuration.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
+            if let str = dict["Difference"] as? String{
+                obj.strTime = str }}
         obj.arrOfRestaurantData = arrForRestaurantData[indexPath.row]
         self.navigationController?.pushViewController(obj, animated: false)
     }

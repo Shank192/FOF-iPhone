@@ -61,10 +61,11 @@ class loginScreenVC: UIViewController {
                 }
             })
         }
+    
     //MARK: - Facebook Request Action
     func fetchFacebookUserDetail() {
         if FBSDKAccessToken.current() != nil {
-    let request = FBSDKGraphRequest(graphPath: "me", parameters: ["fields" : "id,first_name,last_name,picture.width(400).height(400),email,age_range"])
+    let request = FBSDKGraphRequest(graphPath: "me", parameters: ["fields" : "id,first_name,last_name,picture,email,age_range"])
             //,user_gender,user_link, locale,user_birthday
             _ = request?.start(completionHandler: { (_ , result , error ) -> Void in
                 if error == nil {
@@ -78,13 +79,14 @@ class loginScreenVC: UIViewController {
                         var lastName = ""
                         var birthDay = ""
                         var gender = ""
-                        
+                        var id = ""
                         
                         if response.object(forKey: "email") != nil {
                             email = response.object(forKey: "email") as! String
                         }else{
                             email = response.object(forKey: "id") as! String
                         }
+                        id = response.object(forKey: "id") as! String
                         if response.object(forKey: "first_name") != nil {
                             firstName = response.object(forKey: "first_name") as! String
                         }
@@ -98,8 +100,7 @@ class loginScreenVC: UIViewController {
                         if response.object(forKey: "gender") != nil {
                             gender = response.object(forKey: "gender") as! String
                         }
-                       
-                        
+                        var facebookProfileUrl = "http://graph.facebook.com/\(id)/picture?type=large"
                         if let picture : NSDictionary = response.object(forKey: "picture") as? NSDictionary {
                             
                             if let picData : NSDictionary = picture.object(forKey: "data") as? NSDictionary {
@@ -123,8 +124,9 @@ class loginScreenVC: UIViewController {
                                 }
                             }
                         }
-                    
-                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"device_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) as! String,"devicetype":"ios","action":"socialsignin","device_token":UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) as! String,"mobile":"986562323"]
+                    //UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) as! String
+                        //,"device_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) as! String
+                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token":"3651200A7B02BAF23729A1D209BEBE6121BD49E1ACE89ACB6F0BAF1F01423B18","mobile":"986562323"]
                        print(param)
                        self.SocioLoginApi(param as NSDictionary)
                     }

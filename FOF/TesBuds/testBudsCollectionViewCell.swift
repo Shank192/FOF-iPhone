@@ -18,6 +18,9 @@ class testBudsCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var lblFriendName: UILabel!
     @IBOutlet weak var lblDistance: UIButton!
     @IBOutlet weak var imgViewMutualFriend: UIImageView!
+    
+    @IBOutlet weak var imgViewMutualFriend2: UIImageView!
+    
     @IBOutlet weak var viewMatchProfileRate: MBCircularProgressBarView!
     @IBOutlet weak var lblMutualFriend: UILabel!
     @IBOutlet weak var btnMEssage: UIButton!

@@ -80,16 +80,20 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-         self.GetSuggestedFriend()
+        self.GetSuggestedFriend()
+
     }
     @objc func retriveLocation(){
         latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
         longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+        
+        
     }
     func setmap(){
         let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
         let camera = GMSCameraPosition.camera(withTarget: userLoacation, zoom: 14)
         aMapView.camera = camera
+        if ArrayFriendData.count > 0 {
         let arrBuckets = NSMutableArray()
         let arrPins = NSMutableArray()
         for i in 0..<ArrayFriendData.count{
@@ -98,20 +102,12 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
         }
         let iconGenerator = GMUDefaultClusterIconGenerator.init(buckets: arrBuckets as! [NSNumber], backgroundImages: arrPins as! [UIImage])
         // Set up the cluster manager with default icon generator and renderer.
-        
-        
         let algorithm = GMUNonHierarchicalDistanceBasedAlgorithm()
         let renderer = GMUDefaultClusterRenderer(mapView: aMapView, clusterIconGenerator: iconGenerator)
         clusterManager = GMUClusterManager(map: aMapView, algorithm: algorithm, renderer: renderer)
-        
-        // Generate and add random items to the cluster manager.
-        generateClusterItems()
-        
-        // Call cluster() after items have been added to perform the clustering and rendering on map.
-        clusterManager.cluster()
-        
-        // Register self to listen to both GMUClusterManagerDelegate and GMSMapViewDelegate events.
-        clusterManager.setDelegate(self, mapDelegate: self)
+            generateClusterItems()
+            clusterManager.cluster()
+            clusterManager.setDelegate(self, mapDelegate: self)}
     }
      // MARK: - Button Actions
     @IBAction func btnFoodAct(_ sender: Any) {
@@ -163,36 +159,9 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
             {
                 if "\(friendstatus)" == "Friends"
                 {
-                
-                    
                 }
                 else
                 {
-//                    let dictParameters = ["action":"sendfriendrequest","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID),"friendid":"\(frndID)"]
-//
-//                    MBProgressHUD.showAdded(to: self.view, animated: true)
-//
-//                    WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictParameters as NSDictionary) { (success, response) in
-//                        MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-//                        if success == true
-//                        {
-//                            self.showStatusAlert(withImage: UIImage.init(named: "add_friend_btn"), title: "Friend Request", message: "Friend Request sent successfully")
-//                        }
-//                        else
-//                        {
-//                            MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-//                            if let settings = response.object(forKey: "settings") as? NSDictionary
-//                            {
-//                                if let errormessage = settings.object(forKey: "errormessage") as? String
-//                                {
-//                                    self.showStatusAlert(withImage: UIImage.init(named: "add_friend_btn"), title: "Friend Request", message: errormessage)
-//                                }
-//                            }
-//
-//
-//                        }
-//
-//                    }
                 }
             }
         }
@@ -408,14 +377,14 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                         if let matchBuds = dict.object(forKey: "matchBuds")
                         {
                             cell.viewMatchProfileRate.value = CGFloat.init(Double("\(matchBuds)")!)
-                            cell.viewMatchProfileRate.progressStrokeColor = Utility.UIColorFromHex(0xD42926)
-                            cell.viewMatchProfileRate.fontColor = Utility.UIColorFromHex(0xD42926)
+                            cell.viewMatchProfileRate.progressStrokeColor = Constants.color.friendMatchProgressColor
+                            cell.viewMatchProfileRate.fontColor = Constants.color.friendMatchProgressColor
                         }
                         else
                         {
                             cell.viewMatchProfileRate.value = 0
-                            cell.viewMatchProfileRate.progressStrokeColor = Utility.UIColorFromHex(0xD42926)
-                            cell.viewMatchProfileRate.fontColor = Utility.UIColorFromHex(0xD42926)
+                            cell.viewMatchProfileRate.progressStrokeColor = Constants.color.friendMatchProgressColor
+                            cell.viewMatchProfileRate.fontColor = Constants.color.friendMatchProgressColor
                         }
                         //matchBuds
                         
@@ -427,14 +396,14 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                         if let matchBuds = dict.object(forKey: "matchBuds")
                         {
                             cell.viewMatchProfileRate.value = CGFloat.init(Double("\(matchBuds)")!)
-                            cell.viewMatchProfileRate.progressStrokeColor = Utility.UIColorFromHex(0x8b1ea7)
-                            cell.viewMatchProfileRate.fontColor = Utility.UIColorFromHex(0x8b1ea7)
+                            cell.viewMatchProfileRate.progressStrokeColor = Constants.color.matchProgressColor
+                            cell.viewMatchProfileRate.fontColor = Constants.color.matchProgressColor
                         }
                         else
                         {
                             cell.viewMatchProfileRate.value = 0
-                            cell.viewMatchProfileRate.progressStrokeColor = Utility.UIColorFromHex(0x8b1ea7)
-                            cell.viewMatchProfileRate.fontColor = Utility.UIColorFromHex(0x8b1ea7)
+                            cell.viewMatchProfileRate.progressStrokeColor = Constants.color.matchProgressColor
+                            cell.viewMatchProfileRate.fontColor = Constants.color.matchProgressColor
                         }
                     }
                 }
@@ -445,23 +414,23 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                     if let matchBuds = dict.object(forKey: "matchBuds")
                     {
                         cell.viewMatchProfileRate.value = CGFloat.init(Double("\(matchBuds)")!)
-                        cell.viewMatchProfileRate.progressStrokeColor = Utility.UIColorFromHex(0x8b1ea7)
-                        cell.viewMatchProfileRate.fontColor = Utility.UIColorFromHex(0x8b1ea7)
+                        cell.viewMatchProfileRate.progressStrokeColor = Constants.color.matchProgressColor
+                        cell.viewMatchProfileRate.fontColor = Constants.color.matchProgressColor
                     }
                     else
                     {
                         cell.viewMatchProfileRate.value = 0
-                        cell.viewMatchProfileRate.progressStrokeColor = Utility.UIColorFromHex(0x8b1ea7)
-                        cell.viewMatchProfileRate.fontColor = Utility.UIColorFromHex(0x8b1ea7)
+                        cell.viewMatchProfileRate.progressStrokeColor = Constants.color.matchProgressColor
+                        cell.viewMatchProfileRate.fontColor = Constants.color.matchProgressColor
                     }
                 }
 
                 
                 cell.btnMEssage.tag = indexPath.row
                 cell.btnMEssage.addTarget(self, action: #selector(btnActionMessage(sender:)), for: .touchUpInside)
-                
+                let dist = String(describing: distance)
                 cell.lblFriendName.text = "\(first_name) \(last_name)"
-                cell.lblDistance.setTitle("\(distance) km", for: .normal)
+                cell.lblDistance.setTitle("\(dist.prefix(4)) km", for: .normal)
                 cell.imgViewFriendProfile.cornerRadius = cell.imgViewFriendProfile.frame.width/2
                 cell.imgViewFriendProfile.clipsToBounds = true
                 cell.imgViewFriendProfile.image = UIImage.init(named: "disableSingle")
@@ -486,6 +455,7 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                             {
                                 if "\(profilepic11)" != ""
                                 {
+                                     cell.lblMutualFriend.text = "Mutual friend"
                                     cell.imgViewMutualFriend.sd_setImage(with: URL.init(string: "\(profilepic11)")!)
                                 }
                             }
