@@ -7,6 +7,7 @@
 import UIKit
 import GoogleMaps
 import MBProgressHUD
+import CoreLocation
 
 class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
 
@@ -18,7 +19,11 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     
     var latitude = String()
     var longitude = String()
-    
+    var location: CLLocation?
+    var locationManager = CLLocationManager()
+
+    let geocoder = CLGeocoder()
+    var placemark: CLPlacemark?
     private func showStatusAlert(
         withImage image: UIImage?,
         title: String?,
@@ -46,6 +51,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
     
+    // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
@@ -80,14 +86,57 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.GetSuggestedFriend()
-
     }
     @objc func retriveLocation(){
         latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
         longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+
+            location = CLLocation(latitude: Double(latitude)!, longitude: Double(longitude)!)
+            geocoder.reverseGeocodeLocation(location!, completionHandler: { (placemarks, error) in
+                if error == nil, let placemark = placemarks, !placemark.isEmpty {
+                    self.placemark = placemark.last
+                }
+                
+                self.parsePlacemarks()
+            })
+    }
+    func parsePlacemarks() {
+        if let _ = location {
+            if let placemark = placemark {
+                var city1 = ""
+                var country1 = ""
+                    if let city = placemark.locality, !city.isEmpty {
+                       city1 = city
+                    }
+                    if let country = placemark.country, !country.isEmpty {
+                        country1 = country
+                    }
+                let strAddress = placemark.addressDictionary as! [String:AnyObject]
+                let strFormatted = strAddress["FormattedAddressLines"]! as! NSArray
+                setProfile(str: "\(strFormatted[0]),\(strFormatted[1]),\(city1),\(country1)")
+
+                locationManager.stopUpdatingLocation()
+            }
+        } else {}
+    }
+    func setProfile(str: String){
+        let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID),"location":"\(latitude),\(longitude)","location_string":str,"fields":"location,location_string"]
         
-        
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
+            MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+            if success == true
+            {
+                let arr = response["data"] as! NSArray
+                let dictArray = arr[0] as! NSDictionary
+                UserDefaults.standard.set(dictArray.object(forKey: "search_distance")!, forKey: "strDistance")
+                UserDefaults.standard.set(dictArray.object(forKey: "search_min_age")!, forKey: "strLowerValue")
+                UserDefaults.standard.set(dictArray.object(forKey: "search_max_age")!, forKey: "strUpperValue")
+                UserDefaults.standard.set(dictArray.object(forKey: "showme")!, forKey: "strGender")
+                self.GetSuggestedFriend()
+                self.wsSetFriendsList()
+
+            }}
     }
     func setmap(){
         let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
@@ -117,7 +166,8 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     }
     
     @IBAction func btnTestBudsAct(_ sender: Any) {
-        
+        let obj = self.storyboard?.instantiateViewController(withIdentifier: "testBudsScreenVC") as! testBudsScreenVC
+        self.navigationController?.present(obj, animated: true, completion: nil)
     }
     
     @IBAction func btnFilterAct(_ sender: Any) {
@@ -373,6 +423,8 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                 {
                     if "\(friendstatus)" == "Friends"
                     {
+                        cell.imgViewMutualFriend.isHidden = false
+                        cell.imgViewMutualFriend2.isHidden = false
                         cell.btnMEssage.setImage(UIImage.init(named: "chatIcon"), for: .normal)
                         if let matchBuds = dict.object(forKey: "matchBuds")
                         {
@@ -392,7 +444,8 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                     else
                     {
                         cell.btnMEssage.setImage(UIImage.init(named: "add_friend_btn"), for: .normal)
-                        
+                        cell.imgViewMutualFriend.isHidden = true
+                        cell.imgViewMutualFriend2.isHidden = true
                         if let matchBuds = dict.object(forKey: "matchBuds")
                         {
                             cell.viewMatchProfileRate.value = CGFloat.init(Double("\(matchBuds)")!)

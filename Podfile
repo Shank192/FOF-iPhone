@@ -13,6 +13,14 @@ pod 'Alamofire', '~> 4.5'
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'FacebookLogin'
+pod 'GrowingTextView'
+
+
+#Firebase
+pod 'Firebase/Database'
+pod 'Firebase/Storage'
+pod 'Firebase/RemoteConfig'
+pod 'Firebase/Messaging'
 
   # Pods for FOF
 

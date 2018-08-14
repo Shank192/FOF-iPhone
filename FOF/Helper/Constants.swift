@@ -81,6 +81,14 @@ struct Constants {
         static let isLoging = "isUserLoging"
         static let MyTestBuds = "MyTestBuds"
         
+        
+        
+        static let senderId = "senderId"
+        static let receiverId = "receiverId"
+        static let matchId = "matchId"
+        
+        
+        
         static let currentLatitude = "currentLatitude"
         static let currentLongitude = "currentLongitude"
         

@@ -9,6 +9,7 @@
 #import "SDWebImageManager.h"
 #import "SDWebImageManager.h"
 #import "UIImageView+WebCache.h"
+#import "NMRangeSlider.h"
 
 #import "ReachabilityManager.h"
 #import "Reachability.h"

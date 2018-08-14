@@ -24,8 +24,16 @@ class chatTableviewCell: UITableViewCell {
     @IBOutlet weak var imgProfilePic: UIImageView!
     @IBOutlet weak var lblContactNameGroup: UILabel!
     @IBOutlet weak var btnCrossOut: UIButton!
+   
+    //Conversation screen
     
+    @IBOutlet weak var lblMessages: UILabel!
     
+    @IBOutlet weak var imgSenderDp: UIImageView!
+    //receiver
+    
+    @IBOutlet weak var imgReceiverDp: UIImageView!
+    @IBOutlet weak var lblReceiverMessage: UILabel!
     //Review screen
     
     @IBOutlet weak var lblReviewrName: UILabel!

@@ -100,30 +100,7 @@ class loginScreenVC: UIViewController {
                         if response.object(forKey: "gender") != nil {
                             gender = response.object(forKey: "gender") as! String
                         }
-                        var facebookProfileUrl = "http://graph.facebook.com/\(id)/picture?type=large"
-                        if let picture : NSDictionary = response.object(forKey: "picture") as? NSDictionary {
-                            
-                            if let picData : NSDictionary = picture.object(forKey: "data") as? NSDictionary {
-                                if let picurl : String = picData.object(forKey: "url") as? String {
-                                    print(picurl)
-                                    
-//                                    if picurl.characters.count > 0 {
-//                                        
-//                                        UserDefaults.standard.set(picurl, forKey: "USERIMAGE")
-//                                        UserDefaults.standard.synchronize()
-//                                        
-//                                        SDWebImageManager.shared().downloadImage(with: URL(string: picurl), options: SDWebImageOptions.allowInvalidSSLCertificates, progress: nil, completed: { (image, error, SDImageCacheType, finished, url) in
-//                                            
-//                                            if (image != nil) {
-//                                            }
-//                                        })
-//                                        
-//                                        
-//                                        
-//                                    }
-                                }
-                            }
-                        }
+                        _ = "http://graph.facebook.com/\(id)/picture?type=large"
                     //UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) as! String
                         //,"device_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) as! String
                         let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token":"3651200A7B02BAF23729A1D209BEBE6121BD49E1ACE89ACB6F0BAF1F01423B18","mobile":"986562323"]

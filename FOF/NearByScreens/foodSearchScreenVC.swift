@@ -25,6 +25,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     override func viewDidLoad() {
         super.viewDidLoad()
         setCurrentDeatils()
+        self.hideKeyboardWhenTappedAround()
         txtFeildAddressSearch.delegate = self
         txtFieldFoodSearch.delegate = self
         txtFeildAddressSearch.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: UIControlEvents.editingChanged)

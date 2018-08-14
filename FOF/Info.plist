@@ -23,15 +23,15 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb2002191940092091</string>
+				<string>fb1675746376078653</string>
 				<string>com.googleusercontent.apps.682718107954-ofvnrnhh5s018dir4t73oi8gkfdh12ge</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5.3</string>
+	<string>5.4</string>
 	<key>FacebookAppID</key>
-	<string>2002191940092091</string>
+	<string>1675746376078653</string>
 	<key>FacebookDisplayName</key>
 	<string>FOF</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
