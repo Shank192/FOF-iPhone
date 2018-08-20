@@ -28,8 +28,18 @@ class chatTableviewCell: UITableViewCell {
     //Conversation screen
     
     @IBOutlet weak var lblMessages: UILabel!
-    
     @IBOutlet weak var imgSenderDp: UIImageView!
+    
+   
+    @IBOutlet weak var imgRestro: UIImageView!
+    @IBOutlet weak var lblRestroName: UILabel!
+    @IBOutlet weak var lblRestroAddress: UILabel!
+    
+    @IBOutlet weak var btnSta1Out: UIButton!
+    @IBOutlet weak var btnSta5Out: UIButton!
+    @IBOutlet weak var btnSta4Out: UIButton!
+    @IBOutlet weak var btnSta3Out: UIButton!
+    @IBOutlet weak var btnSta2Out: UIButton!
     //receiver
     
     @IBOutlet weak var imgReceiverDp: UIImageView!

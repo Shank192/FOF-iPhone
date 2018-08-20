@@ -34,13 +34,21 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+    }
+    override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.isNavigationBarHidden = true
         startTimer()
         collectionViewCuisine.layoutIfNeeded()
         nslcHightOfCollView.constant = self.collectionViewCuisine.contentSize.height + 10
         
-        arrTestBudsData = (self.app.userDetail.testbuds as NSString).components(separatedBy: ",")
-        
+        if let testbuds = UserDefaults.standard.object(forKey: Constants.UserDefaults.MyTestBuds) as? String
+        {
+            arrTestBudsData = (testbuds as NSString).components(separatedBy: ",")
+            self.collectionViewCuisine.reloadData()
+            
+        }
         
         if self.app.userDetail.profilepic1 != ""
         {
@@ -85,19 +93,17 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                 arrOfImages.append("NoImage")
             }
         }
-            
+        
         
         
         
         self.lblName.text = "\(self.app.userDetail.firstName!) \(self.app.userDetail.lastName!)"
         self.lblEducation.text = self.app.userDetail.education
-        self.lblGender.text = self.app.userDetail.gender
+        self.lblGender.text = self.app.userDetail.gender.capitalized
         self.lblOccupation.text = self.app.userDetail.occupation
         self.lblLocation.text = self.app.userDetail.locationString
         self.lblAbout.text = self.app.userDetail.aboutMe
-        
     }
-    
     override func viewDidLayoutSubviews() {
         
         print(self.collectionViewCuisine.contentSize.height)
@@ -109,8 +115,13 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
         startTime.invalidate()
     }
   
+ 
+    @IBAction func btnEditAct(_ sender: Any) {
+        let obj = self.storyboard?.instantiateViewController(withIdentifier: "userProfileEditScreenVC") as! userProfileEditScreenVC
+       
+        self.navigationController?.pushViewController(obj, animated: false)
+    }
     
-
     // MARK: - CollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == collectionViewProfileImages{

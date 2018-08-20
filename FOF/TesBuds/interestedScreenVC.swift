@@ -31,7 +31,7 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
         
        
         let param = ["action":"mytestbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!] as NSDictionary
-        self.GetMyTestBuds(param)
+       self.GetMyTestBuds(param)
         
     }
     
@@ -341,7 +341,10 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                         if let dict = dataArray.object(at: 0) as? NSDictionary
                         {
                              self.app.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
-                            
+                            let placesData = NSKeyedArchiver.archivedData(withRootObject: dataArray)
+
+                            UserDefaults.standard.set(placesData, forKey: Constants.UserDefaults.ProfileData)
+                            UserDefaults.standard.set(dict.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
                             if let sessionid = dict.object(forKey: "sessionid")
                             {
                                 UserDefaults.standard.set("\(sessionid)", forKey: Constants.UserDefaults.session_ID)
@@ -396,8 +399,12 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
     @IBAction func btnSingleAct(_ sender: Any)
     {
         
-        self.setMyBuds(isSingleGO: true)
-        
+       self.setMyBuds(isSingleGO: true)
+//        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//        let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+//        self.app.IsGoSingle = true
+//        nextVC.selectedIndex = 1
+//        Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
     }
     
     @IBAction func btnGroupAct(_ sender: Any) {

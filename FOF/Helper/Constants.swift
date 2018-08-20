@@ -60,8 +60,10 @@ struct Constants {
         static let kGoogle_Key = "AIzaSyCCmgwexZk3S_kThFZXxZbxRcCJwElEPDw"        
     }
     struct color {
+        
         static let matchProgressColor = Utility.UIColorFromHex(0x8b1ea7)
         static let friendMatchProgressColor = Utility.UIColorFromHex(0xD42926)
+       // static let selectColor = Utility.UIColorFromHex(0xa32e43)
     }
     struct UserDefaults{
         //Devices
@@ -71,6 +73,7 @@ struct Constants {
         static let LoginData = "LoginData"
         static let user_ID = "user_ID"
         static let session_ID = "session_ID"
+        
         static let User_FullName = "User_FullName"
         static let User_First_Name = "User_First_Name"
         static let User_Last_Name = "User_Last_Name"
@@ -80,17 +83,22 @@ struct Constants {
         static let isregistered = "isregistered"
         static let isLoging = "isUserLoging"
         static let MyTestBuds = "MyTestBuds"
-        
+        static let ProfileData = "ProfileData"
         
         
         static let senderId = "senderId"
         static let receiverId = "receiverId"
+        static let receiverDP = "receiverDP"
         static let matchId = "matchId"
         
         
         
         static let currentLatitude = "currentLatitude"
         static let currentLongitude = "currentLongitude"
+        
+        static let notificationName = Notification.Name("NotificationIdentifier")
+        static let pushNotificationName = Notification.Name("pushNotificationName")
+
         
     }
     struct Font{

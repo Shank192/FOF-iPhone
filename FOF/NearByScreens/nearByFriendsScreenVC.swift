@@ -54,10 +54,11 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        hideKeyboardWhenTappedAround()
         self.navigationController?.isNavigationBarHidden = true
         let obj = nearByFriendsScreenVC()
         Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
-        NotificationCenter.default.addObserver(self, selector: #selector(retriveLocation), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+ 
         
     }
 
@@ -86,6 +87,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+               NotificationCenter.default.addObserver(self, selector: #selector(retriveLocation), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
     }
     @objc func retriveLocation(){
         latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
@@ -133,6 +135,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
                 UserDefaults.standard.set(dictArray.object(forKey: "search_min_age")!, forKey: "strLowerValue")
                 UserDefaults.standard.set(dictArray.object(forKey: "search_max_age")!, forKey: "strUpperValue")
                 UserDefaults.standard.set(dictArray.object(forKey: "showme")!, forKey: "strGender")
+                UserDefaults.standard.set(dictArray.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
                 self.GetSuggestedFriend()
                 self.wsSetFriendsList()
 
@@ -359,15 +362,16 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
                                     }
                                 }
                                 
-                                
-                                let persentageMatch = IntStr*100/myTestBuds.count
+                                if let count = myTestBuds.count as? Int{
+                                    if count == 0{}else{
+                                    let persentageMatch = IntStr*100/count
                                 let muteDict = NSMutableDictionary(dictionary: dict)
-                                muteDict.setValue(persentageMatch, forKey: "matchBuds")
+                                    muteDict.setValue(persentageMatch, forKey: "matchBuds")
                                 if muteDict.object(forKey: "friendstatus") == nil
                                 {
                                     muteDict.setValue("notFriend", forKey: "friendstatus")
                                 }
-                                self.ArrayFriendData.replaceObject(at: i, with: muteDict)
+                                        self.ArrayFriendData.replaceObject(at: i, with: muteDict)}}
                             }
                         }
                         

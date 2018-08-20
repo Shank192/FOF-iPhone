@@ -26,6 +26,11 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     @IBOutlet weak var lblReview: UILabel!
     @IBOutlet weak var btnTimeOut: UIButton!
     
+    @IBOutlet weak var btnStar5Out: UIButton!
+    @IBOutlet weak var btnStar4Out: UIButton!
+    @IBOutlet weak var btnStar3Out: UIButton!
+    @IBOutlet weak var btnStar2Out: UIButton!
+    @IBOutlet weak var btnStar1Out: UIButton!
     @IBOutlet weak var lblNumberOfImages: UILabel!
     // MARK: - Life cycle
     override func viewDidLoad() {
@@ -34,12 +39,18 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
         print(arrOfRestaurantData)
         lblRestaurantName.text = arrOfRestaurantData["name"] as? String
         if let str = strTime as? String{
-            btnTimeOut.setTitle(" \(str)", for: .normal)}else{
+            if str == ""{
+                btnTimeOut.setTitle("18 mins", for: .normal)
+
+            }else{
+                btnTimeOut.setTitle(" \(str)", for: .normal)}
+        }else{
            btnTimeOut.setTitle("18 mins", for: .normal)
         }
         getplaceDetails(placeId: arrOfRestaurantData["place_id"] as! String)
     }
     override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = true
         startTimer()
 
     }
@@ -90,6 +101,46 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     func setReviewsDetails(){
         lblReviewerName.text = arrResponseForReviews[0]["author_name"] as? String
         lblReview.text = arrResponseForReviews[0]["text"] as? String
+        let rating = arrResponseForReviews[0]["rating"] as! Int
+        switch rating {
+        case 1:
+            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            break
+        case 2:
+            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            break
+        case 3:
+            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            break
+        case 4:
+            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+            break
+        case 5:
+            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            self.btnStar5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+            break
+        default:
+            break
+        }
         imgPrsnGiveReview.cornerRadius = imgPrsnGiveReview.frame.width/2
         imgPrsnGiveReview.clipsToBounds = true
         let url = NSURL(string: arrResponseForReviews[0]["profile_photo_url"] as! String)!  as URL
@@ -117,6 +168,7 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
                 self.arrOfImages = dict["photos"] as! [[String:AnyObject]]
                 self.lblNumberOfImages.text = "\(1)/\(self.arrOfImages.count)"
                 self.arrResponseForReviews = dict["reviews"] as! [[String:AnyObject]]
+              
                 self.collectionViewProfileImages.reloadData()
                 self.setReviewsDetails()
             }

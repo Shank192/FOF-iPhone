@@ -108,6 +108,10 @@
 		824EC41A2109CCAB00FB52AC /* conversationScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */; };
 		824EC41C2109D5F800FB52AC /* WebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC41B2109D5F800FB52AC /* WebService.swift */; };
 		824F9EB221104EE700145B59 /* allReviewsScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */; };
+		8263DC112125825C00C2A65E /* userProfileEditScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC102125825C00C2A65E /* userProfileEditScreenVC.swift */; };
+		8263DC132125892F00C2A65E /* detailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */; };
+		8263DC152125894C00C2A65E /* photoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */; };
+		8263DC172125897100C2A65E /* preferencesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC162125897100C2A65E /* preferencesCollectionViewCell.swift */; };
 		8278A0B920F8BF3600CF04B3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8278A0B820F8BF3600CF04B3 /* AppDelegate.swift */; };
 		8278A0BE20F8BF3600CF04B3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BC20F8BF3600CF04B3 /* Main.storyboard */; };
 		8278A0C020F8BF3700CF04B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BF20F8BF3700CF04B3 /* Assets.xcassets */; };
@@ -353,6 +357,10 @@
 		824EC41B2109D5F800FB52AC /* WebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebService.swift; sourceTree = "<group>"; };
 		824EC41D2109D89A00FB52AC /* FOF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FOF.entitlements; sourceTree = "<group>"; };
 		824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = allReviewsScreenVC.swift; sourceTree = "<group>"; };
+		8263DC102125825C00C2A65E /* userProfileEditScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userProfileEditScreenVC.swift; sourceTree = "<group>"; };
+		8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = detailCollectionViewCell.swift; sourceTree = "<group>"; };
+		8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photoCollectionViewCell.swift; sourceTree = "<group>"; };
+		8263DC162125897100C2A65E /* preferencesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = preferencesCollectionViewCell.swift; sourceTree = "<group>"; };
 		8278A0B520F8BF3600CF04B3 /* FOF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FOF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8278A0B820F8BF3600CF04B3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8278A0BD20F8BF3600CF04B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -503,6 +511,10 @@
 				821D80292100694F00B02E94 /* selectedRestaurantDeatilsScreenVC.swift */,
 				824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */,
 				820ACBBD2100AF4E00F203B9 /* userDetailScreenVC.swift */,
+				8263DC102125825C00C2A65E /* userProfileEditScreenVC.swift */,
+				8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */,
+				8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */,
+				8263DC162125897100C2A65E /* preferencesCollectionViewCell.swift */,
 				824EC4162109C82100FB52AC /* userProfileDetailScreenVC.swift */,
 			);
 			path = DetailsScreen;
@@ -1433,6 +1445,7 @@
 				829EE59720F8DBFC00F7C52D /* loginScreenVC.swift in Sources */,
 				8233A570210CA5FD0013FB48 /* GMUPlacemark.m in Sources */,
 				8233A463210C45700013FB48 /* StatusAlertUtils.swift in Sources */,
+				8263DC132125892F00C2A65E /* detailCollectionViewCell.swift in Sources */,
 				824EC41A2109CCAB00FB52AC /* conversationScreenVC.swift in Sources */,
 				8233A571210CA5FD0013FB48 /* GMUPolygon.m in Sources */,
 				8233A576210CA5FD0013FB48 /* GMULineString.m in Sources */,
@@ -1445,6 +1458,7 @@
 				824EC4102109AEE800FB52AC /* SSKeychain.m in Sources */,
 				8233A568210CA5FD0013FB48 /* GMUDefaultClusterIconGenerator.m in Sources */,
 				824C4565210B691100D273A9 /* NSData+ImageContentType.m in Sources */,
+				8263DC112125825C00C2A65E /* userProfileEditScreenVC.swift in Sources */,
 				82CCBD6B21186ECD00A3A9CD /* NMRangeSlider.m in Sources */,
 				8204DE2320FF3858004B321B /* nearByFriendsScreenVC.swift in Sources */,
 				8233A565210CA5FD0013FB48 /* GMUSimpleClusterAlgorithm.m in Sources */,
@@ -1456,6 +1470,7 @@
 				824F9EB221104EE700145B59 /* allReviewsScreenVC.swift in Sources */,
 				824C4564210B691100D273A9 /* SDWebImageDownloaderOperation.m in Sources */,
 				829EE59520F8DBE200F7C52D /* testBudsScreenVC.swift in Sources */,
+				8263DC172125897100C2A65E /* preferencesCollectionViewCell.swift in Sources */,
 				820EECBF2101BBBC0011F909 /* inviteFriendsChatScreenVC.swift in Sources */,
 				8233A564210CA5FD0013FB48 /* GMUWrappingDictionaryKey.m in Sources */,
 				8233A562210CA5FD0013FB48 /* GMUClusterManager.m in Sources */,
@@ -1479,6 +1494,7 @@
 				820EECC72101EA4A0011F909 /* filterScreenVC.swift in Sources */,
 				821D802A2100694F00B02E94 /* selectedRestaurantDeatilsScreenVC.swift in Sources */,
 				824C4566210B691100D273A9 /* UIImageView+WebCache.m in Sources */,
+				8263DC152125894C00C2A65E /* photoCollectionViewCell.swift in Sources */,
 				82CCBD4F21186ECD00A3A9CD /* TPKeyboardAvoidingCollectionView.m in Sources */,
 				8233A462210C45700013FB48 /* UIDevice+Platform.swift in Sources */,
 				8233A514210C9F5C0013FB48 /* ReachabilityManager.m in Sources */,
@@ -1681,7 +1697,10 @@
 				DEVELOPMENT_TEAM = 9VZWVJ654Y;
 				INFOPLIST_FILE = FOF/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.entrega.FOF;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "FOF/Helper/FOF-Bridging-Header.h";
@@ -1703,7 +1722,10 @@
 				DEVELOPMENT_TEAM = 9VZWVJ654Y;
 				INFOPLIST_FILE = FOF/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.entrega.FOF;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "FOF/Helper/FOF-Bridging-Header.h";
@@ -1720,7 +1742,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = FOFTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "-60degreeTechno.FOFTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -1737,7 +1763,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = FOFTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "-60degreeTechno.FOFTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -1753,7 +1783,11 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = FOFUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "-60degreeTechno.FOFUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -1769,7 +1803,11 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = FOFUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "-60degreeTechno.FOFUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;

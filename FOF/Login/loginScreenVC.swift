@@ -101,9 +101,13 @@ class loginScreenVC: UIViewController {
                             gender = response.object(forKey: "gender") as! String
                         }
                         _ = "http://graph.facebook.com/\(id)/picture?type=large"
-                    //UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) as! String
-                        //,"device_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) as! String
-                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token":"3651200A7B02BAF23729A1D209BEBE6121BD49E1ACE89ACB6F0BAF1F01423B18","mobile":"986562323"]
+                
+                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token":   UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) as! String
+                            ,"device_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) as! String,"mobile":"986562323"]
+                        
+//                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token":   "B80B5CF9BE91FE1D6AD5DD7BABA282E5F1A009A6A0AE0A292026A3A745A17E40","mobile":"986562323"]
+                        
+
                        print(param)
                        self.SocioLoginApi(param as NSDictionary)
                     }

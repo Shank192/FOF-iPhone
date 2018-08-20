@@ -33,6 +33,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     var arrDuration = NSMutableArray()
     override func viewDidLoad() {
         super.viewDidLoad()
+        hideKeyboardWhenTappedAround()
         let obj = nearByRestaurantsScreenVC()
         Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
         NotificationCenter.default.addObserver(self, selector: #selector(retriveDataForRestaurant), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
@@ -97,7 +98,8 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     }
     
     @IBAction func btnTestBudsAct(_ sender: Any) {
-        
+        let obj = self.storyboard?.instantiateViewController(withIdentifier: "testBudsScreenVC") as! testBudsScreenVC
+        self.navigationController?.present(obj, animated: true, completion: nil)
     }
     
     @IBAction func btnFriendToggleAct(_ sender: Any) {
@@ -154,12 +156,12 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
                     let arr = response["results"]! as! NSArray
                     self.arrForRestaurantData = arr as! [[String : AnyObject]]
                     print(token as Any)
-                    self.retriveDataForRestaurantByCarAndWalking()
+                    self.retriveTimeDataForRestaurantByCar()
                     self.setmap()
                    // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
                 }}}
     }
-    func retriveDataForRestaurantByCarAndWalking(){
+    func retriveTimeDataForRestaurantByCar(){
         MBProgressHUD.showAdded(to: self.view, animated: true)
         arrDuration.removeAllObjects()
         arrPlaces.removeAllObjects()

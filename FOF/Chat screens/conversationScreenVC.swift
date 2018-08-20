@@ -15,10 +15,12 @@ import FirebaseStorage
 class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewDataSource ,GrowingTextViewDelegate{
 
     @IBOutlet weak var tblConversation: UITableView!
-    
     @IBOutlet weak var textViewMessage: GrowingTextView!
     @IBOutlet weak var nslcBottomTextView: NSLayoutConstraint!
-    
+    @IBOutlet weak var imgViewUserDp: UIImageView!
+    @IBOutlet weak var lblUserName: UILabel!
+    @IBOutlet weak var lblLastSeen: UILabel!
+   
     let dateFormatter = DateFormatter()
     
     var arrMessages = NSMutableArray()
@@ -32,6 +34,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     var chatGrpId:String = ""
     var senderId = ""
     var frndId = ""
+    var receipentDp = ""
     var isFrndOnline = false
     var userIsAvalable = false
     
@@ -52,6 +55,8 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         super.viewDidLoad()
         chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
         senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as! String
+        frndId = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId) as! String
+        receipentDp = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String
         hideKeyboardWhenTappedAround()
         registerForKeyboardNotifications()
         initialSetup()
@@ -66,8 +71,10 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         tblConversation.rowHeight = UITableViewAutomaticDimension
         tblConversation.tableFooterView = UIView()
         self.tblConversation.separatorStyle = .none
-        
-        
+    if  let str = Constants.GlobalConstants.appDelegate.userDetail.profilepic1{
+          imgViewUserDp.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
+    }
+    lblUserName.text = Constants.GlobalConstants.appDelegate.userDetail.firstName
         // Setup TextView
         self.textViewMessage.layer.cornerRadius = 13
         self.textViewMessage.clipsToBounds = true
@@ -93,6 +100,47 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         dateFormatter.locale = Locale(identifier: "en_GB")
         dateFormatter.timeZone = TimeZone(abbreviation: "GMT")!
     }
+    
+    @IBAction func btnSendAct(_ sender: Any) {
+        guard let text = self.textViewMessage.text, !text.isEmpty else {
+            return
+        }
+        
+        
+        let message = textViewMessage?.text.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        
+        if (message?.count)! > 0 {
+            
+            if chatGrpId.count > 0 {
+                
+                
+                //1
+                let param = ["senderId":senderId,"msg":textViewMessage!.text!,"timeStamp":ServerValue.timestamp(),"imgUrl":"","recieverId":frndId,"recieverDP":UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String,"senderDp":"","contentType":"text"] as [String : Any]
+                
+                rootRef.child("messages").child(chatGrpId).childByAutoId().setValue(param)
+                
+                //Set Conversation
+                //2
+                
+                //self.setUnreadCount(pluseCount: 1, lastMsg: textViewMessage!.text!)
+                
+                
+                
+                
+               // self.sendNotificationTofrnd(message: textViewMessage!.text!)
+                
+                
+                //  self.sendChatNotification(msg: txtMsgView!.text!, isImage: 0, isVideo: 0)
+                
+                textViewMessage?.text = ""
+            }
+        }
+    }
+    
+    @IBAction func btnSendAttachmentAct(_ sender: Any) {
+        
+    }
+    
     //MARK: - Firebase observe message without chack delete
 
     fileprivate func observeMessages() {
@@ -360,6 +408,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    // MARK: - Tableview delegate
     func numberOfSections(in tableView: UITableView) -> Int {
         return arrMsgByDates.count
     }
@@ -398,31 +447,80 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                         }
                         
                         if sender_id == senderId {
-                     
-                           let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! chatTableviewCell
-                            cell.selectionStyle = .none
-                            
-                            cell.lblMessages.text = rowDict.object(forKey: "msg") as? String
-                            cell.imgSenderDp.image = UIImage.init(named: "disableSingle")
-                            
-                                if let proURL = URL.init(string: "\(rowDict.object(forKey: "senderDp") as! String)")
-                                {
-                                    cell.imgViewProfile.sd_setImage(with: proURL)
+                            if rowDict.object(forKey: "msg") as? String == "you received a restaurant suggestion"{
+                              
+                               if let array = rowDict.object(forKey: "restoVo") as? NSDictionary{
+                                  let cell = tableView.dequeueReusableCell(withIdentifier: "restroSenderCell", for: indexPath) as! chatTableviewCell
+                                cell.selectionStyle = .none
+                                cell.lblRestroName.text = array.object(forKey: "name") as? String
+                                cell.lblRestroAddress.text = array.object(forKey: "vicinity") as? String
+                                let rating = array.object(forKey: "ratings") as! String
+                                switch rating {
+                                case "1":
+                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    break
+                                case "2":
+                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    break
+                                case "3":
+                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    break
+                                case "4":
+                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                    break
+                                case "5":
+                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    cell.btnSta5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                    break
+                                default:
+                                    break
                                 }
-                            return cell
-                            
-                            
-                            
+                                if let photos = array.object(forKey: "photoReference") as? String{
+
+                                    let url = NSURL(string: "\(photos)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
+                                    cell.imgRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
+                                    
+                                }
+                                return cell
+                                }}
+                               else{
+                                let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! chatTableviewCell
+                                cell.selectionStyle = .none
+                                cell.lblMessages.text = rowDict.object(forKey: "msg") as? String
+                                //cell.imgSenderDp.image = UIImage.init(named: "disableSingle")
+                                if  let str = Constants.GlobalConstants.appDelegate.userDetail.profilepic1{
+                                    cell.imgSenderDp.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
+                                }
+                                return cell}
                         } else {
                             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! chatTableviewCell
                             cell.selectionStyle = .none
                             
                             cell.lblReceiverMessage.text = rowDict.object(forKey: "msg") as? String
-                            cell.imgReceiverDp.image = UIImage.init(named: "disableSingle")
+                         cell.imgReceiverDp.image = UIImage.init(named: "disableSingle")
                             
-                            if let proURL = URL.init(string: "\(rowDict.object(forKey: "recieverDP") as! String)")
+                            if let proURL = URL.init(string: "\(receipentDp)")
                             {
-                                cell.imgViewProfile.sd_setImage(with: proURL)
+                                cell.imgReceiverDp.sd_setImage(with: proURL)
                             }
                             return cell
                             

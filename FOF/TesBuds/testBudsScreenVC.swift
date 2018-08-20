@@ -384,13 +384,14 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
             {
                 if "\(isSelected)" == "1"
                 {
-                    cell.backgroundColor = Constants.color.friendMatchProgressColor
+                    cell.backgroundColor = Utility.UIColorFromHex(0xa32e43)
                     cell.lblInterestedTestBudsName.textColor = UIColor.white
+                    
                 }
                 else
                 {
-                    cell.backgroundColor = UIColor.white
-                    cell.lblInterestedTestBudsName.textColor = Constants.color.friendMatchProgressColor
+                    cell.backgroundColor =  UIColor.white
+                    cell.lblInterestedTestBudsName.textColor = Utility.UIColorFromHex(0xa32e43)
                 }
             }
             

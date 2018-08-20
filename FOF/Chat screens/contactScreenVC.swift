@@ -147,6 +147,11 @@ self.navigationController?.isNavigationBarHidden = true
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
+        if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
+        {
+            let profilepic1 = dict.object(forKey: "profilepic1")
+            UserDefaults.standard.setValue(profilepic1, forKey: Constants.UserDefaults.receiverDP)
+        }
         self.navigationController?.pushViewController(obj, animated: false)
     }
    

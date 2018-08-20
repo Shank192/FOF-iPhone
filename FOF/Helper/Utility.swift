@@ -17,7 +17,7 @@ struct Utility{
         )
     }
 //    
-//    // MARK:- MBProgress Indicator Methods
+    // MARK:- MBProgress Indicator Methods
 //    func showLoader() {
 //        UIApplication.shared.isNetworkActivityIndicatorVisible = true
 //        hud = MBProgressHUD.showAdded(to: UIApplication.shared.keyWindow!, animated: true)
