@@ -11,6 +11,7 @@ class contactScreenVC: UIViewController , UITableViewDelegate , UITableViewDataS
    
     var arrContactList = NSMutableArray()
     var ArrayFriendData = NSMutableArray()
+    var arrFriendData = [[String:AnyObject]]()
 
     @IBOutlet weak var tblViewFrndList: UITableView!
     
@@ -45,9 +46,8 @@ self.navigationController?.isNavigationBarHidden = true
                         {
                             if let dict = dataArray.object(at: i) as? NSDictionary
                             {
-                                UserDefaults.standard.set(dict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
-                                UserDefaults.standard.set(dict.object(forKey: "friend1"), forKey: Constants.UserDefaults.senderId)
-                                 UserDefaults.standard.set(dict.object(forKey: "friend2"), forKey: Constants.UserDefaults.receiverId)
+                                self.arrFriendData.append(dict as! [String : AnyObject])
+                             
                                 
                                 if let details = dict.object(forKey: "details") as? NSArray
                                 {
@@ -149,6 +149,11 @@ self.navigationController?.isNavigationBarHidden = true
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
         if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
         {
+            if let dataDict = self.arrFriendData[indexPath.row] as? NSDictionary{
+            UserDefaults.standard.set(dataDict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
+            UserDefaults.standard.set(dataDict.object(forKey: "friend1"), forKey: Constants.UserDefaults.senderId)
+                UserDefaults.standard.set(dataDict.object(forKey: "friend2"), forKey: Constants.UserDefaults.receiverId)}
+            obj.strReceiverName = "\(dict.object(forKey: "first_name")!) \(dict.object(forKey: "last_name")!)"
             let profilepic1 = dict.object(forKey: "profilepic1")
             UserDefaults.standard.setValue(profilepic1, forKey: Constants.UserDefaults.receiverDP)
         }

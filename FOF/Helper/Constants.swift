@@ -73,7 +73,7 @@ struct Constants {
         static let LoginData = "LoginData"
         static let user_ID = "user_ID"
         static let session_ID = "session_ID"
-        
+        static let isFriend = "isFriend"
         static let User_FullName = "User_FullName"
         static let User_First_Name = "User_First_Name"
         static let User_Last_Name = "User_Last_Name"

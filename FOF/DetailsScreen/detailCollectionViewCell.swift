@@ -34,6 +34,7 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
     @IBOutlet weak var btnLGBTout: UIButton!
     @IBOutlet weak var btnFemaleOut: UIButton!
     @IBOutlet weak var btnMaleOut: UIButton!
+  
     @IBOutlet weak var txtViewAboutMe: UITextView!
     
     @IBOutlet weak var txtFieldGender: UITextField!
@@ -56,8 +57,9 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
     var strEducation = String()
     var strFirstname = String()
     var strLastName = String()
-  
-    
+    var strAboutMe = String()
+    var strFields = String()
+
     override func awakeFromNib() {
         initialSetUp()
     }
@@ -127,9 +129,32 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
         relationPickerView.dataSource = self
     }
   @objc  func saveDetails(){
-        
-    let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String,"first_name":txtFirstName.text as Any ,"last_name":txtLastName.text as Any ,"dob":txtFieldBirthDay.text as Any,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID) as! String,"showme":txtFieldGender.text as Any,"distance_unit":"miles","search_min_age":Constants.GlobalConstants.appDelegate.userDetail.searchMinAge,"search_max_age":Constants.GlobalConstants.appDelegate.userDetail.searchMaxAge,"search_distance":Constants.GlobalConstants.appDelegate.userDetail.searchDistance,"isreviewed":(0),"occupation":txtFieldOccupation.text as Any,"relationship":txtFieldRelation.text as Any,"ethnicity":txtFieldEthnicity.text as Any,"education":txtFieldEducation.text as! String,"about_me":txtViewAboutMe.text,"fields":"first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,relationship,ethnicity,education,about_me"] as [String : Any]
     
+    if txtViewAboutMe.text != "About Me" && txtFieldOccupation.text != "" && txtFieldEducation.text != "" && txtFieldRelation.text != ""  && txtFieldEthnicity.text != "" {
+        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,relationship,ethnicity,education,about_me"
+    }else if txtFieldRelation.text == "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text != "" && txtFieldEducation.text != "" && txtFieldEthnicity.text != "" {
+        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,ethnicity,education,about_me"
+    }else if  txtFieldRelation.text != "" && txtViewAboutMe.text == "About Me" && txtFieldOccupation.text != "" && txtFieldEducation.text != "" && txtFieldEthnicity.text != ""  {
+        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,relationship,ethnicity,education"
+        
+    }  else if txtFieldRelation.text != "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text == "" && txtFieldEducation.text != "" && txtFieldEthnicity.text != ""  {
+        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,relationship,ethnicity,education,about_me"
+
+    }  else if txtFieldRelation.text != "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text == "" && txtFieldEducation.text == "" && txtFieldEthnicity.text != ""{
+        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,ethnicity,about_me"
+        
+      
+        
+    }else if    txtFieldRelation.text != "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text == "" && txtFieldEducation.text == "" && txtFieldEthnicity.text == "" {
+        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,relationship,ethnicity,education,about_me"
+    }else{
+         strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed"
+    }
+    
+    
+    
+    
+    let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String,"first_name":txtFirstName.text as Any ,"last_name":txtLastName.text as Any ,"dob":txtFieldBirthDay.text as Any,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID) as! String,"showme":txtFieldGender.text as Any,"distance_unit":"miles","search_min_age":Constants.GlobalConstants.appDelegate.userDetail.searchMinAge,"search_max_age":Constants.GlobalConstants.appDelegate.userDetail.searchMaxAge,"search_distance":Constants.GlobalConstants.appDelegate.userDetail.searchDistance,"isreviewed":(0),"occupation":txtFieldOccupation.text as Any,"relationship":txtFieldRelation.text as Any,"ethnicity":txtFieldEthnicity.text as Any,"education":txtFieldEducation.text as! String,"about_me":strAboutMe,"fields": strFields] as [String : Any]
         WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
             if success == true
             {
@@ -141,7 +166,6 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
                         {
                             Constants.GlobalConstants.appDelegate.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
                             let placesData = NSKeyedArchiver.archivedData(withRootObject: dataArray)
-                            
                             UserDefaults.standard.set(placesData, forKey: Constants.UserDefaults.ProfileData)
                             UserDefaults.standard.set(dict.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
                             if let sessionid = dict.object(forKey: "sessionid")
@@ -150,24 +174,19 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
                             }
                         }
                     }
-                    
                 }
             }
-            
         }
-        
-        
-        
-        
-        
     }
     func setTextView(){
        
         if txtViewAboutMe.text == ""{
             txtViewAboutMe.text = "About Me"
+            strAboutMe = ""
             txtViewAboutMe.textColor = UIColor.gray
         }else{
             txtViewAboutMe.textColor = UIColor.black
+            strAboutMe = txtViewAboutMe.text
             
         }
     }

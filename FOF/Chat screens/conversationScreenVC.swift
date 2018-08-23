@@ -20,13 +20,12 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     @IBOutlet weak var imgViewUserDp: UIImageView!
     @IBOutlet weak var lblUserName: UILabel!
     @IBOutlet weak var lblLastSeen: UILabel!
-   
-    let dateFormatter = DateFormatter()
     
     var arrMessages = NSMutableArray()
     
     var arrChatMsgs = NSMutableArray()
     var arrMsgByDates = NSMutableArray()
+    var arrSenderString = [String]()
     var lastMsgKey = ""
     var lastMsgCount = 20
     var isLoadingPrev = false
@@ -36,6 +35,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     var frndId = ""
     var receipentDp = ""
     var isFrndOnline = false
+    var strReceiverName = String()
     var userIsAvalable = false
     
     //Firebase
@@ -53,28 +53,29 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
-        senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as! String
-        frndId = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId) as! String
-        receipentDp = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String
-        hideKeyboardWhenTappedAround()
-        registerForKeyboardNotifications()
         initialSetup()
         // Do any additional setup after loading the view.
     }
     
   func initialSetup() {
-        
+    chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
+    senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as! String
+    frndId = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId) as! String
+    receipentDp = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String
+    lblUserName.text = strReceiverName
+    
+    hideKeyboardWhenTappedAround()
+    registerForKeyboardNotifications()
         rootRef = Database.database().reference()
         //        storageRef = storage.reference(forURL: "gs://the-qn-app.appspot.com")
         
         tblConversation.rowHeight = UITableViewAutomaticDimension
+    tblConversation.estimatedSectionHeaderHeight = 0
         tblConversation.tableFooterView = UIView()
         self.tblConversation.separatorStyle = .none
-    if  let str = Constants.GlobalConstants.appDelegate.userDetail.profilepic1{
+    if  let str = receipentDp as? String{
           imgViewUserDp.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
     }
-    lblUserName.text = Constants.GlobalConstants.appDelegate.userDetail.firstName
         // Setup TextView
         self.textViewMessage.layer.cornerRadius = 13
         self.textViewMessage.clipsToBounds = true
@@ -96,16 +97,17 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         
         // Setup Formatter
     observeMessages()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.locale = Locale(identifier: "en_GB")
-        dateFormatter.timeZone = TimeZone(abbreviation: "GMT")!
+    CheckOnlineOfflineStatus()
+    addObserverOnlineOfflineStatus()
+    addObserverForRealTimeChatting()
+    Constants.GlobalConstants.appDelegate.online()
     }
     
     @IBAction func btnSendAct(_ sender: Any) {
         guard let text = self.textViewMessage.text, !text.isEmpty else {
             return
         }
-        
+        Constants.GlobalConstants.appDelegate.online()
         
         let message = textViewMessage?.text.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         
@@ -113,9 +115,10 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
             
             if chatGrpId.count > 0 {
                 
+             
                 
                 //1
-                let param = ["senderId":senderId,"msg":textViewMessage!.text!,"timeStamp":ServerValue.timestamp(),"imgUrl":"","recieverId":frndId,"recieverDP":UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String,"senderDp":"","contentType":"text"] as [String : Any]
+                let param = ["senderId":senderId,"msg":textViewMessage!.text!,"timeStamp":setCurrentTimeToTimestamp(),"imgUrl":"","recieverId":frndId,"recieverDP":UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String,"senderDp":"","contentType":"text"] as [String : Any]
                 
                 rootRef.child("messages").child(chatGrpId).childByAutoId().setValue(param)
                 
@@ -157,27 +160,18 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
             
         }
         msgHandle = rootRef.child("messages").child(chatGrpId).queryOrderedByKey().observe(DataEventType.childAdded, with: { (snapshot) in
-            
-            //            MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-            
             if let dataDict : NSDictionary = snapshot.value as? NSDictionary {
-                
                 let newDict = NSMutableDictionary(dictionary: dataDict)
                 newDict.setObject(snapshot.key, forKey: "messageID" as NSCopying)
                 print(newDict)
                 print(snapshot.key)
                 print(snapshot.value ?? "No snaop value in message")
-                
                 let myPredicate = NSPredicate(format: "SELF.messageID ==[c] %@", "\(snapshot.key)")
-                
                 let foundMsg = self.arrChatMsgs.filtered(using: myPredicate)
-                
                 if foundMsg.count == 0 {
-                    
                     if self.lastMsgKey.count == 0 {
                         self.lastMsgKey = "\(snapshot.key)"
                     }
-                    
                     if let sender_id = dataDict.object(forKey: "senderId") as? String {
                         if sender_id != self.senderId {
                             
@@ -190,89 +184,94 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                                     {
                                         temp.setValue(1, forKey: "is_read")
                                         self.rootRef.child("messages").child(self.chatGrpId).child(snapshot.key).setValue(temp)
-                                        
-                                        
-                                    }
-                                    
-                                }
-                                
-                            } else {
-                                
+                                    } } } else {
                                 let temp = NSMutableDictionary(dictionary: dataDict)
-                                if self.userIsAvalable == true
-                                {
+                                if self.userIsAvalable == true{
                                     temp.setValue(1, forKey: "is_read")
-                                    
-                                    self.rootRef.child("messages").child(self.chatGrpId).child(snapshot.key).setValue(temp)
-                                    
-                                    
-                                    
-                                }
+                                    self.rootRef.child("messages").child(self.chatGrpId).child(snapshot.key).setValue(temp)}
                             }
-                            
                         }
                     }
-                    
-                    //                    if let sender_id = dataDict.object(forKey: "sender_id") as? String
-                    //                    {
-                    //                        if sender_id == self.senderId
-                    //                        {
-                    //                            if dataDict.object(forKey: "user_s") != nil
-                    //                            {
-                    //                                if "\(dataDict.object(forKey: "user_s")!)" == "0"
-                    //                                {
                     self.arrChatMsgs.add(newDict)
-                    
                    self.sortArrayByDate(dataDict: newDict)
-                    //
-                    //                                }
-                    //                            }
-                    //
-                    //                        }
-                    //                        else
-                    //                        {
-                    //                            if dataDict.object(forKey: "user_r") != nil
-                    //                            {
-                    //                                if "\(dataDict.object(forKey: "user_r")!)" == "0"
-                    //                                {
-                    //                                    self.arrChatMsgs.add(newDict)
-                    //
-                    //                                    self.sortArrayByDate(dataDict: newDict)
-                    //
-                    //                                }
-                    //                            }
-                    //
-                    //                        }
-                    ////                    }
-                    
                 }
-                
-                
-                
             }
-            
             if self.userIsAvalable == true
             {
                 //self.SetZeroUnreadCount()
             }
-            
         })
-        
         //self.observeValueChared()
+    }
+    func addObserverOnlineOfflineStatus()
+    {
+        Database.database().reference(withPath: "status/\(chatGrpId)").observe(.childChanged) { (snapshot) in
+           // print("frnd : \(snapshot.key) \(String(describing: snapshot.value))")
+            if let DataDict = snapshot.value as? NSDictionary
+            {
+                print(DataDict)
+                if  let strKey = snapshot.key as? String{
+            if strKey == self.senderId{
+                if let strOnline = DataDict.value(forKey: "status")! as? String{
+                    if strOnline == "Offline"{
+                        if let strTimeStamp = DataDict.value(forKey: "lastSeen")! as? String{
+                        if let myInteger = Int(strTimeStamp) {
+                            let str = NSNumber(value: myInteger)
+                            self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))"
+                            }}
+                    }else{
+                        self.lblLastSeen.text = strOnline
+                    } }
+                    }
+            }
+            }
+        }
+    }
+    func addObserverForRealTimeChatting()
+    {
+       Database.database().reference(withPath: "messages/\(chatGrpId)").observe(.childAdded) { (snapshot) in
+            print("frnd : \(snapshot.key) \(String(describing: snapshot.value))")
+            if let DataDict = snapshot.value as? NSDictionary
+            {
+                print(DataDict)
+            }
+        }
+    }
+    
+    func CheckOnlineOfflineStatus()
+    {
+        Database.database().reference(withPath: "status/\(chatGrpId)/\(frndId)").observe(.value) { (snapshot) in
+            // print("frnd : \(snapshot.key) \(String(describing: snapshot.value))")
+                        if let DataDict = snapshot.value as? NSDictionary
+                        {
+                           // let arrayKey = DataDict.allKeys
+                            if let strOnline = DataDict.value(forKey: "status")! as? String{
+                                if strOnline == "Offline"{
+                                    if let myInteger = Int(DataDict.value(forKey: "lastSeen")! as! String) {
+                                        let str = NSNumber(value: myInteger)
+                                        self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))"
+                                    }
+                                    
+                                }else{
+                                    self.lblLastSeen.text = strOnline}}
+                        }
+        }
     }
     //MARK:- Sort Array
     func sortArrayByDate(dataDict: NSDictionary) {
-        
-        //        MBProgressHUD.showAdded(to: self.view, animated: true)
-        
+
         if let msgTime = dataDict.object(forKey: "timeStamp") {
-            
-            let msgDate : Date = Date(timeIntervalSince1970: TimeInterval(truncating: ((msgTime as! Double)/1000) as NSNumber))
-            
+            let msgDate : Date = Date(timeIntervalSince1970: TimeInterval(((msgTime as! Double)/1000) as NSNumber))
             let myFormater = DateFormatter()
             myFormater.dateFormat = "dd/MM/yyyy"
             myFormater.timeZone = TimeZone.ReferenceType.local
             let strTimeToShow = myFormater.string(from: msgDate)
+            
+            
+//           let myFormater = DateFormatter()
+//            myFormater.dateFormat = "dd-MM-yyyy HH:mm:ss"
+//
+//            let strTimeToShow = getDate(msgTime: msgTime)
             
             let myPredicate = NSPredicate(format: "SELF.msgDate ==[c] %@", strTimeToShow)
             
@@ -359,11 +358,6 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                     
                     if lastrow >= 0 {
                         DispatchQueue.main.async(execute: {
-                            
-                            
-                            
-                            //                            print("Last lastSection :- \(lastSection)")
-                            //                            print("Last row :- \(lastrow)")
                             self.tblConversation.scrollToRow(at: IndexPath(row: lastrow, section: lastSection), at: UITableViewScrollPosition.bottom, animated: false)
                             
                         })
@@ -383,13 +377,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                         
                         if lastrow >= 0 {
                             DispatchQueue.main.async(execute: {
-                                
-                                //                                print("Last lastSection :- \(lastSection)")
-                                //                                print("Last row :- \(lastrow)")
-                                
-                                
                                 self.tblConversation.scrollToRow(at: IndexPath(row: lastrow, section: lastSection), at: UITableViewScrollPosition.bottom, animated: false)
-                                
                             })
                         }
                     }
@@ -402,22 +390,29 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         //        MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
     }
     @IBAction func btnBackAct(_ sender: Any) {
+        Constants.GlobalConstants.appDelegate.offline()
         self.navigationController?.popViewController(animated: true)
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        Constants.GlobalConstants.appDelegate.Typing()
+    }
+    func textViewDidEndEditing(_ textView: UITextView) {
+        Constants.GlobalConstants.appDelegate.online()
+    }
     // MARK: - Tableview delegate
     func numberOfSections(in tableView: UITableView) -> Int {
         return arrMsgByDates.count
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
+
         if let MsgRows : NSArray = (arrMsgByDates.object(at: section) as AnyObject).object(forKey: "MsgRows") as? NSArray {
             return MsgRows.count
         }
-        
+
         return 0
     }
     
@@ -436,21 +431,15 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                         var strTimeToShow = ""
                         
                         if let msgTime = rowDict.object(forKey: "timeStamp") {
-                            let msgDate : Date = Date(timeIntervalSince1970: TimeInterval(((msgTime as! Double)/1000) as NSNumber))
-                            let myFormater = DateFormatter()
-                            myFormater.dateFormat = "hh:mm a"
-                            myFormater.timeZone = TimeZone(abbreviation: "GMT")
-                            //print(myFormater.string(from: msgDate))
-                            myFormater.timeZone = TimeZone.current
-                            //print(myFormater.string(from: msgDate))
-                            strTimeToShow = myFormater.string(from: msgDate)
+                           
+                            strTimeToShow = getTimeFromTimeStamp(timestamp: msgTime)
                         }
                         
                         if sender_id == senderId {
                             if rowDict.object(forKey: "msg") as? String == "you received a restaurant suggestion"{
                               
                                if let array = rowDict.object(forKey: "restoVo") as? NSDictionary{
-                                  let cell = tableView.dequeueReusableCell(withIdentifier: "restroSenderCell", for: indexPath) as! chatTableviewCell
+                                  let cell = tableView.dequeueReusableCell(withIdentifier: "restroCell", for: indexPath) as! chatTableviewCell
                                 cell.selectionStyle = .none
                                 cell.lblRestroName.text = array.object(forKey: "name") as? String
                                 cell.lblRestroAddress.text = array.object(forKey: "vicinity") as? String
@@ -503,27 +492,86 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                                 return cell
                                 }}
                                else{
-                                let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! chatTableviewCell
+                                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! chatTableviewCell
                                 cell.selectionStyle = .none
-                                cell.lblMessages.text = rowDict.object(forKey: "msg") as? String
+                                cell.lblReceiverMessage.text = rowDict.object(forKey: "msg") as? String
+                                cell.lblReceiverTime.text = strTimeToShow
+
                                 //cell.imgSenderDp.image = UIImage.init(named: "disableSingle")
                                 if  let str = Constants.GlobalConstants.appDelegate.userDetail.profilepic1{
-                                    cell.imgSenderDp.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
+                                    cell.imgReceiverDp.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
                                 }
+                              
                                 return cell}
                         } else {
-                            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! chatTableviewCell
+                            if rowDict.object(forKey: "msg") as? String == "you received a restaurant suggestion"{
+                                
+                                if let array = rowDict.object(forKey: "restoVo") as? NSDictionary{
+                                    let cell = tableView.dequeueReusableCell(withIdentifier: "restroSenderCell", for: indexPath) as! chatTableviewCell
+                                    cell.selectionStyle = .none
+                                    cell.lblRestroName.text = array.object(forKey: "name") as? String
+                                    cell.lblRestroAddress.text = array.object(forKey: "vicinity") as? String
+                                    let rating = array.object(forKey: "ratings") as! String
+                                    switch rating {
+                                    case "1":
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case "2":
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case "3":
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case "4":
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case "5":
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        break
+                                    default:
+                                        break
+                                    }
+                                    if let photos = array.object(forKey: "photoReference") as? String{
+                                        
+                                        let url = NSURL(string: "\(photos)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
+                                        cell.imgRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
+                                        
+                                    }
+                                    return cell
+                                }}else{
+                            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! chatTableviewCell
                             cell.selectionStyle = .none
-                            
-                            cell.lblReceiverMessage.text = rowDict.object(forKey: "msg") as? String
-                         cell.imgReceiverDp.image = UIImage.init(named: "disableSingle")
+                            cell.lblSenderTime.text = strTimeToShow
+
+                            cell.lblMessages.text = rowDict.object(forKey: "msg") as? String
+                         cell.imgSenderDp.image = UIImage.init(named: "disableSingle")
                             
                             if let proURL = URL.init(string: "\(receipentDp)")
                             {
-                                cell.imgReceiverDp.sd_setImage(with: proURL)
+                                cell.imgSenderDp.sd_setImage(with: proURL)
                             }
                             return cell
-                            
+                            }
                         }
                         
                     }
@@ -537,6 +585,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         
         return cell!
     }
+   
     // MARK: - keyboard actions
     
     func registerForKeyboardNotifications () {

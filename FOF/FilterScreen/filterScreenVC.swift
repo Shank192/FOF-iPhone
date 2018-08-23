@@ -34,6 +34,11 @@ class filterScreenVC: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isFriend){
+            btnFriendsOut.isSelected = true
+        }else{
+            btnNearByPeopleOut.isSelected = true
+        }
         if let range = String(describing:UserDefaults.standard.object(forKey: "strDistance")!) as? String{
             lblDistanceUnitOut.text = "\(range) mi"
             rangeDistanceSlider.setValue(Float(range)!, animated: false)
@@ -165,18 +170,24 @@ class filterScreenVC: UIViewController {
     @IBAction func btnFriendsAct(_ sender: Any) {
         if btnFriendsOut.isSelected == true{
             btnFriendsOut.isSelected = false
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isFriend)
         }else{
             btnFriendsOut.isSelected = true
             btnNearByPeopleOut.isSelected = false
+            UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isFriend)
         }
+        
     }
     
     @IBAction func btnNearByPeopleAct(_ sender: Any) {
         if btnNearByPeopleOut.isSelected == true{
             btnNearByPeopleOut.isSelected = false
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isFriend)
+
         }else{
             btnNearByPeopleOut.isSelected = true
             btnFriendsOut.isSelected = false
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isFriend)
         }
     }
     
@@ -257,7 +268,7 @@ class filterScreenVC: UIViewController {
             MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
             if success == true
             {
-                
+                self.dismiss(animated: true, completion: nil)
             }
             
         }

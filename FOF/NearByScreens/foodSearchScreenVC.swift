@@ -10,12 +10,12 @@ import MBProgressHUD
 class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
     
     @IBOutlet weak var collectionViewFoodSearch: UICollectionView!
-    
     @IBOutlet weak var stackViewOflocation: UIStackView!
     @IBOutlet weak var tblViewAddress: UITableView!
-    
+    @IBOutlet weak var viewFood: UIView!
     @IBOutlet weak var txtFieldFoodSearch: UITextField!
     @IBOutlet weak var txtFeildAddressSearch: UITextField!
+    var arrData = NSMutableArray()
     var arrForRestaurants = [[String:AnyObject]]()
     var arrPlaces = NSMutableArray()
     var arrDuration = NSMutableArray()
@@ -24,17 +24,19 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     var latitude = String()
     var longitude = String()
     
+    var isService = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setCurrentDeatils()
         self.hideKeyboardWhenTappedAround()
         stackViewOflocation.isHidden = true
+        tblViewAddress.layoutMargins = UIEdgeInsets.zero
+        tblViewAddress.tableFooterView = UIView(frame: CGRect.zero)
+        tblViewAddress.separatorInset = UIEdgeInsets.zero
         txtFeildAddressSearch.delegate = self
-        
         txtFieldFoodSearch.delegate = self
-        
         txtFieldFoodSearch.addTarget(self, action: #selector(myTargetFunction(textField:)), for: UIControlEvents.allTouchEvents)
-
         txtFeildAddressSearch.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: UIControlEvents.editingChanged)
     }
     
@@ -46,9 +48,17 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     
     
     @IBAction func btnCancelAct(_ sender: Any) {
-        stackViewOflocation.isHidden = true
+        if stackViewOflocation.isHidden{
+            self.navigationController?.popViewController(animated: true)
+        }else{
+            stackViewOflocation.isHidden = true}
     }
     func setCurrentDeatils(){
+        
+        self.tblViewAddress.isHidden = true
+        self.collectionViewFoodSearch.isHidden = false
+        self.viewFood.isHidden = false
+        
         txtFeildAddressSearch.text = ""
         let obj = nearByRestaurantsScreenVC()
         Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
@@ -59,9 +69,15 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     }
     @IBAction func btnClearForFoodAct(_ sender: Any) {
         txtFieldFoodSearch.text = ""
+        self.tblViewAddress.isHidden = true
+        self.collectionViewFoodSearch.isHidden = false
+        self.viewFood.isHidden = false
     }
     @IBAction func btnClearAct(_ sender: Any) {
         txtFeildAddressSearch.text = ""
+        self.tblViewAddress.isHidden = true
+        self.collectionViewFoodSearch.isHidden = false
+        self.viewFood.isHidden = false
     }
     
     @IBAction func btnCurrentLocation(_ sender: Any) {
@@ -75,22 +91,26 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
         if arrDuration.count == arrForRestaurants.count{
-        cell.viewBack.layer.shadowOpacity = 0.7
-        cell.viewBack.layer.shadowOffset = CGSize.zero
-        cell.viewBack.layer.shadowRadius = 3.0
-        cell.viewBack.layer.shadowColor = UIColor.lightGray.cgColor
-        
-        if let dict = (arrDuration.object(at: indexPath.row) as AnyObject).object(forKey: "WalkFirst") as? NSDictionary{
+            cell.viewBack.layer.shadowOpacity = 0.7
+            cell.viewBack.layer.shadowOffset = CGSize.zero
+            cell.viewBack.layer.shadowRadius = 3.0
+            cell.viewBack.layer.shadowColor = UIColor.lightGray.cgColor
+            
+            if let dict = arrForRestaurants[indexPath.row]["WalkFirst"] as? NSDictionary{
                 if let str = dict["Difference"] as? String{
-                    cell.btnFoodDistanceOut.setTitle(str, for: .normal)}}
-        cell.lblSearchFood.text = arrForRestaurants[indexPath.row]["name"] as? String
-           if let dict = (arrDuration.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
-            if let str = dict["Difference"] as? String{
-                cell.btnFoodDistanceForCarOut.setTitle(str, for: .normal)}}
-        if let photos = arrForRestaurants[indexPath.row]["photos"] as? [[String:Any]]{
-            let strRefre = photos.first
-            let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
-            cell.imgViewFoodRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)}}
+                    let miles = kilometersToMiles(speedString: str)
+                    cell.btnFoodDistanceOut.setTitle("\(miles) mi", for: .normal)}}
+            if let dict = arrForRestaurants[indexPath.row]["CarFirst"] as? NSDictionary{
+                if let str = dict["Difference"] as? String{
+                    let miles = kilometersToMiles(speedString: str)
+                    cell.btnFoodDistanceForCarOut.setTitle("\(miles) mi", for: .normal)}}
+            
+            if let dict1 = arrForRestaurants[indexPath.row]["isSelected"] as? NSDictionary{
+                cell.lblSearchFood.text = dict1["name"] as? String
+                if let photos = dict1["photos"] as? [[String:Any]]{
+                    let strRefre = photos.first
+                    let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
+                    cell.imgViewFoodRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)}}}
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -126,6 +146,14 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
             layer.shadowPath = shadowPath.cgPath
         }
         
+    }
+    // Convert from kilometers to miles (Double)
+    func kilometersToMiles(speedString:String) ->Double {
+        var newstr = speedString.components(separatedBy: " ")
+        let speedInMPH = Double(newstr[0])
+        let speedIn = speedInMPH! / 1.6
+        let speedInKPH = (speedIn*10).rounded()/100
+        return speedInKPH as Double
     }
     // MARK: - Google Api
     @objc func retriveDataForRestaurants(){
@@ -169,6 +197,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                 if success == true {
                     self.tblViewAddress.isHidden = false
                     self.collectionViewFoodSearch.isHidden = true
+                    self.viewFood.isHidden = true
                     if let resultArr : NSArray = response.object(forKey: "predictions") as? NSArray {
                         self.arrForAddress = NSMutableArray(array: resultArr)
                         self.tblViewAddress.reloadData()
@@ -199,7 +228,9 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
             }}}
     
     func retriveDataForRestaurantByCarAndWalking(){
-       MBProgressHUD.showAdded(to: self.view, animated: true)
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        self.isService = false
+        
         arrDuration.removeAllObjects()
         arrTime.removeAllObjects()
         arrPlaces.removeAllObjects()
@@ -238,14 +269,14 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                                 if rows.count > 0 {
                                     if let elements : NSArray = (rows.object(at: 0) as AnyObject).object(forKey: "elements") as? NSArray {
                                         if elements.count > 0 {
-                                          
+                                            
                                             if let durationDict : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "distance") as? NSDictionary {
-                                    let durationDictTime : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "duration") as! NSDictionary
+                                                let durationDictTime : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "duration") as! NSDictionary
                                                 if let differ : String = durationDict.object(forKey: "text") as? String {
-                                                   let Timediffer : String = durationDictTime.object(forKey: "text") as! String
+                                                    let Timediffer : String = durationDictTime.object(forKey: "text") as! String
                                                     let dict = ["Difference":differ]
                                                     let Timedict = ["TimeDifference":Timediffer]
-                                            let myData = NSMutableDictionary(dictionary: tempData)
+                                                    let myData = NSMutableDictionary(dictionary: tempData)
                                                     myData.setObject(dict, forKey: "CarFirst" as NSCopying)
                                                     self.arrDuration.replaceObject(at: index, with: myData)
                                                     let myTimeData = NSMutableDictionary(dictionary: tempData)
@@ -271,10 +302,42 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                                                     //self.setData()
                                                 }
                                             }}}}}}}}}}}
-
+    
     @objc func tempFuncForDelay(){
         MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+        arrData.removeAllObjects()
+        if isService{}else{
+            isService = true
+            for i in arrForRestaurants{
+                arrData.add(i)
+            }
+            setData()
+        }
+        
         self.collectionViewFoodSearch.reloadData()
+    }
+    
+    func setData(){
+        arrForRestaurants.removeAll()
+        for i in 0..<arrData.count{
+            
+            if let BudsDict = self.arrDuration.object(at: i) as? NSDictionary
+            {
+                let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
+                MuteBudsDict.setValue(self.arrData.object(at: i) as? NSDictionary, forKey: "isSelected")
+                arrData.replaceObject(at: i, with: MuteBudsDict)
+            }
+            
+        }
+        
+        for i in arrData{
+            arrForRestaurants.append(i as! [String : AnyObject] )
+        }
+        self.arrForRestaurants = arrForRestaurants.sorted { (obj1, obj2) -> Bool in
+            let obj = obj1["CarFirst"] as! NSDictionary
+            let obj3 = obj2["CarFirst"] as! NSDictionary
+            return (obj["Difference"] as! String) < (obj3["Difference"] as! String)
+        }
     }
 }
 extension foodSearchScreenVC : UITextFieldDelegate {
@@ -287,7 +350,7 @@ extension foodSearchScreenVC : UITextFieldDelegate {
             transition.subtype = kCATransitionFromTop;
             self.stackViewOflocation.isHidden = false
         }
-       
+        
     }
     @objc func textFieldDidChange(textField : UITextField){
         
@@ -339,6 +402,7 @@ extension foodSearchScreenVC : UITableViewDataSource, UITableViewDelegate {
         txtFeildAddressSearch.text = (arrForAddress.object(at: indexPath.row) as AnyObject).object(forKey: "description") as? String
         self.tblViewAddress.isHidden = true
         self.collectionViewFoodSearch.isHidden = false
+        viewFood.isHidden = false
         txtFeildAddressSearch.resignFirstResponder()
     }
 }

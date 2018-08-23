@@ -37,7 +37,8 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
         super.viewDidLoad()
         
         print(arrOfRestaurantData)
-        lblRestaurantName.text = arrOfRestaurantData["name"] as? String
+       if let dict = arrOfRestaurantData["isSelected"] as? NSDictionary{
+        lblRestaurantName.text = dict["name"] as? String
         if let str = strTime as? String{
             if str == ""{
                 btnTimeOut.setTitle("18 mins", for: .normal)
@@ -47,7 +48,9 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
         }else{
            btnTimeOut.setTitle("18 mins", for: .normal)
         }
-        getplaceDetails(placeId: arrOfRestaurantData["place_id"] as! String)
+        getplaceDetails(placeId: dict["place_id"] as! String)
+        }
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.isNavigationBarHidden = true

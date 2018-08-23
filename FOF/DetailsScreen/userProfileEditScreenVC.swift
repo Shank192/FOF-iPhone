@@ -43,6 +43,29 @@ class userProfileEditScreenVC: UIViewController,UICollectionViewDelegate,UIColle
     @IBAction func btnSaveAct(_ sender: Any) {
         
           NotificationCenter.default.post(name: Constants.UserDefaults.notificationName, object: nil)
+        
+//        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
+//            if success == true
+//            {
+//                if let dataArray = response.object(forKey: "data") as? NSArray
+//                {
+//                    if dataArray.count != 0
+//                    {
+//                        if let dict = dataArray.object(at: 0) as? NSDictionary
+//                        {
+//                            Constants.GlobalConstants.appDelegate.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
+//                            let placesData = NSKeyedArchiver.archivedData(withRootObject: dataArray)
+//                            UserDefaults.standard.set(placesData, forKey: Constants.UserDefaults.ProfileData)
+//                            UserDefaults.standard.set(dict.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
+//                            if let sessionid = dict.object(forKey: "sessionid")
+//                            {
+//                                UserDefaults.standard.set("\(sessionid)", forKey: Constants.UserDefaults.session_ID)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
     
     @IBAction func btnDetailsAct(_ sender: Any) {

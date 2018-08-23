@@ -162,19 +162,41 @@ func resizeImageWithWidth(_ image: UIImage, newWidth: CGFloat) -> UIImage {
     return newImage!
 }
 //MARK: - current values
-func CurrentDate() -> String{
-    let date = Date()
-    let formatter = DateFormatter()
-    formatter.dateFormat = "dd-MM-yyyy"
-    let result = formatter.string(from: date)
-    return result
+func getDate(msgTime : Any) -> String{
+    
+    let time = Double(truncating: msgTime as! NSNumber)
+    let msgDate : Date = Date(timeIntervalSince1970: TimeInterval(time))
+    let myFormater = DateFormatter()
+    myFormater.dateFormat = "dd-MM-yyyy HH:mm:ss"
+    myFormater.locale = Locale(identifier: "en_US_POSIX")
+    myFormater.timeZone = TimeZone.current
+   return myFormater.string(from: msgDate)
 }
-func setCurrentTime(){
-    let date = Date()
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "hh:mm a"
-   let str = dateFormatter.string(from: date)
-    //UserDefaults.standard.set(str, forKey: Constants.UserDefaults.chooseCurrentTime)
+func getTimeFromTimeStamp(timestamp : Any) -> String{
+    
+    let myFormater = DateFormatter()
+    myFormater.dateFormat = "dd-MM-yyyy HH:mm:ss"
+    myFormater.locale = Locale(identifier: "en_US_POSIX")
+    let time = Double(truncating: timestamp as! NSNumber)
+    let msgDate : Date = Date(timeIntervalSince1970: TimeInterval(time))
+
+    //let myFormater = DateFormatter()
+    myFormater.dateFormat = "hh:mm a"
+    let strDate = myFormater.string(from: msgDate)
+    return strDate
+}
+func setCurrentTimeToTimestamp() -> NSInteger{
+    
+    let formatter = DateFormatter()
+    formatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
+    let myString = formatter.string(from: Date()) // string purpose I add here
+    let yourDate = formatter.date(from: myString)
+    formatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
+    let myStringafd = formatter.string(from: yourDate!)
+    let date = formatter.date(from: myStringafd)
+    let myTimeInterval = date?.timeIntervalSince1970
+    let time = Int(myTimeInterval!)
+    return time
 }
 func UIColorFromHex(_ rgbValue: UInt) -> UIColor
 {

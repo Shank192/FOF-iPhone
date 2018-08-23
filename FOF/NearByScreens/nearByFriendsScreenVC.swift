@@ -136,8 +136,10 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
                 UserDefaults.standard.set(dictArray.object(forKey: "search_max_age")!, forKey: "strUpperValue")
                 UserDefaults.standard.set(dictArray.object(forKey: "showme")!, forKey: "strGender")
                 UserDefaults.standard.set(dictArray.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
-                self.GetSuggestedFriend()
-                self.wsSetFriendsList()
+                if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isFriend){
+                    self.wsSetFriendsList()
+                }else{
+                self.GetSuggestedFriend()}
 
             }}
     }
@@ -271,8 +273,9 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
                     //self.view.makeToast(response.object(forKey: "message") as! String)
                 }
             }
-            
-            self.GetSuggestedFriend()
+            self.setFriendOrSuggestArray()
+
+            //self.GetSuggestedFriend()
             
         })
         
@@ -421,14 +424,13 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
         if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
         {
             
-            if let first_name = dict.object(forKey: "first_name"),let last_name = dict.object(forKey: "last_name"),let distance = dict.object(forKey: "distance"),let profilepic1 = dict.object(forKey: "profilepic1")
+            if let first_name = dict.object(forKey: "first_name"),let last_name = dict.object(forKey: "last_name"),let profilepic1 = dict.object(forKey: "profilepic1")
             {
                 if let friendstatus = dict.object(forKey: "friendstatus")
                 {
                     if "\(friendstatus)" == "Friends"
                     {
-                        cell.imgViewMutualFriend.isHidden = false
-                        cell.imgViewMutualFriend2.isHidden = false
+                    
                         cell.btnMEssage.setImage(UIImage.init(named: "chatIcon"), for: .normal)
                         if let matchBuds = dict.object(forKey: "matchBuds")
                         {
@@ -448,8 +450,7 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                     else
                     {
                         cell.btnMEssage.setImage(UIImage.init(named: "add_friend_btn"), for: .normal)
-                        cell.imgViewMutualFriend.isHidden = true
-                        cell.imgViewMutualFriend2.isHidden = true
+                     
                         if let matchBuds = dict.object(forKey: "matchBuds")
                         {
                             cell.viewMatchProfileRate.value = CGFloat.init(Double("\(matchBuds)")!)
@@ -484,10 +485,11 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
 
                 
                 cell.btnMEssage.tag = indexPath.row
-                cell.btnMEssage.addTarget(self, action: #selector(btnActionMessage(sender:)), for: .touchUpInside)
-                let dist = String(describing: distance)
                 cell.lblFriendName.text = "\(first_name) \(last_name)"
-                cell.lblDistance.setTitle("\(dist.prefix(4)) km", for: .normal)
+                cell.btnMEssage.addTarget(self, action: #selector(btnActionMessage(sender:)), for: .touchUpInside)
+                if let distance = dict.object(forKey: "distance") as? String{
+                let dist = String(describing: distance)
+                 cell.lblDistance.setTitle("\(dist.prefix(4)) km", for: .normal)}
                 cell.imgViewFriendProfile.cornerRadius = cell.imgViewFriendProfile.frame.width/2
                 cell.imgViewFriendProfile.clipsToBounds = true
                 cell.imgViewFriendProfile.image = UIImage.init(named: "disableSingle")
@@ -512,6 +514,8 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                             {
                                 if "\(profilepic11)" != ""
                                 {
+                                    cell.imgViewMutualFriend.isHidden = false
+                                    cell.imgViewMutualFriend2.isHidden = true
                                      cell.lblMutualFriend.text = "Mutual friend"
                                     cell.imgViewMutualFriend.sd_setImage(with: URL.init(string: "\(profilepic11)")!)
                                 }
@@ -520,6 +524,8 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                     }
                     else
                     {
+                        cell.imgViewMutualFriend.isHidden = true
+                        cell.imgViewMutualFriend2.isHidden = true
                         cell.lblMutualFriend.text = "No mutual friend"
                     }
                 }

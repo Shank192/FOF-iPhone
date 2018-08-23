@@ -25,6 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var currentLongitude : String = ""
     var curLocation : CLLocation?
     
+    var rootRef = DatabaseReference()
+    var arrDetailData = NSMutableDictionary()
     @objc var userLocation = CLLocationCoordinate2D()
     @objc var searchedLocation =  CLLocationCoordinate2D()
     
@@ -33,9 +35,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
         if launchedBefore  {
+            
         }
         else {
             UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isFriend)
             UserDefaults.standard.set(true, forKey: "launchedBefore")
         }
         FirebaseApp.configure()
@@ -65,6 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        online()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -72,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
+        offline()
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     //MARK:- Register RemoteNotification
@@ -123,6 +129,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             return FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         return true
+    }
+    //MARK:- Check Online Offline
+
+    func online(){
+        if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as? String{
+            let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
+            let objConversation = conversationScreenVC()
+            objConversation.addObserverOnlineOfflineStatus()
+            arrDetailData["status"] = "Online"
+            arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
+           arrDetailData["senderId"] = senderId
+            arrDetailData["timestamp"] = ""
+            arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId) as! String
+            Database.database().reference().child("status/\(chatGrpId)/\(senderId)").setValue(arrDetailData)
+        }
+    }
+    func offline(){
+        if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as? String{
+            let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
+            arrDetailData["status"] = "Offline"
+            arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
+            arrDetailData["senderId"] = senderId
+            arrDetailData["timestamp"] = ""
+            arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId) as! String
+            Database.database().reference().child("status/\(chatGrpId)/\(senderId)").setValue(arrDetailData)
+            
+        }
+    }
+    func Typing(){
+        if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as? String{
+            let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
+            arrDetailData["status"] = "typing..."
+            arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
+            arrDetailData["senderId"] = senderId
+            arrDetailData["timestamp"] = ""
+            arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId) as! String
+           Database.database().reference().child("status/\(chatGrpId)/\(senderId)").setValue(arrDetailData)
+            
+        }
     }
     //MARK:- Set Root
     func SetMyRootBy() {
