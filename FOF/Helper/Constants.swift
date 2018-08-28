@@ -79,6 +79,7 @@ struct Constants {
         static let User_Last_Name = "User_Last_Name"
         static let User_Email = "User_Email"
         static let email_ID = "email_ID"
+        static let gender = "gender"
         static let alreadyLogin = "alreadyLogin"
         static let isregistered = "isregistered"
         static let isLoging = "isUserLoging"
@@ -91,7 +92,8 @@ struct Constants {
         static let receiverDP = "receiverDP"
         static let matchId = "matchId"
         
-        
+        static let isCurrentLocationRestro = "isCurrentLocationRestro"
+        static let isCurrentLocationFrnd = "isCurrentLocationFrnd"
         
         static let currentLatitude = "currentLatitude"
         static let currentLongitude = "currentLongitude"

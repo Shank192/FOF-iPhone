@@ -20,11 +20,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "556709239.706097"
+            timestampString = "557143281.2941951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "136"
-            endingLineNumber = "136"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
             landmarkName = "btnSendAct(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -35,13 +35,61 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/AppDelegate.swift"
-            timestampString = "556709239.706647"
+            filePath = "FOF/NearByScreens/foodSearchScreenVC.swift"
+            timestampString = "556808045.396294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "142"
-            endingLineNumber = "142"
-            landmarkName = "online()"
+            startingLineNumber = "135"
+            endingLineNumber = "135"
+            landmarkName = "setData(latitude:longitude:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FOF.foodSearchScreenVC.setData(latitude: Swift.String, longitude: Swift.String) -&gt; ()"
+                  moduleName = "FOF"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/foodSearchScreenVC.swift"
+                  timestampString = "557143281.635415"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "135"
+                  endingLineNumber = "135"
+                  offsetFromSymbolStart = "820">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Bool, __ObjC.NSDictionary) -&gt; () in FOF.foodSearchScreenVC.setData(latitude: Swift.String, longitude: Swift.String) -&gt; ()"
+                  moduleName = "FOF"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/foodSearchScreenVC.swift"
+                  timestampString = "557143281.637244"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "136"
+                  endingLineNumber = "136"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/NearByScreens/foodSearchScreenVC.swift"
+            timestampString = "556808045.396359"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "212"
+            endingLineNumber = "212"
+            landmarkName = "retriveDataForRestaurantByCarAndWalking()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -51,77 +99,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/AppDelegate.swift"
-            timestampString = "556709239.706737"
+            filePath = "FOF/NearByScreens/foodSearchScreenVC.swift"
+            timestampString = "556808045.3964061"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "136"
-            endingLineNumber = "136"
-            landmarkName = "online()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FOF/AppDelegate.swift"
-            timestampString = "556709239.706822"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
-            landmarkName = "offline()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "556709239.706901"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
-            landmarkName = "initialSetup()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "556709239.707242"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "236"
-            endingLineNumber = "236"
-            landmarkName = "addObserverForRealTimeChatting()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "556709239.707559"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "234"
-            endingLineNumber = "234"
-            landmarkName = "addObserverForRealTimeChatting()"
+            startingLineNumber = "215"
+            endingLineNumber = "215"
+            landmarkName = "retriveDataForRestaurantByCarAndWalking()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -132,12 +116,76 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "556709239.707875"
+            timestampString = "557143281.294654"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "238"
-            endingLineNumber = "238"
-            landmarkName = "addObserverForRealTimeChatting()"
+            startingLineNumber = "210"
+            endingLineNumber = "210"
+            landmarkName = "addObserverOnlineOfflineStatus()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/NearByScreens/nearByFriendsScreenVC.swift"
+            timestampString = "557143281.294924"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "313"
+            endingLineNumber = "313"
+            landmarkName = "btnActionMessage(sender:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FOF.nearByFriendsScreenVC.btnActionMessage(sender: __ObjC.UIButton) -&gt; ()"
+                  moduleName = "FOF"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/nearByFriendsScreenVC.swift"
+                  timestampString = "557143281.653782"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "313"
+                  endingLineNumber = "313"
+                  offsetFromSymbolStart = "2156">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Bool, __ObjC.NSDictionary) -&gt; () in FOF.nearByFriendsScreenVC.btnActionMessage(sender: __ObjC.UIButton) -&gt; ()"
+                  moduleName = "FOF"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/nearByFriendsScreenVC.swift"
+                  timestampString = "557143281.655704"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "315"
+                  endingLineNumber = "315"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/conversationScreenVC.swift"
+            timestampString = "557143281.2949769"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "239"
+            endingLineNumber = "239"
+            landmarkName = "CheckOnlineOfflineStatus()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -148,12 +196,92 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "556709239.70819"
+            timestampString = "557143281.295218"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "235"
             endingLineNumber = "235"
-            landmarkName = "addObserverForRealTimeChatting()"
+            landmarkName = "CheckOnlineOfflineStatus()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/conversationScreenVC.swift"
+            timestampString = "557143281.295459"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "232"
+            endingLineNumber = "232"
+            landmarkName = "CheckOnlineOfflineStatus()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/conversationScreenVC.swift"
+            timestampString = "557143281.295702"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "230"
+            endingLineNumber = "230"
+            landmarkName = "CheckOnlineOfflineStatus()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FOF.conversationScreenVC.CheckOnlineOfflineStatus() -&gt; ()"
+                  moduleName = "FOF"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/conversationScreenVC.swift"
+                  timestampString = "557143281.671471"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "230"
+                  endingLineNumber = "230"
+                  offsetFromSymbolStart = "28">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (__ObjC.DataSnapshot) -&gt; () in FOF.conversationScreenVC.CheckOnlineOfflineStatus() -&gt; ()"
+                  moduleName = "FOF"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/conversationScreenVC.swift"
+                  timestampString = "557143281.67352"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "232"
+                  endingLineNumber = "232"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/conversationScreenVC.swift"
+            timestampString = "557143281.295941"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "237"
+            endingLineNumber = "237"
+            landmarkName = "CheckOnlineOfflineStatus()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

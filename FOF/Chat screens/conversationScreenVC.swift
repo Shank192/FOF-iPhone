@@ -87,14 +87,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         self.textViewMessage.maxHeight = 120.0
         self.textViewMessage.textContainerInset = .init(top: 15, left: 12, bottom: 13, right: 48)
         self.textViewMessage.delegate = self
-        
-       
-        // Setup CollectionView
-        
-        
-        // Get Messages
-       // self.initiateRealmUpdates()
-        
+    
         // Setup Formatter
     observeMessages()
     CheckOnlineOfflineStatus()
@@ -147,12 +140,6 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     //MARK: - Firebase observe message without chack delete
 
     fileprivate func observeMessages() {
-        
-        //msgHandle = rootRef.child("Messages").child(chatGrpId).queryOrderedByKey().obser
-        
-        //1 .queryLimited(toLast:20)
-        
-        //        MBProgressHUD.showAdded(to: self.view, animated: true)
         
         if msgHandle != nil
         {
@@ -217,10 +204,10 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                         if let strTimeStamp = DataDict.value(forKey: "lastSeen")! as? String{
                         if let myInteger = Int(strTimeStamp) {
                             let str = NSNumber(value: myInteger)
-                            self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))"
+                         //   self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))"
                             }}
                     }else{
-                        self.lblLastSeen.text = strOnline
+                       // self.lblLastSeen.text = strOnline
                     } }
                     }
             }
@@ -254,7 +241,9 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                                     
                                 }else{
                                     self.lblLastSeen.text = strOnline}}
-                        }
+                        }else{
+                             self.lblLastSeen.text = ""
+            }
         }
     }
     //MARK:- Sort Array

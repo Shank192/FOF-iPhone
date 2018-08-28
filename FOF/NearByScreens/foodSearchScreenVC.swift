@@ -83,49 +83,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     @IBAction func btnCurrentLocation(_ sender: Any) {
         setCurrentDeatils()
     }
-    // MARK: - CollectionView Delegate
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return arrForRestaurants.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
-        if arrDuration.count == arrForRestaurants.count{
-            cell.viewBack.layer.shadowOpacity = 0.7
-            cell.viewBack.layer.shadowOffset = CGSize.zero
-            cell.viewBack.layer.shadowRadius = 3.0
-            cell.viewBack.layer.shadowColor = UIColor.lightGray.cgColor
-            
-            if let dict = arrForRestaurants[indexPath.row]["WalkFirst"] as? NSDictionary{
-                if let str = dict["Difference"] as? String{
-                    let miles = kilometersToMiles(speedString: str)
-                    cell.btnFoodDistanceOut.setTitle("\(miles) mi", for: .normal)}}
-            if let dict = arrForRestaurants[indexPath.row]["CarFirst"] as? NSDictionary{
-                if let str = dict["Difference"] as? String{
-                    let miles = kilometersToMiles(speedString: str)
-                    cell.btnFoodDistanceForCarOut.setTitle("\(miles) mi", for: .normal)}}
-            
-            if let dict1 = arrForRestaurants[indexPath.row]["isSelected"] as? NSDictionary{
-                cell.lblSearchFood.text = dict1["name"] as? String
-                if let photos = dict1["photos"] as? [[String:Any]]{
-                    let strRefre = photos.first
-                    let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
-                    cell.imgViewFoodRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)}}}
-        return cell
-    }
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
-        obj.arrOfRestaurantData = arrForRestaurants[indexPath.row]
-        if let dict = (arrTime.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
-            if let str = dict["TimeDifference"] as? String{
-                obj.strTime = str }}
-        self.navigationController?.pushViewController(obj, animated: false)
-    }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: (self.collectionViewFoodSearch.frame.width
-            / 2) - 15, height: 197)
-        
-    }
+   
     @IBDesignable
     class CardView: UIView {
         
@@ -147,14 +105,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
         }
         
     }
-    // Convert from kilometers to miles (Double)
-    func kilometersToMiles(speedString:String) ->Double {
-        var newstr = speedString.components(separatedBy: " ")
-        let speedInMPH = Double(newstr[0])
-        let speedIn = speedInMPH! / 1.6
-        let speedInKPH = (speedIn*10).rounded()/100
-        return speedInKPH as Double
-    }
+
     // MARK: - Google Api
     @objc func retriveDataForRestaurants(){
         MBProgressHUD.showAdded(to: self.view, animated: true)
@@ -170,9 +121,9 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                     let arr = response.object(forKey: "result") as! NSDictionary
                     let dict = arr["geometry"] as? NSDictionary
                     if let loc = dict!["location"] as? NSDictionary{
-                        let lat = String(describing:loc["lat"]!)
-                        let lng = String(describing:loc["lng"]!)
-                        self.setData(latitude: lat, longitude: lng)
+                        self.latitude = String(describing:loc["lat"]!)
+                        self.longitude = String(describing:loc["lng"]!)
+                        self.setData(latitude: self.latitude, longitude: self.longitude)
                     }
                 }
                 self.dismiss(animated: true, completion: nil)
@@ -270,18 +221,12 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                                     if let elements : NSArray = (rows.object(at: 0) as AnyObject).object(forKey: "elements") as? NSArray {
                                         if elements.count > 0 {
                                             
-                                            if let durationDict : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "distance") as? NSDictionary {
-                                                let durationDictTime : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "duration") as! NSDictionary
+                                            if let durationDict : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "duration") as? NSDictionary {
                                                 if let differ : String = durationDict.object(forKey: "text") as? String {
-                                                    let Timediffer : String = durationDictTime.object(forKey: "text") as! String
                                                     let dict = ["Difference":differ]
-                                                    let Timedict = ["TimeDifference":Timediffer]
                                                     let myData = NSMutableDictionary(dictionary: tempData)
                                                     myData.setObject(dict, forKey: "CarFirst" as NSCopying)
                                                     self.arrDuration.replaceObject(at: index, with: myData)
-                                                    let myTimeData = NSMutableDictionary(dictionary: tempData)
-                                                    myTimeData.setObject(Timedict, forKey: "CarFirst" as NSCopying)
-                                                    self.arrTime.replaceObject(at: index, with: myTimeData)
                                                 }}}}}}}}
                     myURL = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=\(firstStartLat),\(firstStartLong)&destinations=\(secondStartLat),\(secondStartLong)&mode=walking&language=EN&key=\(Constants.GoogleKey.kGoogle_Key)"
                     WebService.CallRequestUrl(myURL) { (success, response) in
@@ -291,7 +236,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                                     if rows.count > 0 {
                                         if let elements : NSArray = (rows.object(at: 0) as AnyObject).object(forKey: "elements") as? NSArray {
                                             if elements.count > 0 {
-                                                if let durationDict : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "distance") as? NSDictionary {
+                                                if let durationDict : NSDictionary = (elements.object(at: 0) as AnyObject).object(forKey: "duration") as? NSDictionary {
                                                     if let differ : String = durationDict.object(forKey: "text") as? String {
                                                         let dict = ["Difference":differ]
                                                         let myData = NSMutableDictionary(dictionary: tempData)
@@ -334,10 +279,51 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
             arrForRestaurants.append(i as! [String : AnyObject] )
         }
         self.arrForRestaurants = arrForRestaurants.sorted { (obj1, obj2) -> Bool in
-            let obj = obj1["CarFirst"] as! NSDictionary
-            let obj3 = obj2["CarFirst"] as! NSDictionary
-            return (obj["Difference"] as! String) < (obj3["Difference"] as! String)
+            let str = ((obj1["CarFirst"] as! NSDictionary)["Difference"] as! String).components(separatedBy: " ")
+            let str2 = ((obj2["CarFirst"] as! NSDictionary)["Difference"] as! String).components(separatedBy: " ")
+            return (str[0]) > (str2[0])
         }
+    }
+    // MARK: - CollectionView Delegate
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return arrForRestaurants.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
+        if arrDuration.count == arrForRestaurants.count{
+            cell.viewBack.layer.shadowOpacity = 0.7
+            cell.viewBack.layer.shadowOffset = CGSize.zero
+            cell.viewBack.layer.shadowRadius = 3.0
+            cell.viewBack.layer.shadowColor = UIColor.lightGray.cgColor
+            
+            if let dict = arrForRestaurants[indexPath.row]["WalkFirst"] as? NSDictionary{
+                if let str = dict["Difference"] as? String{
+                    cell.btnFoodDistanceOut.setTitle("\(str)", for: .normal)}}
+            if let dict = arrForRestaurants[indexPath.row]["CarFirst"] as? NSDictionary{
+                if let str = dict["Difference"] as? String{
+                    cell.btnFoodDistanceForCarOut.setTitle("\(str)", for: .normal)}}
+            
+            if let dict1 = arrForRestaurants[indexPath.row]["isSelected"] as? NSDictionary{
+                cell.lblSearchFood.text = dict1["name"] as? String
+                if let photos = dict1["photos"] as? [[String:Any]]{
+                    let strRefre = photos.first
+                    let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
+                    cell.imgViewFoodRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)}}}
+        return cell
+    }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
+        obj.arrOfRestaurantData = arrForRestaurants[indexPath.row]
+        if let dict = (arrTime.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
+            if let str = dict["TimeDifference"] as? String{
+                obj.strTime = str }}
+        self.navigationController?.pushViewController(obj, animated: false)
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: (self.collectionViewFoodSearch.frame.width
+            / 2) - 5, height: 197)
+        
     }
 }
 extension foodSearchScreenVC : UITextFieldDelegate {

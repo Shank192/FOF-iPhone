@@ -312,8 +312,13 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
         
         UserDefaults.standard.set(selectedBudsArray, forKey: Constants.UserDefaults.MyTestBuds)
         UserDefaults.standard.synchronize()
-        
-        let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID),"testbuds":selectedBuds,"showme":"all","distance_unit":"miles","search_min_age":18,"search_max_age":40,"search_distance":40,"isreviewed":(0),"fields":"testbuds,showme,search_min_age,distance_unit,search_max_age,search_distance,isreviewed"]
+        var strGender = String()
+        if let str = UserDefaults.standard.object(forKey: Constants.UserDefaults.gender) as? String{
+            strGender = str
+        }else{
+            strGender = "all"
+        }
+        let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID),"testbuds":selectedBuds,"showme":strGender,"distance_unit":"miles","search_min_age":18,"search_max_age":40,"search_distance":40,"isreviewed":(0),"fields":"testbuds,showme,search_min_age,distance_unit,search_max_age,search_distance,isreviewed"]
         
         MBProgressHUD.showAdded(to: self.view, animated: true)
         WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in

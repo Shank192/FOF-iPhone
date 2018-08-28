@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     @objc var userDetail = UserDetail()
     var strSearchedPlace = ""
     var locationManager = CLLocationManager()
-    
+    var isView = UIViewController()
     var currentLatitude : String = ""
     var currentLongitude : String = ""
     var curLocation : CLLocation?
@@ -38,6 +38,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             
         }
         else {
+            UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationRestro)
+            UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
             UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
             UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isFriend)
             UserDefaults.standard.set(true, forKey: "launchedBefore")
@@ -205,6 +207,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     func locateLocationManager(view : UIViewController)
     {
+        isView = view
         self.locationManager.requestAlwaysAuthorization()
         // For use in foreground
         self.locationManager.requestWhenInUseAuthorization()
@@ -233,20 +236,30 @@ extension AppDelegate : CLLocationManagerDelegate
            // if meters > 25 {
                 currentLatitude = NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String
                 currentLongitude = NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String
-                UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey: Constants.UserDefaults.currentLatitude)
+            
+            UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey: Constants.UserDefaults.currentLatitude)
+            
                 UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String, forKey: Constants.UserDefaults.currentLongitude)
+           
+            //UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey:Constants.UserDefaults.currentRestLatitude)
+           
+          //  UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String, forKey:Constants.UserDefaults.currentRestLongitude)
                 
                 curLocation = manager.location
-                
-              NotificationCenter.default.post(name: Notification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
                 manager.stopUpdatingLocation()
            // }
         } else {
             currentLatitude = NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String
             currentLongitude = NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String
-            UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey: Constants.UserDefaults.currentLatitude)
-            UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String, forKey: Constants.UserDefaults.currentLongitude)
             
+            UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey: Constants.UserDefaults.currentLatitude)
+           
+            UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String, forKey: Constants.UserDefaults.currentLongitude)
+           
+           // UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.latitude)!) as String, forKey:Constants.UserDefaults.currentRestLatitude)
+            
+           // UserDefaults.standard.set(NSString(format: "%.8f", (manager.location?.coordinate.longitude)!) as String, forKey:Constants.UserDefaults.currentRestLongitude)
             curLocation = manager.location
            NotificationCenter.default.post(name: Notification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
             manager.stopUpdatingLocation()

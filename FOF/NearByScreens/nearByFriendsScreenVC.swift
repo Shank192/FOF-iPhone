@@ -9,19 +9,27 @@ import GoogleMaps
 import MBProgressHUD
 import CoreLocation
 
-class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
-
+class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDelegate {
+    @IBOutlet weak var tblViewAddress: UITableView!
+    
     @IBOutlet weak var collectionViewNearByFrnds: UICollectionView!
     @IBOutlet weak var aMapView: GMSMapView!
     
     var ArrayFriendData = NSMutableArray()
     var clusterManager: GMUClusterManager!
-    
     var latitude = String()
     var longitude = String()
     var location: CLLocation?
     var locationManager = CLLocationManager()
-
+    var objofFilter : filterScreenVC?
+    //var isCurrentLocation = true
+    
+    @IBOutlet weak var nslcHightOfButton: NSLayoutConstraint!
+    @IBOutlet weak var btnCancelOut: UIButton!
+    @IBOutlet weak var btnSearchOut: UIButton!
+    @IBOutlet weak var txtFieldLocation: UITextField!
+    
+    var arrForAddress = NSMutableArray()
     let geocoder = CLGeocoder()
     var placemark: CLPlacemark?
     private func showStatusAlert(
@@ -55,14 +63,28 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         hideKeyboardWhenTappedAround()
-        self.navigationController?.isNavigationBarHidden = true
-        let obj = nearByFriendsScreenVC()
-        Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
- 
         
-    }
 
-    
+        txtFieldLocation.delegate = self
+        txtFieldLocation.addTarget(self, action: #selector(myTargetFunction(textField:)), for: UIControlEvents.allTouchEvents)
+        txtFieldLocation.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: UIControlEvents.editingChanged)
+
+        let blurEffect = UIBlurEffect(style: .dark)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = self.view.frame
+        self.tblViewAddress.backgroundView = blurEffectView
+        tblViewAddress.layoutMargins = UIEdgeInsets.zero
+        tblViewAddress.tableFooterView = UIView(frame: CGRect.zero)
+        tblViewAddress.separatorInset = UIEdgeInsets.zero
+        tblViewAddress.isHidden = true
+        self.navigationController?.isNavigationBarHidden = true
+       // if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isCurrentLocationFrnd){
+            let obj = nearByFriendsScreenVC()
+            Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
+            NotificationCenter.default.addObserver(self, selector: #selector(retriveLocation), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+       // }
+        self.objofFilter = (self.storyboard?.instantiateViewController(withIdentifier: "filterScreenVC") as! filterScreenVC)
+    }
     override func loadView()
     {
         super.loadView()
@@ -87,9 +109,16 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-               NotificationCenter.default.addObserver(self, selector: #selector(retriveLocation), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+        nslcHightOfButton.constant = 10
+        btnCancelOut.setTitle("", for: .normal)
+        btnSearchOut.setTitle("", for: .normal)
+    
+        NotificationCenter.default.addObserver(self, selector: #selector(cancel), name: NSNotification.Name(rawValue: "Cancel"), object: nil)
+
     }
     @objc func retriveLocation(){
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+
         latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
         longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
 
@@ -115,18 +144,19 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
                     }
                 let strAddress = placemark.addressDictionary as! [String:AnyObject]
                 let strFormatted = strAddress["FormattedAddressLines"]! as! NSArray
-                setProfile(str: "\(strFormatted[0]),\(strFormatted[1]),\(city1),\(country1)")
+                setProfile(str: "\(strFormatted[0]),\(strFormatted[1]),\(city1),\(country1)", latitude: latitude , longitude: longitude)
 
                 locationManager.stopUpdatingLocation()
             }
         } else {}
     }
-    func setProfile(str: String){
+    func setProfile(str: String , latitude : String,longitude : String){
+       // latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
+       // longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
         let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID),"location":"\(latitude),\(longitude)","location_string":str,"fields":"location,location_string"]
         
         MBProgressHUD.showAdded(to: self.view, animated: true)
         WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
-            MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
             if success == true
             {
                 let arr = response["data"] as! NSArray
@@ -134,14 +164,17 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
                 UserDefaults.standard.set(dictArray.object(forKey: "search_distance")!, forKey: "strDistance")
                 UserDefaults.standard.set(dictArray.object(forKey: "search_min_age")!, forKey: "strLowerValue")
                 UserDefaults.standard.set(dictArray.object(forKey: "search_max_age")!, forKey: "strUpperValue")
-                UserDefaults.standard.set(dictArray.object(forKey: "showme")!, forKey: "strGender")
+                UserDefaults.standard.set(dictArray.object(forKey: "showme")!, forKey: Constants.UserDefaults.gender)
                 UserDefaults.standard.set(dictArray.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
                 if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isFriend){
                     self.wsSetFriendsList()
                 }else{
                 self.GetSuggestedFriend()}
 
-            }}
+            }else{
+                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+            }
+        }
     }
     func setmap(){
         let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
@@ -163,7 +196,62 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
             clusterManager.cluster()
             clusterManager.setDelegate(self, mapDelegate: self)}
     }
+    
+    // MARK: - TextField delegate method
+    @objc func myTargetFunction(textField: UITextField) {
+        UIView.animate(withDuration: 0.5) {
+            let transition = CATransition()
+            transition.duration = 0.5
+            transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+            transition.type = kCATransitionPush;
+            transition.subtype = kCATransitionFromRight;
+           self.nslcHightOfButton.constant = 30
+            self.btnCancelOut.setTitle("Cancel", for: .normal)
+            self.btnSearchOut.setTitle("Search", for: .normal)
+        }
+        
+    }
+    @objc func textFieldDidChange(textField : UITextField){
+        
+        if (textField.text?.count)! > 0 {
+                self.fetchBusinessFromGoogle(textField.text!)
+        }}
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool
+    {
+        textField.resignFirstResponder()
+        return true
+    }
      // MARK: - Button Actions
+    
+    @IBAction func btnCurrentLocationAct(_ sender: Any) {
+        UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
+
+        txtFieldLocation.text = ""
+        let obj = nearByFriendsScreenVC()
+        Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
+    }
+    
+    
+    @IBAction func btnCancelAct(_ sender: Any) {
+        nslcHightOfButton.constant = 10
+        btnCancelOut.setTitle("", for: .normal)
+        btnSearchOut.setTitle("", for: .normal)
+        txtFieldLocation.resignFirstResponder()
+        tblViewAddress.isHidden = true
+    }
+    
+    @IBAction func btnClearAct(_ sender: Any) {
+        txtFieldLocation.text = ""
+        tblViewAddress.isHidden = true
+        
+    }
+    
+    @IBAction func btnSearchAct(_ sender: Any) {
+      
+        txtFieldLocation.resignFirstResponder()  
+    }
+    
     @IBAction func btnFoodAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "foodSearchScreenVC") as! foodSearchScreenVC
         
@@ -176,15 +264,20 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     }
     
     @IBAction func btnFilterAct(_ sender: Any) {
-        let obj = self.storyboard?.instantiateViewController(withIdentifier: "filterScreenVC") as! filterScreenVC
-        self.navigationController?.present(obj, animated: true, completion: nil)
+        addChildViewController(objofFilter!)
+        self.view.addSubview(objofFilter!.view)
+        objofFilter!.didMove(toParentViewController: self)
     }
-    
+    @objc func cancel(){
+        objofFilter!.willMove(toParentViewController: nil)
+        objofFilter!.view.removeFromSuperview()
+        objofFilter!.removeFromParentViewController()
+        retriveLocation()
+    }
     @IBAction func btnSingleToggleAct(_ sender: Any) {
         let allviewController = self.navigationController?.viewControllers
         if allviewController![0].isKind(of:nearByFriendsScreenVC.self)
-        {
-            let obj = self.storyboard?.instantiateViewController(withIdentifier: "nearByRestaurantsScreenVC") as! nearByRestaurantsScreenVC
+        {let obj = self.storyboard?.instantiateViewController(withIdentifier: "nearByRestaurantsScreenVC") as! nearByRestaurantsScreenVC
             let transition = CATransition()
             transition.duration = 0.5
             transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
@@ -192,9 +285,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
             transition.subtype = kCATransitionFromRight;
             navigationController?.view.layer.add(transition, forKey: kCATransition)
             self.navigationController?.pushViewController(obj, animated: false)
-        }
-        else
-        {
+        }else{
             let transition = CATransition()
             transition.duration = 0.5
             transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
@@ -203,7 +294,6 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
             navigationController?.view.layer.add(transition, forKey:kCATransition)
             let _ = navigationController?.popViewController(animated: false)
         }
-        
     }
     
     @objc func btnActionMessage(sender : UIButton)
@@ -214,9 +304,15 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
             {
                 if "\(friendstatus)" == "Friends"
                 {
+                    
                 }
                 else
                 {
+    let param = ["action":"sendfriendrequest","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID),"friendid":frndID]
+                    
+    WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param as NSDictionary, CompletionHandler: { (success, response) in
+                        
+                    })
                 }
             }
         }
@@ -228,6 +324,44 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     
     
     // MARK: - webService
+    func fetchBusinessFromGoogle (_ searchname : String){
+        if searchname.count > 0 {
+            WebService.GetAutoCompletePlaces(searchname, locationString: "\(latitude),\(longitude)", radiusString: "20000", CompletionHandler: { (success, response) in
+                if success == true {
+                   self.tblViewAddress.isHidden = false
+                    if let resultArr : NSArray = response.object(forKey: "predictions") as? NSArray {
+                        self.arrForAddress = NSMutableArray(array: resultArr)
+                        self.tblViewAddress.reloadData()
+                    } else {
+                        self.arrForAddress = NSMutableArray()
+                        self.tblViewAddress.reloadData()
+                    }
+                } else {
+                    self.arrForAddress = NSMutableArray()
+                    self.tblViewAddress.reloadData()
+                }
+            })
+        } else {
+            self.arrForAddress = NSMutableArray()
+            self.tblViewAddress.reloadData()
+        }}
+    func getPlaceDetail(googlePlaceID:String , location : String) {
+        
+        WebService.GetPlaceDetailByPlaceId(googlePlaceID) { (success, response) -> () in
+            if success == true {
+                if (response.object(forKey: "result") != nil) {
+                    let arr = response.object(forKey: "result") as! NSDictionary
+                    let dict = arr["geometry"] as? NSDictionary
+                    if let loc = dict!["location"] as? NSDictionary{
+                        let lat = String(describing:loc["lat"]!)
+                        let lng = String(describing:loc["lng"]!)
+                       
+                        self.setProfile(str: location, latitude: lat , longitude: lng)
+                    }
+                }
+                self.dismiss(animated: true, completion: nil)
+            }
+        }}
     func wsSetFriendsList(){
         let param = ["action":"myfriends","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID)]
         MBProgressHUD.showAdded(to: self.view, animated: true)
@@ -287,29 +421,56 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
             
             if success == true
             {
+                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+
+                var isRemove = false
                 if let dataArray = response.object(forKey: "data") as? NSArray
                 {
-                    if self.ArrayFriendData.count != 0
-                    {
-                        self.ArrayFriendData.removeAllObjects()
-                        self.ArrayFriendData.addObjects(from: dataArray as! [Any])
+                    let arrDataForFilter = dataArray as! [[String:AnyObject]]
+                       if let str = UserDefaults.standard.object(forKey: Constants.UserDefaults.gender) as? String{
+                      self.ArrayFriendData.removeAllObjects()
+                        for i in arrDataForFilter{
+                            let strGende = i["gender"] as! String
+                            if str == "all" || str == "female,mal" {
+                                if self.ArrayFriendData.count != 0{
+                                    if isRemove{}else{self.ArrayFriendData.removeAllObjects()
+                                        isRemove = true}
+                                    self.ArrayFriendData.add(i)
+                                }else{
+                                   self.ArrayFriendData = NSMutableArray(array: dataArray)
+                                }
+                            }else if  str == "lgbt,femal" || str == "female"{
+                                if strGende == "female"{
+                                    if self.ArrayFriendData.count != 0{
+                                        if isRemove{}else{self.ArrayFriendData.removeAllObjects()
+                                            isRemove = true}
+                                        self.ArrayFriendData.add(i)
+                                    }else{
+                                        self.ArrayFriendData = NSMutableArray(array: dataArray)
+                                    }
+                                }
+                            }else if str == "male" || str == "lgbt,male"{
+                                if strGende == "male"{
+                                    if self.ArrayFriendData.count != 0{
+                                        if isRemove{}else{self.ArrayFriendData.removeAllObjects()
+                                            isRemove = true}
+                                        self.ArrayFriendData.add(i)
+                                    }else{
+                                      self.ArrayFriendData = NSMutableArray(array: dataArray)
+                                    }
+                                }
+                            }
+                        }
                     }
-                    else
-                    {
-                        self.ArrayFriendData = NSMutableArray(array: dataArray)
-                    }
+                   
                 }
-                
-            }
-            else if response.object(forKey: "message") != nil
-            {
-                //self.view.makeToast(response.object(forKey: "message") as! String)
-            }
-            else
-            {
+            }else if response.object(forKey: "message") != nil {
+                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+
+            } else {
                 if response.object(forKey: "message") != nil
                 {
-                    //self.view.makeToast(response.object(forKey: "message") as! String)
+                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
                 }
             }
             
@@ -331,6 +492,8 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     
     func setFriendOrSuggestArray()
     {
+        MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+
         if self.ArrayFriendData.count != 0
         {
             for i in 0..<self.ArrayFriendData.count
@@ -404,7 +567,39 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate {
     
 
 }
+extension nearByFriendsScreenVC : UITableViewDataSource, UITableViewDelegate {
+    
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return arrForAddress.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell")
+        cell?.selectionStyle = .none
+        cell?.textLabel?.font = UIFont.init(name: "GillSans", size: 16.0)
+        cell?.textLabel?.frame = CGRect(x: 20, y: 5, width: tableView.frame.size.width - 40, height: 21)
+        cell?.textLabel?.numberOfLines = 0
+        cell?.textLabel?.textColor = UIColor.white
+        if arrForAddress.count > indexPath.row {
+            cell?.textLabel?.text = (arrForAddress.object(at: indexPath.row) as AnyObject).object(forKey: "description") as? String
+        } else {
+            cell?.textLabel?.text = ""
+        }
+        cell?.textLabel?.sizeToFit()
+        return cell!
+        
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
 
+        txtFieldLocation.text = (arrForAddress.object(at: indexPath.row) as AnyObject).object(forKey: "description") as? String
+        getPlaceDetail(googlePlaceID:(arrForAddress.object(at: indexPath.row)as AnyObject).object(forKey: "place_id") as! String, location: txtFieldLocation.text!)
+                self.tblViewAddress.isHidden = true
+                txtFieldLocation.resignFirstResponder()
+    }
+}
 extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
 {
     // MARK: - CollectionView Delegate
@@ -498,6 +693,9 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                     if let proURL = URL.init(string: "\(profilepic1)")
                     {
                         cell.imgViewFriendProfile.sd_setImage(with: proURL)
+                    }
+                    if cell.imgViewFriendProfile.image == nil{
+                        cell.imgViewFriendProfile.image = UIImage.init(named: "disableSingle")
                     }
                 }
                 
