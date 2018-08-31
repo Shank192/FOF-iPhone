@@ -146,18 +146,28 @@ self.navigationController?.isNavigationBarHidden = true
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
         if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
-        {
-            if let dataDict = self.arrFriendData[indexPath.row] as? NSDictionary{
+        {if let dataDict = self.arrFriendData[indexPath.row] as? NSDictionary{
+                if dataDict.object(forKey: "status") as! String == "0"{
+                        let obj = self.storyboard?.instantiateViewController(withIdentifier: "sentRequestRestaurantScreenVC") as! sentRequestRestaurantScreenVC
+                       
+                    obj.dictUserDetails = arrFriendData[indexPath.row] as NSDictionary
+                        self.navigationController?.pushViewController(obj, animated: false)
+                }else{
+                let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
             UserDefaults.standard.set(dataDict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
             UserDefaults.standard.set(dataDict.object(forKey: "friend1"), forKey: Constants.UserDefaults.senderId)
-                UserDefaults.standard.set(dataDict.object(forKey: "friend2"), forKey: Constants.UserDefaults.receiverId)}
+                UserDefaults.standard.set(dataDict.object(forKey: "friend2"), forKey: Constants.UserDefaults.receiverId)
             obj.strReceiverName = "\(dict.object(forKey: "first_name")!) \(dict.object(forKey: "last_name")!)"
-            let profilepic1 = dict.object(forKey: "profilepic1")
-            UserDefaults.standard.setValue(profilepic1, forKey: Constants.UserDefaults.receiverDP)
+                    obj.isFreind = true
+           if let profilepic1 = dict.object(forKey: "profilepic1") as? String{
+            UserDefaults.standard.setValue(profilepic1, forKey: Constants.UserDefaults.receiverDP)}else{
+            UserDefaults.standard.setValue("", forKey: Constants.UserDefaults.receiverDP)
+                    }
+            self.navigationController?.pushViewController(obj, animated: false)
+        }}
         }
-        self.navigationController?.pushViewController(obj, animated: false)
+     
     }
    
 

@@ -24,7 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var currentLatitude : String = ""
     var currentLongitude : String = ""
     var curLocation : CLLocation?
-    
+    let objSendMessage = sendMessageServicesScreenVC()
+
     var rootRef = DatabaseReference()
     var arrDetailData = NSMutableDictionary()
     @objc var userLocation = CLLocationCoordinate2D()
@@ -137,8 +138,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     func online(){
         if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as? String{
             let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
-            let objConversation = conversationScreenVC()
-            objConversation.addObserverOnlineOfflineStatus()
+            objSendMessage.addObserverForStatusUpdateforChatId(chatId: chatGrpId)
             arrDetailData["status"] = "Online"
             arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
            arrDetailData["senderId"] = senderId

@@ -12,8 +12,10 @@ import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 
-class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewDataSource ,GrowingTextViewDelegate{
-
+class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewDataSource ,GrowingTextViewDelegate,FirebaseDelegate{
+  
+    
+   
     @IBOutlet weak var tblConversation: UITableView!
     @IBOutlet weak var textViewMessage: GrowingTextView!
     @IBOutlet weak var nslcBottomTextView: NSLayoutConstraint!
@@ -22,19 +24,18 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     @IBOutlet weak var lblLastSeen: UILabel!
     
     var arrMessages = NSMutableArray()
-    
     var arrChatMsgs = NSMutableArray()
     var arrMsgByDates = NSMutableArray()
     var arrSenderString = [String]()
     var lastMsgKey = ""
     var lastMsgCount = 20
     var isLoadingPrev = false
-    
+    var dictUserDetail = NSDictionary()
     var chatGrpId:String = ""
     var senderId = ""
     var frndId = ""
     var receipentDp = ""
-    var isFrndOnline = false
+    var isFreind = Bool()
     var strReceiverName = String()
     var userIsAvalable = false
     
@@ -42,14 +43,11 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     var msgHandle : DatabaseHandle?
     var msgChangedHandle : DatabaseHandle?
     var rootRef = DatabaseReference()
-    var storageRef = StorageReference()
-    var storage = Storage.storage()
-    
-    var onlineRef = DatabaseReference()
-    var typingRef = DatabaseReference()
+
     
     var myTypingRef : DatabaseReference?
-    
+    let objSendMessage = sendMessageServicesScreenVC()
+    var objSentRestaurants : sentRestaurantsScreenVC?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,16 +56,16 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     }
     
   func initialSetup() {
+    objSendMessage.delegate = self
+
     chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
     senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.senderId) as! String
     frndId = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId) as! String
     receipentDp = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String
     lblUserName.text = strReceiverName
-    
     hideKeyboardWhenTappedAround()
     registerForKeyboardNotifications()
         rootRef = Database.database().reference()
-        //        storageRef = storage.reference(forURL: "gs://the-qn-app.appspot.com")
         
         tblConversation.rowHeight = UITableViewAutomaticDimension
     tblConversation.estimatedSectionHeaderHeight = 0
@@ -87,11 +85,21 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         self.textViewMessage.maxHeight = 120.0
         self.textViewMessage.textContainerInset = .init(top: 15, left: 12, bottom: 13, right: 48)
         self.textViewMessage.delegate = self
+   
     
+    
+    if isFreind{
+        
+    }else{
+        addRestaurants()
+        return
+    }
+
         // Setup Formatter
     observeMessages()
-    CheckOnlineOfflineStatus()
-    addObserverOnlineOfflineStatus()
+    objSendMessage.getStatusDetailOfUserId(otherUserId:frndId,chatId:chatGrpId)
+    objSendMessage.addObserverForStatusUpdateforChatId(chatId:chatGrpId)
+    objSendMessage.addObserverForRecipteCHangeWithChatId(chatId:chatGrpId)
     addObserverForRealTimeChatting()
     Constants.GlobalConstants.appDelegate.online()
     }
@@ -100,41 +108,140 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         guard let text = self.textViewMessage.text, !text.isEmpty else {
             return
         }
-        Constants.GlobalConstants.appDelegate.online()
-        
-        let message = textViewMessage?.text.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        
-        if (message?.count)! > 0 {
-            
-            if chatGrpId.count > 0 {
-                
-             
-                
-                //1
-                let param = ["senderId":senderId,"msg":textViewMessage!.text!,"timeStamp":setCurrentTimeToTimestamp(),"imgUrl":"","recieverId":frndId,"recieverDP":UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String,"senderDp":"","contentType":"text"] as [String : Any]
-                
-                rootRef.child("messages").child(chatGrpId).childByAutoId().setValue(param)
-                
-                //Set Conversation
-                //2
-                
-                //self.setUnreadCount(pluseCount: 1, lastMsg: textViewMessage!.text!)
-                
-                
-                
-                
-               // self.sendNotificationTofrnd(message: textViewMessage!.text!)
-                
-                
-                //  self.sendChatNotification(msg: txtMsgView!.text!, isImage: 0, isVideo: 0)
-                
-                textViewMessage?.text = ""
-            }
+        if textViewMessage.text != ""{
+            reloadTableviewWithTextMessage(strTextMessage: self.textViewMessage.text!, isIncoming: false)
         }
+       textViewMessage.text = ""
     }
     
-    @IBAction func btnSendAttachmentAct(_ sender: Any) {
+    func setCurrentUpdatedStatusOfOtherUser(snapshot : DataSnapshot){
+        if snapshot.key == frndId{
+            if snapshot.value(forKey: "status") as! String == "Offline"{
+                lblLastSeen.text = "Offline"
+            }else if snapshot.value(forKey: "status") as! String == "Online"{
+                lblLastSeen.text = "Online"
+            }else{
+                lblLastSeen.text = "Typing..."
+            }
+        }
         
+    }
+    func setMsgseenTickMarkForMessage(snapshot: DataSnapshot) {
+        
+        
+        
+        
+    }
+    func otherUserIdStatusDetail(snapshot: DataSnapshot) {
+        if let arr = snapshot.value as? NSDictionary{
+        let str = arr.object(forKey: "status") as! String
+        if str == "Offline"{
+        if let myInteger = Int(arr.object(forKey: "lastSeen")! as! String) {
+        let str = NSNumber(value: myInteger)
+        self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))" }
+        }else if str == "Online"{
+            lblLastSeen.text = "Online" }
+        }else{
+            lblLastSeen.text = ""
+        }
+    }
+    func sendRestaurants(arrRestaurants : NSArray , strMessage : String){
+        print(arrRestaurants)
+        print(strMessage)
+        reloadTablview(arrRestaurants : arrRestaurants)
+    }
+    func reloadTableviewWithTextMessage(strTextMessage : String ,isIncoming : Bool){
+        Constants.GlobalConstants.appDelegate.online()
+
+        objSendMessage.setDictFormatForWriteDataDefault()
+        updateFirebaseDictForTextMessage(strMsgText: strTextMessage)
+        if isIncoming{
+            
+        }else{
+            objSendMessage.mutMessageParamDictDetail["senderId"] = senderId
+            objSendMessage.mutMessageParamDictDetail["recieverId"] = frndId
+            objSendMessage.mutMessageParamDictDetail["recieverDP"] = receipentDp
+            objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
+            objSendMessage.mutParamDict["priceRange"] = NSNumber.init(integerLiteral: 1)
+            objSendMessage.mutParamDict["posInList"] = NSNumber.init(integerLiteral: 0)
+            objSendMessage.mutParamDict["isSelected"] = NSNumber.init(booleanLiteral: false)
+            objSendMessage.sendMessageToRecieverId(recieverId: frndId, isFriend: true)
+        }
+        
+    }
+    func updateFirebaseDictForTextMessage(strMsgText : String){
+        objSendMessage.mutMessageParamDictDetail["contentType"] = "text"
+        objSendMessage.mutMessageParamDictDetail["msg"] = strMsgText
+        objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp()
+    }
+    func reloadTablview(arrRestaurants : NSArray){
+        objSendMessage.setDictFormatForWriteDataDefault()
+        for i in 0..<arrRestaurants.count {
+            var strPhotoUrl = String()
+            if let dataDict =  (arrRestaurants.object(at: i) as AnyObject).object(forKey: "RestaurantData") as? NSDictionary{
+                if let photos = dataDict["photos"] as? [[String:Any]]{
+                    let strRefre = photos.first
+            strPhotoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1080&photoreference=\(strRefre!["photo_reference"] as! String)"}
+            objSendMessage.mutMessageParamDictDetail["msg"] = "you received a restaurant suggestion"
+            objSendMessage.mutParamDict["vicinity"] = dataDict.object(forKey: "vicinity") as! String
+            objSendMessage.mutParamDict["photoReference"] = strPhotoUrl
+            objSendMessage.mutMessageParamDictDetail["contentType"] = "restaurant"
+            objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp() + i
+            objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
+            if let geometry = dataDict.object(forKey: "geometry") as? NSDictionary{
+            if let location = geometry.object(forKey: "location") as? NSDictionary{
+                objSendMessage.mutParamDict["latitude"] = String(describing: location.object(forKey: "lat")!)
+            objSendMessage.mutParamDict["longitude"] = String(describing: location.object(forKey: "lng")!)  }}
+            objSendMessage.mutParamDict["ratings"] = String(describing: dataDict.object(forKey: "rating")!)
+            objSendMessage.mutMessageParamDictDetail["recieverId"] = frndId
+            objSendMessage.mutMessageParamDictDetail["senderId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
+            objSendMessage.mutParamDict["phoneNumber"] = ""
+            objSendMessage.mutParamDict["placeid"] = dataDict.object(forKey: "place_id") as! String
+            objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
+            objSendMessage.mutParamDict["url"] = ""
+            objSendMessage.mutParamDict["website"] = ""
+            objSendMessage.mutParamDict["websiteUrl"] = ""
+            objSendMessage.mutParamDict["open_now"] = ""
+                objSendMessage.mutMessageParamDictDetail["recieverDP"] = receipentDp
+            objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
+            objSendMessage.mutParamDict["priceRange"] = NSNumber.init(integerLiteral: 1)
+            objSendMessage.mutParamDict["posInList"] = NSNumber.init(integerLiteral: 0)
+            objSendMessage.mutParamDict["isSelected"] = NSNumber.init(booleanLiteral: false)
+            objSendMessage.mutParamDict["reference"] = dataDict.object(forKey: "reference") as! String
+            }
+            if let dataTime =  (arrRestaurants.object(at: i) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
+                objSendMessage.mutParamDict["timeToReach"] = dataTime.object(forKey: "Difference") as! String
+            }
+            objSendMessage.sendMessageToRecieverId(recieverId:frndId,isFriend : true)
+        }
+    }
+    @IBAction func btnSendAttachmentAct(_ sender: Any) {
+        addRestaurants()
+    }
+    func addRestaurants(){
+        objSentRestaurants = self.storyboard?.instantiateViewController(withIdentifier: "sentRestaurantsScreenVC") as! sentRestaurantsScreenVC
+
+        if isFreind{
+            objSentRestaurants!.isfrind = true
+        }else{
+            objSentRestaurants!.isfrind = false
+        }
+        objSentRestaurants?.dictUserDetail = dictUserDetail
+      // self.present(objSentRestaurants!, animated: true, completion: nil)
+        
+                addChildViewController(objSentRestaurants!)
+        objSentRestaurants!.view.frame(forAlignmentRect: CGRect(x: 0.0, y: 0.0, width: self.view.frame.size.width, height:self.view.frame.size.height))
+                self.view.addSubview(objSentRestaurants!.view)
+                objSentRestaurants?.didMove(toParentViewController: self)
+    }
+    func backButtonRestraunt(){
+        objSentRestaurants?.view.alpha = 0
+        nslcBottomTextView.constant = 0
+        
+//        objSentRestaurants!.willMove(toParentViewController: nil)
+//        objSentRestaurants!.view.removeFromSuperview()
+//        objSentRestaurants!.removeFromParentViewController()
+
     }
     
     //MARK: - Firebase observe message without chack delete
@@ -190,30 +297,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         })
         //self.observeValueChared()
     }
-    func addObserverOnlineOfflineStatus()
-    {
-        Database.database().reference(withPath: "status/\(chatGrpId)").observe(.childChanged) { (snapshot) in
-           // print("frnd : \(snapshot.key) \(String(describing: snapshot.value))")
-            if let DataDict = snapshot.value as? NSDictionary
-            {
-                print(DataDict)
-                if  let strKey = snapshot.key as? String{
-            if strKey == self.senderId{
-                if let strOnline = DataDict.value(forKey: "status")! as? String{
-                    if strOnline == "Offline"{
-                        if let strTimeStamp = DataDict.value(forKey: "lastSeen")! as? String{
-                        if let myInteger = Int(strTimeStamp) {
-                            let str = NSNumber(value: myInteger)
-                         //   self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))"
-                            }}
-                    }else{
-                       // self.lblLastSeen.text = strOnline
-                    } }
-                    }
-            }
-            }
-        }
-    }
+    
     func addObserverForRealTimeChatting()
     {
        Database.database().reference(withPath: "messages/\(chatGrpId)").observe(.childAdded) { (snapshot) in
@@ -225,27 +309,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         }
     }
     
-    func CheckOnlineOfflineStatus()
-    {
-        Database.database().reference(withPath: "status/\(chatGrpId)/\(frndId)").observe(.value) { (snapshot) in
-            // print("frnd : \(snapshot.key) \(String(describing: snapshot.value))")
-                        if let DataDict = snapshot.value as? NSDictionary
-                        {
-                           // let arrayKey = DataDict.allKeys
-                            if let strOnline = DataDict.value(forKey: "status")! as? String{
-                                if strOnline == "Offline"{
-                                    if let myInteger = Int(DataDict.value(forKey: "lastSeen")! as! String) {
-                                        let str = NSNumber(value: myInteger)
-                                        self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))"
-                                    }
-                                    
-                                }else{
-                                    self.lblLastSeen.text = strOnline}}
-                        }else{
-                             self.lblLastSeen.text = ""
-            }
-        }
-    }
+    
     //MARK:- Sort Array
     func sortArrayByDate(dataDict: NSDictionary) {
 

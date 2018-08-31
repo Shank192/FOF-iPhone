@@ -78,6 +78,8 @@
 		8233A577210CA5FD0013FB48 /* GMUGeoJSONParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A556210CA5FC0013FB48 /* GMUGeoJSONParser.m */; };
 		8233A578210CA5FD0013FB48 /* GQTPointQuadTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A559210CA5FC0013FB48 /* GQTPointQuadTree.m */; };
 		8233A579210CA5FD0013FB48 /* GQTPointQuadTreeChild.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A55B210CA5FC0013FB48 /* GQTPointQuadTreeChild.m */; };
+		824ADCD82135684A0032668D /* sentRestaurantsScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824ADCD72135684A0032668D /* sentRestaurantsScreenVC.swift */; };
+		824B231F2136CC06009F394C /* sendMessageServicesScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824B231E2136CC06009F394C /* sendMessageServicesScreenVC.swift */; };
 		824C4522210B42E700D273A9 /* NearbyNavigationVCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */; };
 		824C4556210B691100D273A9 /* UIImage+WebP.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C4527210B691100D273A9 /* UIImage+WebP.m */; };
 		824C4557210B691100D273A9 /* MKAnnotationView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C4528210B691100D273A9 /* MKAnnotationView+WebCache.m */; };
@@ -108,6 +110,7 @@
 		824EC41A2109CCAB00FB52AC /* conversationScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */; };
 		824EC41C2109D5F800FB52AC /* WebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC41B2109D5F800FB52AC /* WebService.swift */; };
 		824F9EB221104EE700145B59 /* allReviewsScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */; };
+		8259A98C2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8259A98B2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift */; };
 		8263DC112125825C00C2A65E /* userProfileEditScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC102125825C00C2A65E /* userProfileEditScreenVC.swift */; };
 		8263DC132125892F00C2A65E /* detailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */; };
 		8263DC152125894C00C2A65E /* photoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */; };
@@ -300,6 +303,8 @@
 		8233A55D210CA5FC0013FB48 /* GQTPointQuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTPointQuadTree.h; sourceTree = "<group>"; };
 		8233A55E210CA5FC0013FB48 /* GQTPointQuadTreeChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTPointQuadTreeChild.h; sourceTree = "<group>"; };
 		8233A55F210CA5FC0013FB48 /* GQTBounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTBounds.h; sourceTree = "<group>"; };
+		824ADCD72135684A0032668D /* sentRestaurantsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sentRestaurantsScreenVC.swift; sourceTree = "<group>"; };
+		824B231E2136CC06009F394C /* sendMessageServicesScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sendMessageServicesScreenVC.swift; sourceTree = "<group>"; };
 		824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyNavigationVCViewController.swift; sourceTree = "<group>"; };
 		824C4527210B691100D273A9 /* UIImage+WebP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+WebP.m"; sourceTree = "<group>"; };
 		824C4528210B691100D273A9 /* MKAnnotationView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKAnnotationView+WebCache.m"; sourceTree = "<group>"; };
@@ -357,6 +362,7 @@
 		824EC41B2109D5F800FB52AC /* WebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebService.swift; sourceTree = "<group>"; };
 		824EC41D2109D89A00FB52AC /* FOF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FOF.entitlements; sourceTree = "<group>"; };
 		824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = allReviewsScreenVC.swift; sourceTree = "<group>"; };
+		8259A98B2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sentRequestRestaurantScreenVC.swift; sourceTree = "<group>"; };
 		8263DC102125825C00C2A65E /* userProfileEditScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userProfileEditScreenVC.swift; sourceTree = "<group>"; };
 		8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = detailCollectionViewCell.swift; sourceTree = "<group>"; };
 		8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photoCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -524,6 +530,9 @@
 			isa = PBXGroup;
 			children = (
 				8222F9C92100C739005F8EA4 /* contactScreenVC.swift */,
+				8259A98B2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift */,
+				824B231E2136CC06009F394C /* sendMessageServicesScreenVC.swift */,
+				824ADCD72135684A0032668D /* sentRestaurantsScreenVC.swift */,
 				824EC4192109CCAB00FB52AC /* conversationScreenVC.swift */,
 				820EECBE2101BBBC0011F909 /* inviteFriendsChatScreenVC.swift */,
 				820EECC42101D7D90011F909 /* groupScreenVC.swift */,
@@ -1465,6 +1474,7 @@
 				824C4562210B691100D273A9 /* SDWebImagePrefetcher.m in Sources */,
 				8209951C20FC9374005EE071 /* interestedScreenVC.swift in Sources */,
 				8204DE2520FF3872004B321B /* nearByRestaurantsScreenVC.swift in Sources */,
+				824B231F2136CC06009F394C /* sendMessageServicesScreenVC.swift in Sources */,
 				824C4561210B691100D273A9 /* SDWebImageCompat.m in Sources */,
 				824C4568210B691100D273A9 /* SDImageCacheConfig.m in Sources */,
 				824F9EB221104EE700145B59 /* allReviewsScreenVC.swift in Sources */,
@@ -1496,6 +1506,7 @@
 				824C4566210B691100D273A9 /* UIImageView+WebCache.m in Sources */,
 				8263DC152125894C00C2A65E /* photoCollectionViewCell.swift in Sources */,
 				82CCBD4F21186ECD00A3A9CD /* TPKeyboardAvoidingCollectionView.m in Sources */,
+				8259A98C2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift in Sources */,
 				8233A462210C45700013FB48 /* UIDevice+Platform.swift in Sources */,
 				8233A514210C9F5C0013FB48 /* ReachabilityManager.m in Sources */,
 				824C455A210B691100D273A9 /* UIImageView+HighlightedWebCache.m in Sources */,
@@ -1509,6 +1520,7 @@
 				8233A56B210CA5FD0013FB48 /* GMUGradient.m in Sources */,
 				8204DE2120FF28D2004B321B /* Constants.swift in Sources */,
 				8233A572210CA5FD0013FB48 /* GMUFeature.m in Sources */,
+				824ADCD82135684A0032668D /* sentRestaurantsScreenVC.swift in Sources */,
 				824C456A210B691100D273A9 /* UIView+WebCache.m in Sources */,
 				8233A569210CA5FD0013FB48 /* GMUStaticCluster.m in Sources */,
 				8233A512210C966D0013FB48 /* UserDetail.m in Sources */,

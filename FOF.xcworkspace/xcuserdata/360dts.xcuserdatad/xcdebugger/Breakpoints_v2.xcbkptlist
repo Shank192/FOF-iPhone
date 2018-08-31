@@ -19,28 +19,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "557143281.2941951"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "129"
-            endingLineNumber = "129"
-            landmarkName = "btnSendAct(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "FOF/NearByScreens/foodSearchScreenVC.swift"
-            timestampString = "556808045.396294"
+            timestampString = "557300075.869764"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
+            startingLineNumber = "134"
+            endingLineNumber = "134"
             landmarkName = "setData(latitude:longitude:)"
             landmarkType = "7">
             <Locations>
@@ -52,11 +36,11 @@
                   moduleName = "FOF"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/foodSearchScreenVC.swift"
-                  timestampString = "557143281.635415"
+                  timestampString = "557392991.5416141"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "135"
-                  endingLineNumber = "135"
+                  startingLineNumber = "134"
+                  endingLineNumber = "134"
                   offsetFromSymbolStart = "820">
                </Location>
                <Location
@@ -67,11 +51,11 @@
                   moduleName = "FOF"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/foodSearchScreenVC.swift"
-                  timestampString = "557143281.637244"
+                  timestampString = "557392991.543532"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "136"
-                  endingLineNumber = "136"
+                  startingLineNumber = "135"
+                  endingLineNumber = "135"
                   offsetFromSymbolStart = "32">
                </Location>
             </Locations>
@@ -84,11 +68,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FOF/NearByScreens/foodSearchScreenVC.swift"
-            timestampString = "556808045.396359"
+            timestampString = "557300075.86981"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "212"
-            endingLineNumber = "212"
+            startingLineNumber = "211"
+            endingLineNumber = "211"
             landmarkName = "retriveDataForRestaurantByCarAndWalking()"
             landmarkType = "7">
          </BreakpointContent>
@@ -100,11 +84,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FOF/NearByScreens/foodSearchScreenVC.swift"
-            timestampString = "556808045.3964061"
+            timestampString = "557300075.8698519"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "215"
-            endingLineNumber = "215"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
             landmarkName = "retriveDataForRestaurantByCarAndWalking()"
             landmarkType = "7">
          </BreakpointContent>
@@ -116,12 +100,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "557143281.294654"
+            timestampString = "557393162.7224751"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "210"
-            endingLineNumber = "210"
-            landmarkName = "addObserverOnlineOfflineStatus()"
+            startingLineNumber = "280"
+            endingLineNumber = "280"
+            landmarkName = "observeMessages()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -131,44 +115,156 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/NearByScreens/nearByFriendsScreenVC.swift"
-            timestampString = "557143281.294924"
+            filePath = "FOF/Chat screens/sendMessageServicesScreenVC.swift"
+            timestampString = "557387686.485238"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "313"
-            endingLineNumber = "313"
-            landmarkName = "btnActionMessage(sender:)"
+            startingLineNumber = "75"
+            endingLineNumber = "75"
+            landmarkName = "addObserverForRecipteCHangeWithChatId(chatId:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sendMessageServicesScreenVC.swift"
+            timestampString = "557387686.485283"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "73"
+            endingLineNumber = "73"
+            landmarkName = "addObserverForRecipteCHangeWithChatId(chatId:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sendMessageServicesScreenVC.swift"
+            timestampString = "557387686.485324"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
+            landmarkName = "addObserverForRecipteCHangeWithChatId(chatId:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sentRestaurantsScreenVC.swift"
+            timestampString = "557393162.722977"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "206"
+            endingLineNumber = "206"
+            landmarkName = "btnSendAct(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sentRestaurantsScreenVC.swift"
+            timestampString = "557393162.723761"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "225"
+            endingLineNumber = "225"
+            landmarkName = "btnSendAct(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/conversationScreenVC.swift"
+            timestampString = "557393162.724319"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "233"
+            endingLineNumber = "233"
+            landmarkName = "addRestaurants()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sentRestaurantsScreenVC.swift"
+            timestampString = "557393162.724501"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "216"
+            endingLineNumber = "216"
+            landmarkName = "btnSendAct(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sentRestaurantsScreenVC.swift"
+            timestampString = "557393162.725099"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
+            landmarkName = "btnSendAct(_:)"
             landmarkType = "7">
             <Locations>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "FOF.nearByFriendsScreenVC.btnActionMessage(sender: __ObjC.UIButton) -&gt; ()"
+                  symbolName = "FOF.sentRestaurantsScreenVC.btnSendAct(Any) -&gt; ()"
                   moduleName = "FOF"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/nearByFriendsScreenVC.swift"
-                  timestampString = "557143281.653782"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/sentRestaurantsScreenVC.swift"
+                  timestampString = "557392991.595964"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "313"
-                  endingLineNumber = "313"
-                  offsetFromSymbolStart = "2156">
+                  startingLineNumber = "214"
+                  endingLineNumber = "214"
+                  offsetFromSymbolStart = "1616">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Bool, __ObjC.NSDictionary) -&gt; () in FOF.nearByFriendsScreenVC.btnActionMessage(sender: __ObjC.UIButton) -&gt; ()"
+                  symbolName = "FOF.sentRestaurantsScreenVC.btnSendAct(Any) -&gt; ()"
                   moduleName = "FOF"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/NearByScreens/nearByFriendsScreenVC.swift"
-                  timestampString = "557143281.655704"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/sentRestaurantsScreenVC.swift"
+                  timestampString = "557392991.598231"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "315"
-                  endingLineNumber = "315"
-                  offsetFromSymbolStart = "24">
+                  startingLineNumber = "214"
+                  endingLineNumber = "214"
+                  offsetFromSymbolStart = "4100">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -179,13 +275,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "557143281.2949769"
+            filePath = "FOF/Chat screens/sentRequestRestaurantScreenVC.swift"
+            timestampString = "557393162.725602"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "239"
-            endingLineNumber = "239"
-            landmarkName = "CheckOnlineOfflineStatus()"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -195,13 +291,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "557143281.295218"
+            filePath = "FOF/Chat screens/sentRequestRestaurantScreenVC.swift"
+            timestampString = "557393162.726055"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "235"
-            endingLineNumber = "235"
-            landmarkName = "CheckOnlineOfflineStatus()"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
+            landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -211,13 +307,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "557143281.295459"
+            filePath = "FOF/Chat screens/sentRequestRestaurantScreenVC.swift"
+            timestampString = "557393162.726429"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "232"
-            endingLineNumber = "232"
-            landmarkName = "CheckOnlineOfflineStatus()"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
+            landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -227,44 +323,76 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "557143281.295702"
+            filePath = "FOF/Chat screens/sentRequestRestaurantScreenVC.swift"
+            timestampString = "557393162.726753"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "230"
-            endingLineNumber = "230"
-            landmarkName = "CheckOnlineOfflineStatus()"
+            startingLineNumber = "41"
+            endingLineNumber = "41"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/contactScreenVC.swift"
+            timestampString = "557393162.727134"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "153"
+            endingLineNumber = "153"
+            landmarkName = "tableView(_:didSelectRowAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/contactScreenVC.swift"
+            timestampString = "557393162.72725"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
+            landmarkName = "tableView(_:didSelectRowAt:)"
             landmarkType = "7">
             <Locations>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "FOF.conversationScreenVC.CheckOnlineOfflineStatus() -&gt; ()"
+                  symbolName = "FOF.contactScreenVC.tableView(__ObjC.UITableView, didSelectRowAt: Foundation.IndexPath) -&gt; ()"
                   moduleName = "FOF"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/conversationScreenVC.swift"
-                  timestampString = "557143281.671471"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/contactScreenVC.swift"
+                  timestampString = "557392991.628263"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "230"
-                  endingLineNumber = "230"
-                  offsetFromSymbolStart = "28">
+                  startingLineNumber = "152"
+                  endingLineNumber = "152"
+                  offsetFromSymbolStart = "980">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (__ObjC.DataSnapshot) -&gt; () in FOF.conversationScreenVC.CheckOnlineOfflineStatus() -&gt; ()"
+                  symbolName = "FOF.contactScreenVC.tableView(__ObjC.UITableView, didSelectRowAt: Foundation.IndexPath) -&gt; ()"
                   moduleName = "FOF"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/conversationScreenVC.swift"
-                  timestampString = "557143281.67352"
+                  urlString = "file:///Volumes/Data/Krutika/FOF/FOF%20Git/FOF/Chat%20screens/contactScreenVC.swift"
+                  timestampString = "557392991.63024"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "232"
-                  endingLineNumber = "232"
-                  offsetFromSymbolStart = "32">
+                  startingLineNumber = "152"
+                  endingLineNumber = "152"
+                  offsetFromSymbolStart = "5332">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -275,13 +403,45 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FOF/Chat screens/conversationScreenVC.swift"
-            timestampString = "557143281.295941"
+            filePath = "FOF/Chat screens/contactScreenVC.swift"
+            timestampString = "557393162.727392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "237"
-            endingLineNumber = "237"
-            landmarkName = "CheckOnlineOfflineStatus()"
+            startingLineNumber = "150"
+            endingLineNumber = "150"
+            landmarkName = "tableView(_:didSelectRowAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sentRequestRestaurantScreenVC.swift"
+            timestampString = "557393162.727529"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FOF/Chat screens/sentRequestRestaurantScreenVC.swift"
+            timestampString = "557393162.727895"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "43"
+            endingLineNumber = "43"
+            landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

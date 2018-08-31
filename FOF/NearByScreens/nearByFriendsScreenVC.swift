@@ -296,27 +296,44 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
         }
     }
     
-    @objc func btnActionMessage(sender : UIButton)
-    {
-        if let dict = self.ArrayFriendData.object(at: sender.tag) as? NSDictionary
-        {
-            if let friendstatus = dict.object(forKey: "friendstatus"),let frndID = dict.object(forKey: "id")
-            {
-                if "\(friendstatus)" == "Friends"
-                {
-                    
-                }
-                else
-                {
-    let param = ["action":"sendfriendrequest","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID),"friendid":frndID]
-                    
-    WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param as NSDictionary, CompletionHandler: { (success, response) in
-                        
-                    })
-                }
+    @objc func btnActionMessage(sender : UIButton){
+    if let dict = self.ArrayFriendData.object(at: sender.tag) as? NSDictionary{
+    if dict.object(forKey: "friendstatus") as! String == "Sent"{
+        return
+        }
+        let objChat = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
+        objChat.dictUserDetail = dict
+        if dict.object(forKey: "friendstatus") as! String == "Friend"{
+            objChat.isFreind = true
+        }else{
+            objChat.isFreind = false
             }
+        self.navigationController?.pushViewController(objChat, animated: true)
         }
     }
+//    {
+//        if let dict = self.ArrayFriendData.object(at: sender.tag) as? NSDictionary
+//        {
+//            if let friendstatus = dict.object(forKey: "friendstatus"),let frndID = dict.object(forKey: "id")
+//            {
+//                if "\(friendstatus)" == "Friends"
+//                {
+//
+//                }
+//                else
+//                {
+//    let param = ["action":"sendfriendrequest","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID),"friendid":frndID]
+//
+//    WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param as NSDictionary, CompletionHandler: { (success, response) in
+//
+//
+//
+//
+//                    })
+//                }
+//            }
+//        }
+//    }
     
     
     
@@ -714,11 +731,25 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
                                 {
                                     cell.imgViewMutualFriend.isHidden = false
                                     cell.imgViewMutualFriend2.isHidden = true
-                                     cell.lblMutualFriend.text = "Mutual friend"
+                                    cell.lblMutualFriend.text = "Mutual friend"
                                     cell.imgViewMutualFriend.sd_setImage(with: URL.init(string: "\(profilepic11)")!)
                                 }
                             }
                         }
+                        if mutualfriendsArray.count == 2{
+                            if let frndDict = mutualfriendsArray.object(at: 1) as? NSDictionary
+                            {
+                                if let profilepic11 = frndDict.object(forKey: "profilepic1") as? String
+                                {
+                                    if "\(profilepic11)" != ""
+                                    {
+                                        cell.imgViewMutualFriend.isHidden = false
+                                        cell.imgViewMutualFriend2.isHidden = false
+                                    cell.imgViewMutualFriend2.sd_setImage(with: URL.init(string: "\(profilepic11)")!)
+                                    }
+                                }
+                            }
+                       }
                     }
                     else
                     {
