@@ -9,6 +9,7 @@ import GoogleMaps
 import FBSDKLoginKit
 import UserNotifications
 import GooglePlaces
+import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDelegate {
@@ -30,9 +31,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var arrDetailData = NSMutableDictionary()
     @objc var userLocation = CLLocationCoordinate2D()
     @objc var searchedLocation =  CLLocationCoordinate2D()
-    
     var strCurrentPlace = ""
-    
+    lazy var persistentContainer: NSPersistentContainer = {
+        
+        let container = NSPersistentContainer(name: "CoreData")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error {
+                
+                fatalError("Unresolved error, \((error as NSError).userInfo)")
+            }
+        })
+        return container
+    }()
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
         if launchedBefore  {
@@ -53,7 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         registerRemoteNotification()
         
         self.SetMyRootBy()
-        
+       let cdm = CoreDataManage()
+      //  cdm.deleteAllDataWithEntityName(entity: "UserData")
         
         //GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         // Override point for customization after application launch.
@@ -171,6 +182,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             
         }
     }
+    var managedObjectContext: NSManagedObjectContext {
+        let context: NSManagedObjectContext? = persistentContainer.viewContext
+        var error: Error? = nil
+        if (context?.hasChanges)! && !(((try? context?.save()) != nil)) {
+            // Replace this implementation with code to handle the error appropriately.
+            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            //      NSLog(@"Unresolved error %@, %@", error, error.userInfo);
+            abort()
+        }
+        let managedObjectModel: NSManagedObjectModel? = context?.persistentStoreCoordinator?.managedObjectModel
+        let entities = managedObjectModel?.entitiesByName
+        let entityNames = entities?.keys
+        //   NSLog(@"All loaded entities are: %@", entityNames);
+        return context ?? NSManagedObjectContext()
+    }
+
     //MARK:- Set Root
     func SetMyRootBy() {
         

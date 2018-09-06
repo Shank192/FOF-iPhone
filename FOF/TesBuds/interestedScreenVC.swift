@@ -403,12 +403,12 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
     @IBAction func btnSingleAct(_ sender: Any)
     {
         
-    //   self.setMyBuds(isSingleGO: true)
-        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-        let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
-        self.app.IsGoSingle = true
-        nextVC.selectedIndex = 1
-        Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+    self.setMyBuds(isSingleGO: true)
+//        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//        let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+//        self.app.IsGoSingle = true
+//        nextVC.selectedIndex = 1
+//        Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
     }
     
     @IBAction func btnGroupAct(_ sender: Any) {
@@ -440,7 +440,7 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
             if let isSelected = dict.object(forKey: "isSelected")
             {
                 if "\(isSelected)" == "1" {
-                    cell.backgroundColor = Utility.UIColorFromHex(0xa32e43)
+                    cell.backgroundColor = UIColor.clear
                     cell.lblTestbudsName.textColor = UIColor.white
                 }else {
                     cell.backgroundColor = UIColor.white

@@ -1,4 +1,4 @@
-//
+////
 //  nearByFriendsScreenVC.swift
 //  FOF
 //
@@ -169,7 +169,9 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
                 if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isFriend){
                     self.wsSetFriendsList()
                 }else{
-                self.GetSuggestedFriend()}
+                ///self.GetSuggestedFriend()
+                    self.wsSetFriendsList()
+                }
 
             }else{
                 MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
@@ -383,7 +385,8 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
         let param = ["action":"myfriends","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID)]
         MBProgressHUD.showAdded(to: self.view, animated: true)
         WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param as NSDictionary, CompletionHandler: { (success, response) -> () in
-            
+             let cdm = CoreDataManage()
+           let arrOldFriends : NSArray = cdm.fetchWithEntityName(entity: "FriendOtherDetail")
             if success == true
             {
                 if let dataArray = response.object(forKey: "data") as? NSArray
@@ -400,8 +403,15 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
                                     {
                                         if let detailsDict = details.object(at: 0) as? NSDictionary
                                         {
+                                        cdm.updateEntity(entity: "FriendOtherDetail", arrUdetails: dataArray)
+                                           
+                                             let arrFetchedFriendDetails : NSArray = cdm.fetchWithEntityName(entity: "FriendOtherDetail")
+                                            
                                             self.ArrayFriendData.add(detailsDict)
+                                            
                                         }
+                                        
+                                        
                                     }
                                 }
                             }

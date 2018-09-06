@@ -156,7 +156,7 @@
                                                 <real key="value" value="1"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                <color key="value" red="0.8326209188" green="0.16254431010000001" blue="0.14949071410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -1191,7 +1191,7 @@
                                                         <state key="normal" image="detailLocation"/>
                                                     </button>
                                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="17, Ashram Rd, Usmanpura, Ahmedabad-380014, Gujarat " textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ILe-Aq-FBh">
-                                                        <rect key="frame" x="38" y="-6" width="250" height="32"/>
+                                                        <rect key="frame" x="38" y="-6.5" width="250" height="32"/>
                                                         <fontDescription key="fontDescription" name="Montserrat-Regular" family="Montserrat" pointSize="13"/>
                                                         <color key="textColor" red="0.15686274510000001" green="0.15686274510000001" blue="0.15686274510000001" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
@@ -1243,7 +1243,7 @@
                                                 <rect key="frame" x="16" y="581" width="288" height="16.5"/>
                                                 <subviews>
                                                     <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="R1O-LT-ioe">
-                                                        <rect key="frame" x="0.0" y="-0.5" width="20" height="19"/>
+                                                        <rect key="frame" x="0.0" y="-1" width="20" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="20" id="GdM-N0-xwA"/>
                                                             <constraint firstAttribute="height" constant="19" id="gV8-9K-rfu"/>
@@ -2383,7 +2383,7 @@
                                                 </subviews>
                                             </stackView>
                                             <stackView hidden="YES" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ahY-Uf-rHG">
-                                                <rect key="frame" x="0.0" y="-54.5" width="298" height="45"/>
+                                                <rect key="frame" x="0.0" y="-47.5" width="298" height="45"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zkp-pY-fJS">
                                                         <rect key="frame" x="0.0" y="0.0" width="298" height="45"/>
@@ -4568,7 +4568,7 @@
                                                 <real key="value" value="1"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                <color key="value" red="0.8326209188" green="0.16254431010000001" blue="0.14949071410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -5173,7 +5173,7 @@
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                         <subviews>
                                                                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="facebook-avatar.jpg" translatesAutoresizingMaskIntoConstraints="NO" id="Hyz-nU-GNu">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="0.0" height="100"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="1000" height="1100"/>
                                                                             </imageView>
                                                                         </subviews>
                                                                     </view>
@@ -6647,9 +6647,10 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="64"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ross.jpg" translatesAutoresizingMaskIntoConstraints="NO" id="b7M-7I-Sjn">
-                                        <rect key="frame" x="50.5" y="15.5" width="32" height="32"/>
+                                        <rect key="frame" x="50.5" y="20.5" width="32" height="32"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" secondItem="b7M-7I-Sjn" secondAttribute="height" multiplier="1:1" id="Q7b-FC-rI0"/>
+                                            <constraint firstAttribute="height" constant="32" id="5g7-YA-CV4"/>
+                                            <constraint firstAttribute="width" constant="32" id="tRO-zq-kPy"/>
                                         </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -6664,7 +6665,7 @@
                                         </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Jack Johnson" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OLI-EF-9Zl">
-                                        <rect key="frame" x="92.5" y="21.5" width="212" height="20"/>
+                                        <rect key="frame" x="92.5" y="26.5" width="212" height="20"/>
                                         <fontDescription key="fontDescription" name="Montserrat-Regular" family="Montserrat" pointSize="16"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
@@ -6681,7 +6682,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="J7J-sE-Jtl"/>
                                     <constraint firstItem="OLI-EF-9Zl" firstAttribute="leading" secondItem="b7M-7I-Sjn" secondAttribute="trailing" constant="10" id="KbA-eL-Wn6"/>
-                                    <constraint firstItem="b7M-7I-Sjn" firstAttribute="centerY" secondItem="yo9-tm-vv1" secondAttribute="centerY" id="NQg-1p-EkW"/>
+                                    <constraint firstItem="b7M-7I-Sjn" firstAttribute="centerY" secondItem="yo9-tm-vv1" secondAttribute="centerY" constant="4.75" id="NQg-1p-EkW"/>
                                     <constraint firstItem="b7M-7I-Sjn" firstAttribute="leading" secondItem="yo9-tm-vv1" secondAttribute="trailing" constant="5" id="RVP-GP-rRP"/>
                                     <constraint firstItem="yo9-tm-vv1" firstAttribute="leading" secondItem="SZX-Ll-YeF" secondAttribute="leading" constant="5" id="cEf-sG-lhk"/>
                                     <constraint firstItem="yo9-tm-vv1" firstAttribute="top" secondItem="SZX-Ll-YeF" secondAttribute="top" constant="2" id="jnG-y5-MUa"/>
@@ -6833,7 +6834,7 @@
                                     <constraint firstAttribute="height" constant="5" id="5Ff-De-ka5"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0SX-LY-zu6">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0SX-LY-zu6">
                                 <rect key="frame" x="0.0" y="525" width="320" height="5"/>
                                 <color key="backgroundColor" red="0.92541211840000004" green="0.92554193740000001" blue="0.92537128930000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -6876,8 +6877,8 @@
                             <constraint firstAttribute="trailing" secondItem="SHc-V1-DQU" secondAttribute="trailing" id="31i-KZ-7aa"/>
                             <constraint firstItem="fnc-5y-VQm" firstAttribute="top" secondItem="SZX-Ll-YeF" secondAttribute="bottom" constant="20" id="4FE-AQ-VwU"/>
                             <constraint firstItem="hfH-Vd-gWm" firstAttribute="top" secondItem="OxY-rw-ySd" secondAttribute="bottom" constant="22" id="4cs-2l-Mpg"/>
+                            <constraint firstItem="Mw5-K1-W7f" firstAttribute="top" secondItem="0SX-LY-zu6" secondAttribute="bottom" constant="19" id="6eg-wg-6Mk"/>
                             <constraint firstItem="SHc-V1-DQU" firstAttribute="centerX" secondItem="aTx-Xg-RVW" secondAttribute="centerX" id="7Ya-jk-OJ7"/>
-                            <constraint firstItem="b7M-7I-Sjn" firstAttribute="width" secondItem="aTx-Xg-RVW" secondAttribute="width" multiplier="0.1" id="Al3-wl-LSS"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Mw5-K1-W7f" secondAttribute="trailing" id="B1v-ey-ohc"/>
                             <constraint firstItem="hfH-Vd-gWm" firstAttribute="top" secondItem="Mw5-K1-W7f" secondAttribute="bottom" constant="19" id="B62-fF-mYe"/>
                             <constraint firstItem="Xxs-yp-tgt" firstAttribute="leading" secondItem="aTx-Xg-RVW" secondAttribute="leadingMargin" id="GlS-u6-w0W"/>

@@ -389,7 +389,7 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
             {
                 if "\(isSelected)" == "1"
                 {
-                    cell.backgroundColor = Utility.UIColorFromHex(0xa32e43)
+                    cell.backgroundColor = UIColor.clear
                     cell.lblInterestedTestBudsName.textColor = UIColor.white
                     
                 }
