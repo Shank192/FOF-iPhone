@@ -109,6 +109,7 @@
 		824EC41C2109D5F800FB52AC /* WebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824EC41B2109D5F800FB52AC /* WebService.swift */; };
 		824F9EB221104EE700145B59 /* allReviewsScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */; };
 		8259A98C2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8259A98B2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift */; };
+		825C6A10216BB9AE00E199C9 /* Webservices_Alamofier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 825C6A0F216BB9AE00E199C9 /* Webservices_Alamofier.swift */; };
 		8263DC112125825C00C2A65E /* userProfileEditScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC102125825C00C2A65E /* userProfileEditScreenVC.swift */; };
 		8263DC132125892F00C2A65E /* detailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */; };
 		8263DC152125894C00C2A65E /* photoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */; };
@@ -132,6 +133,7 @@
 		829D8854214112DB00617D50 /* CoreDataManage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829D8851214112DB00617D50 /* CoreDataManage.swift */; };
 		829D885A214113AE00617D50 /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 829D8858214113AE00617D50 /* CoreData.xcdatamodeld */; };
 		829D885C214113DB00617D50 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829D885B214113DB00617D50 /* AppDelegate.swift */; };
+		829D885E2141152800617D50 /* getFriendsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829D885D2141152800617D50 /* getFriendsScreen.swift */; };
 		829EE59320F8D8A100F7C52D /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EE59220F8D8A100F7C52D /* Utility.swift */; };
 		829EE59720F8DBFC00F7C52D /* loginScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EE59620F8DBFC00F7C52D /* loginScreenVC.swift */; };
 		829EE59920F8DCC800F7C52D /* testBudsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EE59820F8DCC800F7C52D /* testBudsCollectionViewCell.swift */; };
@@ -365,6 +367,7 @@
 		824EC41D2109D89A00FB52AC /* FOF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FOF.entitlements; sourceTree = "<group>"; };
 		824F9EB121104EE700145B59 /* allReviewsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = allReviewsScreenVC.swift; sourceTree = "<group>"; };
 		8259A98B2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sentRequestRestaurantScreenVC.swift; sourceTree = "<group>"; };
+		825C6A0F216BB9AE00E199C9 /* Webservices_Alamofier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Webservices_Alamofier.swift; sourceTree = "<group>"; };
 		8263DC102125825C00C2A65E /* userProfileEditScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userProfileEditScreenVC.swift; sourceTree = "<group>"; };
 		8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = detailCollectionViewCell.swift; sourceTree = "<group>"; };
 		8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photoCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -396,6 +399,7 @@
 		829D8851214112DB00617D50 /* CoreDataManage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManage.swift; sourceTree = "<group>"; };
 		829D8859214113AE00617D50 /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
 		829D885B214113DB00617D50 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		829D885D2141152800617D50 /* getFriendsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = getFriendsScreen.swift; sourceTree = "<group>"; };
 		829EE59220F8D8A100F7C52D /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		829EE59620F8DBFC00F7C52D /* loginScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = loginScreenVC.swift; sourceTree = "<group>"; };
 		829EE59820F8DCC800F7C52D /* testBudsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testBudsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -489,6 +493,7 @@
 			isa = PBXGroup;
 			children = (
 				829D884C214112B200617D50 /* nearByFriendsScreenVC.swift */,
+				829D885D2141152800617D50 /* getFriendsScreen.swift */,
 				8204DE2420FF3872004B321B /* nearByRestaurantsScreenVC.swift */,
 				8204DE3920FF78E2004B321B /* foodSearchScreenVC.swift */,
 				824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */,
@@ -959,8 +964,9 @@
 			children = (
 				8233A50E210C8CE70013FB48 /* UserData */,
 				824EC4142109AEFE00FB52AC /* KeyChain */,
-				824EC41B2109D5F800FB52AC /* WebService.swift */,
 				8204DE2020FF28D2004B321B /* Constants.swift */,
+				824EC41B2109D5F800FB52AC /* WebService.swift */,
+				825C6A0F216BB9AE00E199C9 /* Webservices_Alamofier.swift */,
 				829EE59220F8D8A100F7C52D /* Utility.swift */,
 				8233A515210CA1AE0013FB48 /* CommonCFile.h */,
 				824EC40E2109AEE700FB52AC /* FOF-Bridging-Header.h */,
@@ -1530,6 +1536,7 @@
 				829D885A214113AE00617D50 /* CoreData.xcdatamodeld in Sources */,
 				82CCBD4F21186ECD00A3A9CD /* TPKeyboardAvoidingCollectionView.m in Sources */,
 				8259A98C2137FEAE0016EBD6 /* sentRequestRestaurantScreenVC.swift in Sources */,
+				825C6A10216BB9AE00E199C9 /* Webservices_Alamofier.swift in Sources */,
 				8233A462210C45700013FB48 /* UIDevice+Platform.swift in Sources */,
 				8233A514210C9F5C0013FB48 /* ReachabilityManager.m in Sources */,
 				824C455A210B691100D273A9 /* UIImageView+HighlightedWebCache.m in Sources */,
@@ -1547,6 +1554,7 @@
 				824ADCD82135684A0032668D /* sentRestaurantsScreenVC.swift in Sources */,
 				824C456A210B691100D273A9 /* UIView+WebCache.m in Sources */,
 				8233A569210CA5FD0013FB48 /* GMUStaticCluster.m in Sources */,
+				829D885E2141152800617D50 /* getFriendsScreen.swift in Sources */,
 				8233A512210C966D0013FB48 /* UserDetail.m in Sources */,
 				824C4557210B691100D273A9 /* MKAnnotationView+WebCache.m in Sources */,
 				8233A578210CA5FD0013FB48 /* GQTPointQuadTree.m in Sources */,

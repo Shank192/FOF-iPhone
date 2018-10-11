@@ -30,10 +30,15 @@ class chatTableviewCell: UITableViewCell {
     //Conversation screen
     
     //sender
+    
+    @IBOutlet weak var imgSenderReadTick: UIButton!
     @IBOutlet weak var lblMessages: UILabel!
     @IBOutlet weak var imgSenderDp: UIImageView!
     @IBOutlet weak var lblSenderTime: UILabel!
     //restro
+    
+    @IBOutlet weak var lblRestroTime: UILabel!
+    @IBOutlet weak var imgReadRestroTick: UIButton!
     @IBOutlet weak var imgRestro: UIImageView!
     @IBOutlet weak var lblRestroName: UILabel!
     @IBOutlet weak var lblRestroAddress: UILabel!
@@ -45,6 +50,7 @@ class chatTableviewCell: UITableViewCell {
     
     //receiver
     
+    @IBOutlet weak var imgReadTick: UIButton!
     @IBOutlet weak var lblReceiverTime: UILabel!
     @IBOutlet weak var imgReceiverDp: UIImageView!
     @IBOutlet weak var lblReceiverMessage: UILabel!

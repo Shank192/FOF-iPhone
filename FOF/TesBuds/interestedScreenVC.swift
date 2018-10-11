@@ -26,14 +26,25 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
 
     let app = UIApplication.shared.delegate as! AppDelegate
     
+    var rightNowGetAllTEstBuds = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
        
-        let param = ["action":"mytestbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!] as NSDictionary
-       self.GetMyTestBuds(param)
+//        let param = ["action":"mytestbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!] as NSDictionary
+//       self.GetMyTestBuds(param)
+        
+        if let user_id = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)
+        {
+            let param = ["user_id":"\(user_id)"]
+            self.GetMyTestBuds(param as NSDictionary)
+        }
         
     }
+    
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         
@@ -75,13 +86,13 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                 {
                     if self.userLocation != nil
                     {
-                        let param = ["action":"testbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!,"latlng":"\(self.userLocation!.latitude),\(self.userLocation!.longitude)"] as NSDictionary
-                        self.GetAllTestBuds(param)
+                        
+                        self.GetAllTestBuds(latitude: "\(self.userLocation!.latitude)", longitude: "\(self.userLocation!.longitude)")
                     }
                     else
                     {
-                        let param = ["action":"testbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!,"latlng":"\(0),\(0)"] as NSDictionary
-                        self.GetAllTestBuds(param)
+                       
+                        self.GetAllTestBuds(latitude: "", longitude: "")
                     }
                 }
             }
@@ -105,13 +116,14 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
             {
                 if self.userLocation != nil
                 {
-                    let param = ["action":"testbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!,"latlng":"\(self.userLocation!.latitude),\(self.userLocation!.longitude)"] as NSDictionary
-                    self.GetAllTestBuds(param)
+                    
+                    self.GetAllTestBuds(latitude: "\(self.userLocation!.latitude)", longitude: "\(self.userLocation!.longitude)")
                 }
                 else
                 {
-                    let param = ["action":"testbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!,"latlng":"\(0),\(0)"] as NSDictionary
-                    self.GetAllTestBuds(param)
+                    
+                    self.GetAllTestBuds(latitude: "", longitude: "")
+                    
                 }
             }
             
@@ -152,110 +164,294 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
     //MARK:- Webservice
     func GetMyTestBuds(_ param:NSDictionary) {
         MBProgressHUD.showAdded(to: self.view, animated: true)
-        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param) { (success, response) in
+        
+        Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.GetUserProfile, param: param, key: "", successStatusCode: 200) { (success, response) in
             
             if success == true
             {
-                if let dataArray = response.object(forKey: "data") as? NSArray
+                if let dataDict = response.object(forKey: "response_data") as? NSDictionary
                 {
-                    self.MyArrTestBudsData = NSMutableArray(array: dataArray)
-                    UserDefaults.standard.set(dataArray, forKey: Constants.UserDefaults.MyTestBuds)
-                    UserDefaults.standard.synchronize()
-                    self.arrTestBudsData = NSMutableArray(array: self.MyArrTestBudsData)
-                    for J in 0..<self.arrTestBudsData.count
+                    
+                    UserDefaults.standard.set("\(dataDict)", forKey: Constants.UserDefaults.ProfileData)
+                    
+                    if let tastebuds = dataDict.object(forKey: "tastebuds") as? NSArray
                     {
-                        if let BudsDict = self.arrTestBudsData.object(at: J) as? NSDictionary
+                        self.MyArrTestBudsData = NSMutableArray(array: tastebuds)
+                        UserDefaults.standard.set(tastebuds, forKey: Constants.UserDefaults.MyTestBuds)
+                        UserDefaults.standard.synchronize()
+                        self.arrTestBudsData = NSMutableArray(array: self.MyArrTestBudsData)
+                        
+                        for J in 0..<self.arrTestBudsData.count
                         {
-                            let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
-                            MuteBudsDict.setValue("1", forKey: "isSelected")
-                            self.arrTestBudsData.replaceObject(at: J, with: MuteBudsDict)
-                            
+                            if let BudsDict = self.arrTestBudsData.object(at: J) as? NSDictionary
+                            {
+                                let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
+                                MuteBudsDict.setValue("1", forKey: "isSelected")
+                                self.arrTestBudsData.replaceObject(at: J, with: MuteBudsDict)
+                                
+                            }
                         }
                     }
                 }
+                
+                UserDefaults.standard.synchronize()
             }
             else
             {
-                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-                if let settings = response.object(forKey: "settings") as? NSDictionary
+                if let msg = response.object(forKey: "message") as? String
                 {
-                    if let  errormessage = settings.object(forKey:"errormessage") as? String
-                    {
-                        if errormessage ==  "invalid session"
-                        {
-                            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
-                            UserDefaults.standard.synchronize()
-                            
-                            self.app.SetMyRootBy()
-                        }
-                    }
+                }
+                else
+                {
                 }
             }
             
             self.checkData()
-            
-           
-            
         }
+        
+//        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param) { (success, response) in
+//
+//            if success == true
+//            {
+//                if let dataArray = response.object(forKey: "data") as? NSArray
+//                {
+//                    self.MyArrTestBudsData = NSMutableArray(array: dataArray)
+//                    UserDefaults.standard.set(dataArray, forKey: Constants.UserDefaults.MyTestBuds)
+//                    UserDefaults.standard.synchronize()
+//                    self.arrTestBudsData = NSMutableArray(array: self.MyArrTestBudsData)
+//                    for J in 0..<self.arrTestBudsData.count
+//                    {
+//                        if let BudsDict = self.arrTestBudsData.object(at: J) as? NSDictionary
+//                        {
+//                            let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
+//                            MuteBudsDict.setValue("1", forKey: "isSelected")
+//                            self.arrTestBudsData.replaceObject(at: J, with: MuteBudsDict)
+//
+//                        }
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+//                if let settings = response.object(forKey: "settings") as? NSDictionary
+//                {
+//                    if let  errormessage = settings.object(forKey:"errormessage") as? String
+//                    {
+//                        if errormessage ==  "invalid session"
+//                        {
+//                            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
+//                            UserDefaults.standard.synchronize()
+//
+//                            self.app.SetMyRootBy()
+//                        }
+//                    }
+//                }
+//            }
+//
+//
+//
+//
+//
+//        }
     }
     
-    func GetAllTestBuds(_ param:NSDictionary) {
+    
+    func GetAllTestBuds(latitude : String, longitude : String) {
+
         MBProgressHUD.showAdded(to: self.view, animated: true)
-        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param) { (success, response) in
+        if self.rightNowGetAllTEstBuds == false
+        {
+           self.rightNowGetAllTEstBuds = true
             
-            if success == true
-            {
-                if let dataArray = response.object(forKey: "data") as? NSArray
+            Webservices_Alamofier.GetPlaceDetailByLatAndLong(latitude, longitude: longitude) { (success, response) in
+                
+                if success == true
                 {
-                    self.arrTestBudsData = NSMutableArray(array: dataArray)
+                    print(response)
                     
-                    for J in 0..<self.arrTestBudsData.count
+                    var city = ""
+                    
+                    if let resultsArray = response.object(forKey: "results") as? NSArray
                     {
-                        if let BudsDict = self.arrTestBudsData.object(at: J) as? NSDictionary
+                        
+                        
+                        for (_,data) in resultsArray.enumerated()
                         {
-                            let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
-                            MuteBudsDict.setValue("0", forKey: "isSelected")
-                            self.arrTestBudsData.replaceObject(at: J, with: MuteBudsDict)
+                            let dict = data as! NSDictionary
                             
+                            if let address_components = dict.object(forKey: "address_components") as? NSArray
+                            {
+                                for (_,data1) in address_components.enumerated()
+                                {
+                                    let dict1 = data1 as! NSDictionary
+                                    
+                                    if let types = dict1.object(forKey: "types") as? NSArray
+                                    {
+                                        for (_,str) in types.enumerated()
+                                        {
+                                            let strName = str as! String
+                                            
+                                            if strName == "locality"
+                                            {
+                                                if let long_name = dict1.object(forKey: "long_name") as? String
+                                                {
+                                                    city = long_name
+                                                    break
+                                                }
+                                            }
+                                        }
+                                        
+                                        if city != ""
+                                        {
+                                            break
+                                        }
+                                    }
+                                }
+                                
+                                if city != ""
+                                {
+                                    break
+                                }
+                                
+                            }
                         }
                     }
                     
+                    if city != ""
+                    {
+                        if let user_id = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),self.userLocation != nil
+                        {
+                            let param = ["user_id":"\(user_id)","latitude":latitude,"longitude":longitude,"city":city]
+                            
+                            Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.GetTestBuds, param: param as NSDictionary, key: "", successStatusCode: 200, CompletionHandler: { (success, response) in
+                                
+                                UserDefaults.standard.set(city, forKey: Constants.UserDefaults.CurrentCity)
+                                UserDefaults.standard.synchronize()
+                                
+                                if success == true
+                                {
+                                    if let dict = response.object(forKey: "response_data") as? NSDictionary
+                                    {
+                                        if let dataArray = dict.object(forKey: "tastebuds") as? NSArray
+                                        {
+                                            self.arrTestBudsData = NSMutableArray(array: dataArray)
+                                            
+                                            for J in 0..<self.arrTestBudsData.count
+                                            {
+                                                if let BudsDict = self.arrTestBudsData.object(at: J) as? NSDictionary
+                                                {
+                                                    let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
+                                                    MuteBudsDict.setValue("0", forKey: "isSelected")
+                                                    self.arrTestBudsData.replaceObject(at: J, with: MuteBudsDict)
+                                                    
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if let msg = response.object(forKey: "message") as? String
+                                    {
+                                        
+                                    }
+                                    else
+                                    {
+                                        
+                                    }
+                                }
+                                
+                                self.rightNowGetAllTEstBuds = false
+                                self.setTestBuds()
+                            })
+                            
+                        }
+                    }
+                    else
+                    {
+                        self.rightNowGetAllTEstBuds = false
+                    }
+                    
+                }
+                else
+                {
+                    self.rightNowGetAllTEstBuds = false
+                    if let msg = response.object(forKey: "message") as? String
+                    {
+                        
+                    }
                 }
                 
             }
-            else
-            {
-                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-                if let settings = response.object(forKey: "settings") as? NSDictionary
-                {
-                    if let  errormessage = settings.object(forKey:"errormessage") as? String
-                    {
-                        if errormessage ==  "invalid session"
-                        {
-                            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
-                            UserDefaults.standard.synchronize()
-                            
-                            self.app.SetMyRootBy()
-                        }
-                    }
-                }
-            }
             
-            self.setTestBuds()
         }
+
+
+
     }
+    
+    
+//    func GetAllTestBuds(_ param:NSDictionary) {
+//        MBProgressHUD.showAdded(to: self.view, animated: true)
+//        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param) { (success, response) in
+//
+//            if success == true
+//            {
+//                if let dataArray = response.object(forKey: "data") as? NSArray
+//                {
+//                    self.arrTestBudsData = NSMutableArray(array: dataArray)
+//
+//                    for J in 0..<self.arrTestBudsData.count
+//                    {
+//                        if let BudsDict = self.arrTestBudsData.object(at: J) as? NSDictionary
+//                        {
+//                            let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
+//                            MuteBudsDict.setValue("0", forKey: "isSelected")
+//                            self.arrTestBudsData.replaceObject(at: J, with: MuteBudsDict)
+//
+//                        }
+//                    }
+//
+//                }
+//
+//            }
+//            else
+//            {
+//                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+//                if let settings = response.object(forKey: "settings") as? NSDictionary
+//                {
+//                    if let  errormessage = settings.object(forKey:"errormessage") as? String
+//                    {
+//                        if errormessage ==  "invalid session"
+//                        {
+//                            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
+//                            UserDefaults.standard.synchronize()
+//
+//                            self.app.SetMyRootBy()
+//                        }
+//                    }
+//                }
+//            }
+//
+//            self.setTestBuds()
+//        }
+//    }
     
     
     //MARK:- Custome method
     func setTestBuds()
     {
+        print(MyArrTestBudsData)
+        print(arrTestBudsData)
+        
         if self.MyArrTestBudsData.count != 0
         {
             for i in 0..<self.MyArrTestBudsData.count
             {
                 if let myBudsDict = self.MyArrTestBudsData.object(at: i) as? NSDictionary
                 {
-                    if let myBudsID = myBudsDict.object(forKey: "id")
+                    if let myBudsID = myBudsDict.object(forKey: "tastebud_id")
                     {
                         if self.arrTestBudsData.count != 0
                         {
@@ -295,104 +491,153 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
     
     func setMyBuds(isSingleGO : Bool)
     {
-        var selectedBuds = ""
-        var selectedBudsArray = NSMutableArray()
-        for i in 0..<self.arrTestBudsData.count
+        if let userid = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)
         {
-            if let dict = self.arrTestBudsData.object(at: i) as? NSDictionary
+            var selectedBudsID = ""
+            let selectedBudsArray = NSMutableArray()
+            for i in 0..<self.arrTestBudsData.count
             {
-                if let isSelected = dict.object(forKey: "isSelected")
+                if let dict = self.arrTestBudsData.object(at: i) as? NSDictionary
                 {
-                    if "\(isSelected)" == "1"
+                    if let isSelected = dict.object(forKey: "isSelected")
                     {
-                        selectedBudsArray.add(dict)
-                        if let name = dict.object(forKey: "name") as? String
+                        if "\(isSelected)" == "1"
                         {
-                            if selectedBuds != ""
+                            selectedBudsArray.add(dict)
+                            if let ID = dict.object(forKey: "id") as? String
                             {
-                                selectedBuds = "\(selectedBuds),\(name)"
+                                if selectedBudsID != ""
+                                {
+                                    selectedBudsID = "\(selectedBudsID),\(ID)"
+                                }
+                                else
+                                {
+                                    selectedBudsID = "\(ID)"
+                                }
+                                
                             }
-                            else
-                            {
-                                selectedBuds = "\(name)"
-                            }
-                            
-                        }
-                    }
-                }
-            }
-        }
-        
-        UserDefaults.standard.set(selectedBudsArray, forKey: Constants.UserDefaults.MyTestBuds)
-        UserDefaults.standard.synchronize()
-        var strGender = String()
-        if let str = UserDefaults.standard.object(forKey: Constants.UserDefaults.gender) as? String{
-            strGender = str
-        }else{
-            strGender = "all"
-        }
-        let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID),"testbuds":selectedBuds,"showme":strGender,"distance_unit":"miles","search_min_age":18,"search_max_age":40,"search_distance":40,"isreviewed":(0),"fields":"testbuds,showme,search_min_age,distance_unit,search_max_age,search_distance,isreviewed"]
-        
-        MBProgressHUD.showAdded(to: self.view, animated: true)
-        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
-            MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-            if success == true
-            {
-                if let dataArray = response.object(forKey: "data") as? NSArray
-                {
-                    if dataArray.count != 0
-                    {
-                        if let dict = dataArray.object(at: 0) as? NSDictionary
-                        {
-                             self.app.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
-                            let placesData = NSKeyedArchiver.archivedData(withRootObject: dataArray)
-
-                            UserDefaults.standard.set(placesData, forKey: Constants.UserDefaults.ProfileData)
-                            UserDefaults.standard.set(dict.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
-                            if let sessionid = dict.object(forKey: "sessionid")
-                            {
-                                UserDefaults.standard.set("\(sessionid)", forKey: Constants.UserDefaults.session_ID)
-                            }
-                        }
-                    }
-                    
-                }
-                
-                if isSingleGO == true
-                {
-                    let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-                    let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
-                    self.app.IsGoSingle = true
-                    nextVC.selectedIndex = 1
-                    Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
-                }
-                else
-                {
-                    let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-                    let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
-                    self.app.IsGoSingle = false
-                    nextVC.selectedIndex = 1
-                    Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
-                }
-            }
-            else
-            {
-                if let settings = response.object(forKey: "settings") as? NSDictionary
-                {
-                    if let  errormessage = settings.object(forKey:"errormessage") as? String
-                    {
-                        if errormessage ==  "invalid session"
-                        {
-                            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
-                            UserDefaults.standard.synchronize()
-                            
-                            self.app.SetMyRootBy()
                         }
                     }
                 }
             }
             
+            
+            
+            UserDefaults.standard.set(selectedBudsArray, forKey: Constants.UserDefaults.MyTestBuds)
+            UserDefaults.standard.synchronize()
+//            var strGender = String()
+//            if let str = UserDefaults.standard.object(forKey: Constants.UserDefaults.gender) as? String{
+//                strGender = str
+//            }else{
+//                strGender = "all"
+//            }
+            let param = ["user_id":"\(userid)","tastebud_ids":selectedBudsID]
+            
+            
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+            
+            Webservices_Alamofier.postWithURL(serverlink:Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.SaveUserTestbuds, param: param as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
+                
+                UserDefaults.standard.set(selectedBudsID, forKey: Constants.UserDefaults.MySelectedTEstBudsID)
+                UserDefaults.standard.synchronize()
+                
+                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                
+                if success == true
+                {
+                    if isSingleGO == true
+                    {
+                        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                        let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+                        self.app.IsGoSingle = true
+                        nextVC.selectedIndex = 1
+                        Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+                    }
+                    else
+                    {
+                        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                        let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+                        self.app.IsGoSingle = false
+                        nextVC.selectedIndex = 1
+                        Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+                    }
+                }
+                else
+                {
+                    if let msg = response.object(forKey: "message") as? String
+                    {
+                        
+                    }
+                    else
+                    {
+                        
+                    }
+                }
+                
+            }
         }
+
+        
+        
+//        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
+//            
+//            if success == true
+//            {
+//                if let dataArray = response.object(forKey: "data") as? NSArray
+//                {
+//                    if dataArray.count != 0
+//                    {
+//                        if let dict = dataArray.object(at: 0) as? NSDictionary
+//                        {
+//                             self.app.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
+//                            let placesData = NSKeyedArchiver.archivedData(withRootObject: dataArray)
+//
+//                            UserDefaults.standard.set(placesData, forKey: Constants.UserDefaults.ProfileData)
+//                            UserDefaults.standard.set(dict.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
+//                            if let sessionid = dict.object(forKey: "sessionid")
+//                            {
+//                                UserDefaults.standard.set("\(sessionid)", forKey: Constants.UserDefaults.session_ID)
+//                            }
+//                        }
+//                    }
+//                    
+//                }
+//                
+//                if isSingleGO == true
+//                {
+//                    let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//                    let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+//                    self.app.IsGoSingle = true
+//                    nextVC.selectedIndex = 1
+//                    Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+//                }
+//                else
+//                {
+//                    let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//                    let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+//                    self.app.IsGoSingle = false
+//                    nextVC.selectedIndex = 1
+//                    Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+//                }
+//            }
+//            else
+//            {
+//                if let settings = response.object(forKey: "settings") as? NSDictionary
+//                {
+//                    if let  errormessage = settings.object(forKey:"errormessage") as? String
+//                    {
+//                        if errormessage ==  "invalid session"
+//                        {
+//                            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
+//                            UserDefaults.standard.synchronize()
+//                            
+//                            self.app.SetMyRootBy()
+//                        }
+//                    }
+//                }
+//            }
+//            
+//        }
         
     }
     
@@ -516,8 +761,8 @@ extension interestedScreenVC : CLLocationManagerDelegate
         if self.userLocation != nil
         {
             app.userLocation = self.userLocation!
-            let param = ["action":"testbuds","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID)!,"latlng":"\(self.userLocation!.latitude),\(self.userLocation!.longitude)"] as NSDictionary
-                self.GetAllTestBuds(param)
+            
+            self.GetAllTestBuds(latitude: "\(self.userLocation!.latitude)", longitude: "\(self.userLocation!.longitude)")
             
         }
        

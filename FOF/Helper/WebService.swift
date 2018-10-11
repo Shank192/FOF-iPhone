@@ -179,6 +179,26 @@ class WebService: NSObject {
         
     }
    
+    class func GetPlaceDetailByLatAndLong(_ latitude:String,longitude : String,CompletionHandler:@escaping (_ success:Bool,_ response:NSDictionary) -> ()) {
+        
+        if latitude.count > 0 && longitude.count > 0{
+            
+            
+            
+            let GdetailLink : String = "https://maps.googleapis.com/maps/api/place/details/json?latlng=\(latitude),\(longitude)&key=\(Constants.GoogleKey.kGoogle_Key)"
+            
+            WebService.CallRequestUrl(GdetailLink) { (success, response) in
+                CompletionHandler(success, response)
+            }
+            
+        } else {
+            let errDict:NSDictionary = ["message":"Please enter latitude and longitude"]
+            CompletionHandler(false,errDict)
+        }
+        
+    }
+    
+    
     class func GetPlaceDetailByPlaceId(_ place_id:String,CompletionHandler:@escaping (_ success:Bool,_ response:NSDictionary) -> ()) {
         
         if place_id.count > 0 {
@@ -232,5 +252,113 @@ class WebService: NSObject {
         }
         
     }
+    
+    
+    //MARK:- Use For Zomato api
+    class func postWithURL(serverlink:String, methodname:String, param:NSDictionary, key:String,successStatusCode : Int,  CompletionHandler : @escaping  (Bool,NSDictionary) -> ())
+    {
+        print("POST : " + serverlink + methodname + " and Param \(param) ")
+        
+        var fullLink = serverlink
+        
+        if fullLink.characters.count > 0 {
+            
+            fullLink = serverlink + methodname
+        }
+        else {
+            
+            fullLink = methodname
+        }
+        
+        var header = [String : String]()
+        if key != ""
+        {
+            header = ["content-type":"application/json","user-key":key]
+        }
+        else
+        {
+            header = ["content-type":"application/json"]
+        }
+        
+        Alamofire.request(fullLink, method: .post, parameters: param as? Parameters, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
+            
+            print(response)
+            
+            if let TempresponseDict:NSDictionary = response.result.value as? NSDictionary {
+                
+                print("response of \(fullLink)")
+                print(TempresponseDict)
+                
+                var statusCode = response.response?.statusCode
+                
+                if statusCode == successStatusCode {
+                    
+                    CompletionHandler(true, TempresponseDict)
+                }
+                else {
+                    
+                    
+                    
+                    if let error = response.result.error as? AFError {
+                        
+                        statusCode = error._code // statusCode private
+                        
+                        switch error {
+                            
+                        case .invalidURL(let url):
+                            print("Invalid URL: \(url) - \(error.localizedDescription)")
+                        case .parameterEncodingFailed(let reason):
+                            print("Parameter encoding failed: \(error.localizedDescription)")
+                            print("Failure Reason: \(reason)")
+                        case .multipartEncodingFailed(let reason):
+                            print("Multipart encoding failed: \(error.localizedDescription)")
+                            print("Failure Reason: \(reason)")
+                        case .responseValidationFailed(let reason):
+                            print("Response validation failed: \(error.localizedDescription)")
+                            print("Failure Reason: \(reason)")
+                            
+                            switch reason {
+                                
+                            case .dataFileNil, .dataFileReadFailed:
+                                print("Downloaded file could not be read")
+                            case .missingContentType(let acceptableContentTypes):
+                                print("Content Type Missing: \(acceptableContentTypes)")
+                            case .unacceptableContentType(let acceptableContentTypes, let responseContentType):
+                                print("Response content type: \(responseContentType) was unacceptable: \(acceptableContentTypes)")
+                            case .unacceptableStatusCode(let code):
+                                print("Response status code was unacceptable: \(code)")
+                                statusCode = code
+                            }
+                        case .responseSerializationFailed(let reason):
+                            
+                            print("Response serialization failed: \(error.localizedDescription)")
+                            print("Failure Reason: \(reason)")
+                            // statusCode = 3840 ???? maybe..
+                        }
+                        
+                        print("Underlying error: \(String(describing: error.underlyingError))")
+                    }
+                    else if let error = response.result.error as? URLError {
+                        
+                        print("URLError occurred: \(error)")
+                    }
+                    else {
+                        
+                        print("Unknown error: \(String(describing: response.result.error))")
+                    }
+                    
+                    print("\(String(describing: statusCode))") // the status code
+                    
+                    CompletionHandler(false, TempresponseDict)
+                }
+            }
+            else {
+                //print("Fail \(fullLink)")
+                CompletionHandler(false, NSDictionary())
+            }
+        }
+        //        }
+    }
+    
     
 }

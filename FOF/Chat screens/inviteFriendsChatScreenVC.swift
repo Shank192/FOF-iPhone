@@ -37,7 +37,7 @@ class chatScreenVC: UIViewController,UITableViewDelegate,UITableViewDataSource {
                             if let dict = dataArray.object(at: i) as? NSDictionary
                             {
                                 UserDefaults.standard.set(dict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
-                                UserDefaults.standard.set(dict.object(forKey: "friend1"), forKey: Constants.UserDefaults.senderId)
+                                UserDefaults.standard.set(dict.object(forKey: "friend1"), forKey: Constants.UserDefaults.user_ID)
                                 UserDefaults.standard.set(dict.object(forKey: "friend2"), forKey: Constants.UserDefaults.receiverId)
                                 
                                 if let details = dict.object(forKey: "details") as? NSArray

@@ -15,7 +15,7 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
     
     @IBOutlet weak var nslcHightOfViewGender: NSLayoutConstraint!
     
-    
+    var mutDictUserDetail = NSMutableDictionary()
     @IBOutlet weak var viewOfPicker: UIView!
     @IBOutlet weak var viewOfGender: UIView!
     
@@ -67,8 +67,6 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
 
     func initialSetUp(){
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.saveDetails), name: Constants.UserDefaults.notificationName, object: nil)
-
         nslcHightOfViewGender.constant = -viewOfGender.frame.size.height
         let placesData = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSData
    
@@ -81,6 +79,8 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
         self.txtFieldEducation.text = Constants.GlobalConstants.appDelegate.userDetail.education
         self.txtFieldOccupation.text = Constants.GlobalConstants.appDelegate.userDetail.occupation
         self.txtViewAboutMe.text = Constants.GlobalConstants.appDelegate.userDetail.aboutMe
+        lblCharacterLength.text = "\(txtViewAboutMe.text.count)/250"
+        
         self.txtFieldBirthDay.text = Constants.GlobalConstants.appDelegate.userDetail.dob
        self.txtFieldEthnicity.text = Constants.GlobalConstants.appDelegate.userDetail.ethnicity
         if let strFirstName = arrProfileData["first_name"] as? String{
@@ -127,56 +127,8 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
         viewOfGender.isHidden = true
         relationPickerView.delegate = self
         relationPickerView.dataSource = self
-    }
-  @objc  func saveDetails(){
-    
-    if txtViewAboutMe.text != "About Me" && txtFieldOccupation.text != "" && txtFieldEducation.text != "" && txtFieldRelation.text != ""  && txtFieldEthnicity.text != "" {
-        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,relationship,ethnicity,education,about_me"
-    }else if txtFieldRelation.text == "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text != "" && txtFieldEducation.text != "" && txtFieldEthnicity.text != "" {
-        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,ethnicity,education,about_me"
-    }else if  txtFieldRelation.text != "" && txtViewAboutMe.text == "About Me" && txtFieldOccupation.text != "" && txtFieldEducation.text != "" && txtFieldEthnicity.text != ""  {
-        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,relationship,ethnicity,education"
-        
-    }  else if txtFieldRelation.text != "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text == "" && txtFieldEducation.text != "" && txtFieldEthnicity.text != ""  {
-        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,relationship,ethnicity,education,about_me"
+        setDictionary()
 
-    }  else if txtFieldRelation.text != "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text == "" && txtFieldEducation.text == "" && txtFieldEthnicity.text != ""{
-        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,ethnicity,about_me"
-        
-      
-        
-    }else if    txtFieldRelation.text != "" && txtViewAboutMe.text != "About Me" && txtFieldOccupation.text == "" && txtFieldEducation.text == "" && txtFieldEthnicity.text == "" {
-        strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed,occupation,relationship,ethnicity,education,about_me"
-    }else{
-         strFields = "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,distance_unit,isreviewed"
-    }
-    
-    
-    
-    
-    let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String,"first_name":txtFirstName.text as Any ,"last_name":txtLastName.text as Any ,"dob":txtFieldBirthDay.text as Any,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID) as! String,"showme":txtFieldGender.text as Any,"distance_unit":"miles","search_min_age":Constants.GlobalConstants.appDelegate.userDetail.searchMinAge,"search_max_age":Constants.GlobalConstants.appDelegate.userDetail.searchMaxAge,"search_distance":Constants.GlobalConstants.appDelegate.userDetail.searchDistance,"isreviewed":(0),"occupation":txtFieldOccupation.text as Any,"relationship":txtFieldRelation.text as Any,"ethnicity":txtFieldEthnicity.text as Any,"education":txtFieldEducation.text as! String,"about_me":strAboutMe,"fields": strFields] as [String : Any]
-        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
-            if success == true
-            {
-                if let dataArray = response.object(forKey: "data") as? NSArray
-                {
-                    if dataArray.count != 0
-                    {
-                        if let dict = dataArray.object(at: 0) as? NSDictionary
-                        {
-                            Constants.GlobalConstants.appDelegate.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
-                            let placesData = NSKeyedArchiver.archivedData(withRootObject: dataArray)
-                            UserDefaults.standard.set(placesData, forKey: Constants.UserDefaults.ProfileData)
-                            UserDefaults.standard.set(dict.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
-                            if let sessionid = dict.object(forKey: "sessionid")
-                            {
-                                UserDefaults.standard.set("\(sessionid)", forKey: Constants.UserDefaults.session_ID)
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
     func setTextView(){
        
@@ -189,6 +141,11 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
             strAboutMe = txtViewAboutMe.text
             
         }
+    }
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
+        let numberOfChars = newText.count // for Swift use count(newText)
+        return numberOfChars < 251
     }
     func setKeyboard(){
         txtFirstName.resignFirstResponder()
@@ -268,6 +225,7 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
             strGender = "male"
             txtFieldGender.text = strGender.capitalized
         }
+         setDictionary()
     }
     
     @IBAction func btnLGBTAct(_ sender: Any) {
@@ -283,8 +241,8 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
             lblLGBT.textColor = Utility.UIColorFromHex(0xAC192E)
             strGender = "lgbt"
             txtFieldGender.text = strGender.capitalized
-            
         }
+         setDictionary()
     }
     @IBAction func btnFemaleAct(_ sender: Any) {
         if btnFemaleOut.isSelected == true{
@@ -299,8 +257,8 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
             lblLGBT.textColor = UIColor.black
             strGender = "female"
             txtFieldGender.text = strGender.capitalized
-
         }
+         setDictionary()
     }
     
     @IBAction func btnTestBudsAct(_ sender: Any){
@@ -319,8 +277,8 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
             }
         }else{
             txtFieldBirthDay.text = datePicker()
-            
         }
+         setDictionary()
     }
     @IBAction func btnCancelAct(_ sender: Any) {
         viewOfPicker.isHidden = true
@@ -357,32 +315,45 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
             }        }
     }
     func textFieldDidEndEditing(_ textField: UITextField) {
-        strRelationship = txtFieldRelation.text!
-        strGender = txtFieldGender.text!
-        strEthnicity = txtFieldEthnicity.text!
-        strOccupation = txtFieldOccupation.text!
-        strEducation = txtFieldEducation.text!
-        strBirthday = txtFieldBirthDay.text!
-        strFirstname = txtFirstName.text!
-        strLastName = txtLastName.text!
+       
+        setDictionary()
     }
-    
+    func setDictionary(){
+        mutDictUserDetail.setValue(txtFirstName.text!, forKey: "first_name")
+        mutDictUserDetail.setValue(txtLastName.text!, forKey: "last_name")
+        mutDictUserDetail.setValue(txtFieldEthnicity.text!, forKey: "ethnicity")
+        mutDictUserDetail.setValue(txtFieldOccupation.text!, forKey: "occupation")
+        mutDictUserDetail.setValue(txtViewAboutMe.text, forKey: "about_me")
+        mutDictUserDetail.setValue(txtFieldEducation.text, forKey: "education")
+        mutDictUserDetail.setValue(txtFieldRelation.text!, forKey: "RelationShip")
+        mutDictUserDetail.setValue(strGender, forKey: "Gender")
+        mutDictUserDetail.setValue(txtFieldBirthDay.text!, forKey: "Birthday")
+
+        
+        print(mutDictUserDetail)
+        let data = NSKeyedArchiver.archivedData(withRootObject: mutDictUserDetail)
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(data, forKey:"mutDictUserDetail")
+
+    }
     // MARK: - TextView delegate
     func textViewDidBeginEditing(_ textView: UITextView) {
-      
+        if textView.text.count > 250{}else{
         if textView.text == "About Me"{
             textView.text = ""
-        }
+            }}
     }
     func textViewDidChange(_ textView: UITextView) {
- 
+        if textView.text.count > 250{}else{
         lblCharacterLength.text = "\(textView.text.count)/250"
         textView.textColor = UIColor.black
-        textView.autoresizingMask = .flexibleHeight
-
+            textView.autoresizingMask = .flexibleHeight
+        }
+        setDictionary()
     }
     func textViewDidEndEditing(_ textView: UITextView) {
         setTextView()
+        setDictionary()
     }
     
     // MARK: - Pickerview delegate

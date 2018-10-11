@@ -7,10 +7,7 @@ import UIKit
 import MBProgressHUD
 
 class sentRestaurantsScreenVC: UIViewController,UISearchBarDelegate {
-    
-    
-    
-    
+  
     @IBOutlet weak var txtViewMessage: UITextView!
     var arrForRestaurants = [[String:AnyObject]]()
     var arrSelectedRestaurants = NSMutableArray()
@@ -21,7 +18,6 @@ class sentRestaurantsScreenVC: UIViewController,UISearchBarDelegate {
     var arrPlaces = NSMutableArray()
     var arrTime = NSMutableArray()
     var arrData = NSMutableArray()
-
     var latitude = String()
     var longitude = String()
     var dictUserDetail = NSDictionary()
@@ -44,12 +40,15 @@ override func didReceiveMemoryWarning() {
     
         let obj = sentRestaurantsScreenVC()
         
-      
+    
         if let str = dictUserDetail.object(forKey: "first_name") as? String{
             txtViewMessage.text = "Hi \(str) Wanna grab a bite?"}
    
         Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
         NotificationCenter.default.addObserver(self, selector: #selector(retriveDataForRestaurants), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+    }
+    func setRestaurantScreen(){
+        
     }
     // MARK: - Google Api
     @objc func retriveDataForRestaurants(){
@@ -220,12 +219,17 @@ override func didReceiveMemoryWarning() {
                     obj.arrForRestaurants.append(i)
                 }
             }
+            obj.isSent = false
             obj.dictUserDetails = dictUserDetail
             obj.strMessage = (txtViewMessage?.text)!
-            self.navigationController?.pushViewController(obj, animated: false)
-            self.dismiss(animated: true, completion: nil)
+           self.navigationController?.pushViewController(obj, animated: false)
+           // self.dismiss(animated: true, completion: nil)
         }
   }
+    
+    
+    
+    
 }
 extension sentRestaurantsScreenVC : UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

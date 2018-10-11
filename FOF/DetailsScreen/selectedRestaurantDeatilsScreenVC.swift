@@ -5,6 +5,7 @@
 //
 
 import UIKit
+import MBProgressHUD
 
 
 class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout {
@@ -13,10 +14,10 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     @IBOutlet weak var imgPrsnGiveReview: UIImageView!
     var startTime = Timer()
     var phoneNumber = String()
-    var arrOfImages = [[String:AnyObject]]()
+    var arrOfImages = [String]()
     var arrOfRestaurantData = [String:AnyObject]()
     var arrResponseForDetail = [[String:AnyObject]]()
-    var arrResponseForReviews = [[String:AnyObject]]()
+    var arrResponseForReviews = NSMutableArray()
    var strTime = String()
     @IBOutlet weak var lblRestaurantName: UILabel!
     @IBOutlet weak var lblReviewerName: UILabel!
@@ -32,24 +33,28 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     @IBOutlet weak var btnStar2Out: UIButton!
     @IBOutlet weak var btnStar1Out: UIButton!
     @IBOutlet weak var lblNumberOfImages: UILabel!
+    
+    
+    let app = UIApplication.shared.delegate as! AppDelegate
+    
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         print(arrOfRestaurantData)
-       if let dict = arrOfRestaurantData["isSelected"] as? NSDictionary{
-        lblRestaurantName.text = dict["name"] as? String
-        if let str = strTime as? String{
-            if str == ""{
-                btnTimeOut.setTitle("18 mins", for: .normal)
+        
+        if let CarFirst = self.arrOfRestaurantData["CarFirst"] as? NSDictionary
+        {
+            if let Difference = CarFirst.object(forKey: "Difference") as? String
+            {
+                self.btnTimeOut.setTitle(" \(Difference)", for: .normal)
+            }
+            
+        }
+        
+        self.GetRestuarantReview()
+        
 
-            }else{
-                btnTimeOut.setTitle(" \(str)", for: .normal)}
-        }else{
-           btnTimeOut.setTitle("18 mins", for: .normal)
-        }
-        getplaceDetails(placeId: dict["place_id"] as! String)
-        }
         
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -102,80 +107,177 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
      startTime = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(scrollToNextCell), userInfo: nil, repeats: true);
     }
     func setReviewsDetails(){
-        lblReviewerName.text = arrResponseForReviews[0]["author_name"] as? String
-        lblReview.text = arrResponseForReviews[0]["text"] as? String
-        let rating = arrResponseForReviews[0]["rating"] as! Int
-        switch rating {
-        case 1:
-            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            break
-        case 2:
-            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            break
-        case 3:
-            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            break
-        case 4:
-            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-            break
-        case 5:
-            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            self.btnStar5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-            break
-        default:
-            break
+        
+        if let dataDict = self.arrResponseForReviews.object(at: 0) as? NSDictionary
+        {
+            if let reviewDict = dataDict.object(forKey: "review") as? NSDictionary
+            {
+                if let dict = reviewDict.object(forKey: "user") as? NSDictionary
+                {
+                    lblReviewerName.text = dict.object(forKey: "name") as? String
+                    lblReview.text = reviewDict.object(forKey: "review_text") as? String
+                    if let rating = reviewDict.object(forKey: "rating") as? Int
+                    {
+                        switch rating {
+                        case 1:
+                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            break
+                        case 2:
+                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            break
+                        case 3:
+                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            break
+                        case 4:
+                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                            break
+                        case 5:
+                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            self.btnStar5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                            break
+                        default:
+                            break
+                        }
+                    }
+                    
+                    if let str = dict.object(forKey: "profile_image") as? String
+                    {
+                        imgPrsnGiveReview.cornerRadius = imgPrsnGiveReview.frame.width/2
+                        imgPrsnGiveReview.clipsToBounds = true
+                        let url = NSURL(string:  str)!  as URL
+                        imgPrsnGiveReview.sd_setImage(with: url)
+                    }
+                    
+                }
+            }
+            
         }
-        imgPrsnGiveReview.cornerRadius = imgPrsnGiveReview.frame.width/2
-        imgPrsnGiveReview.clipsToBounds = true
-        let url = NSURL(string: arrResponseForReviews[0]["profile_photo_url"] as! String)!  as URL
-        imgPrsnGiveReview.sd_setImage(with: url)
+ 
+        
     }
   
-    func getplaceDetails(placeId : String){
-        if placeId != "" {
-            let GdetailLink : String = "https://maps.googleapis.com/maps/api/place/details/json?placeid="  + placeId  + "&key=\(Constants.GoogleKey.kGoogle_Key)"
-            WebService.CallRequestUrl(GdetailLink) { (success, response) in
-                print(response)
-                let dict = response["result"] as! NSDictionary
-                if let str = dict["website"] as? String{
-                    self.lblRestaurantWebsite.text = str
-                }else{
-                   self.lblRestaurantWebsite.text = "No website"
-                }
-                if let strPhone = dict["international_phone_number"] as? String{
-                    self.phoneNumber = strPhone
-                    self.lblRestaurantNumber.setTitle(strPhone, for: .normal)
-                }else{
-                     self.lblRestaurantNumber.setTitle("No phone number", for: .normal)
-                }
-                self.lblRestaurantAddress.text = dict["vicinity"] as? String
-                self.arrOfImages = dict["photos"] as! [[String:AnyObject]]
-                self.lblNumberOfImages.text = "\(1)/\(self.arrOfImages.count)"
-                self.arrResponseForReviews = dict["reviews"] as! [[String:AnyObject]]
-              
-                self.collectionViewProfileImages.reloadData()
-                self.setReviewsDetails()
+    func setRestuarantData(dict : NSDictionary)
+    {
+        
+        print(dict)
+       self.lblRestaurantWebsite.isHidden = true
+        self.lblRestaurantNumber.isHidden = true
+        
+        if let addDict = dict.object(forKey: "location") as? NSDictionary
+        {
+            if let address = addDict.object(forKey: "address") as? String
+            {
+                self.lblRestaurantAddress.text = address
             }
-        }}
+        }
+        
+        
+        if let featured_image = dict.object(forKey: "thumb") as? String
+        {
+            self.arrOfImages.append(featured_image)
+        }
+        
+        self.lblNumberOfImages.text = "\(1)/\(self.arrOfImages.count)"
+        
+        
+        self.collectionViewProfileImages.reloadData()
+        self.setReviewsDetails()
+        
+    }
+    
+    
+//    func getplaceDetails(placeId : String){
+//        if placeId != "" {
+//            let GdetailLink : String = "https://maps.googleapis.com/maps/api/place/details/json?placeid="  + placeId  + "&key=\(Constants.GoogleKey.kGoogle_Key)"
+//            WebService.CallRequestUrl(GdetailLink) { (success, response) in
+//                print(response)
+//                let dict = response["result"] as! NSDictionary
+//                if let str = dict["website"] as? String{
+//                    self.lblRestaurantWebsite.text = str
+//                }else{
+//                   self.lblRestaurantWebsite.text = "No website"
+//                }
+//                if let strPhone = dict["international_phone_number"] as? String{
+//                    self.phoneNumber = strPhone
+//                    self.lblRestaurantNumber.setTitle(strPhone, for: .normal)
+//                }else{
+//                     self.lblRestaurantNumber.setTitle("No phone number", for: .normal)
+//                }
+//                self.lblRestaurantAddress.text = dict["vicinity"] as? String
+//                self.arrOfImages = dict["photos"] as! [[String:AnyObject]]
+//                self.lblNumberOfImages.text = "\(1)/\(self.arrOfImages.count)"
+//                self.arrResponseForReviews = dict["reviews"] as! [[String:AnyObject]]
+//
+//                self.collectionViewProfileImages.reloadData()
+//                self.setReviewsDetails()
+//            }
+//        }
+//    }
+    
+    //MARK:- Webservice
+    
+    func GetRestuarantReview()
+    {
+        if let dataDict = self.arrOfRestaurantData["isSelected"] as? NSDictionary
+        {
+            if let restID = dataDict.object(forKey: "id")
+            {
+                let mainLink = "https://developers.zomato.com/api/v2.1/reviews?res_id=\(restID)&start=0&count=10"
+                MBProgressHUD.showAdded(to: self.view, animated: true)
+                
+                Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy, successStatusCode: 200) { (success, response) in
+                   
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                    if success == true
+                    {
+                        if let arryData = response.object(forKey: "user_reviews") as? [[String:AnyObject]]
+                        {
+                            self.arrResponseForReviews = NSMutableArray(array: arryData)
+                            
+                        }
+                        
+                        if let dict = self.arrOfRestaurantData["isSelected"] as? NSDictionary
+                        {
+                            self.setRestuarantData(dict: dict)
+                        }
+                        
+                    }
+                    else
+                    {
+                        if let msg = response.object(forKey: "message") as? String
+                        {
+                            _ = self.navigationController?.popViewController(animated: true)
+                        }
+                        else
+                        {
+                            self.GetRestuarantReview()
+                        }
+                        
+                    }
+                    
+                }
+            }
+        }
+    }
     
     
     
@@ -187,8 +289,23 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath as IndexPath) as! testBudsCollectionViewCell
         
-        let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=\(arrOfImages[indexPath.row]["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
-        cell.imgViewOfRestaurant.sd_setImage(with: url, placeholderImage: UIImage(named: "placeHolderRestraunt"), options: .retryFailed)
+//        let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=\(arrOfImages[indexPath.row]["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
+//        cell.imgViewOfRestaurant.sd_setImage(with: url, placeholderImage: UIImage(named: "placeHolderRestraunt"), options: .retryFailed)
+        
+        
+        if let str = self.arrOfImages[indexPath.row] as? String
+        {
+            if str != ""
+            {
+                cell.imgViewOfRestaurant.sd_setImage(with: URL.init(string: str)!, placeholderImage: UIImage(named: "placeHolderRestraunt"), options: .retryFailed)
+            }
+            else
+            {
+                cell.imgViewOfRestaurant.image = UIImage(named: "placeHolderRestraunt")
+            }
+            
+        }
+        
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

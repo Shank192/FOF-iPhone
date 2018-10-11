@@ -21,10 +21,12 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     var arrDuration = NSMutableArray()
     var arrTime = NSMutableArray()
     var arrForAddress = NSMutableArray()
-    var latitude = String()
-    var longitude = String()
+    var latitude : String?
+    var longitude : String?
     
     var isService = false
+    
+    let app = UIApplication.shared.delegate as! AppDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,12 +107,64 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
         
     }
     
+    //MARK:- Zomato API to get Restuarant
+    
+    func setZomatoRest(latitude: String,longitude : String,StrtCounty : Int,EndCount : Int)
+    {
+        let mainLink = "https://developers.zomato.com/api/v2.1/search?q=loader&start=\(StrtCounty)&count=\(EndCount)&lat=\(latitude)&lon=\(longitude)"
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        
+        Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy, successStatusCode: 200)  { (success, response) in
+            MBProgressHUD.hide(for: self.view, animated: true)
+            if success == true
+            {
+                if let restaurants = response.object(forKey: "restaurants") as? NSArray
+                {
+                    if StrtCounty == 0
+                    {
+                        self.arrForRestaurants.removeAll()
+                        self.arrForRestaurants = restaurants as! [[String : AnyObject]]
+                    }
+                    else
+                    {
+                        for (_,data) in restaurants.enumerated()
+                        {
+                            if let dataDict = data as? [String : AnyObject]
+                            {
+                                self.arrForRestaurants.append(dataDict)
+                            }
+                        }
+                        
+                    }
+                }
+                
+                self.retriveDataForRestaurantByCarAndWalking()
+            }
+            else
+            {
+                
+            }
+            
+        }
+
+    }
+    
+    
+    
     // MARK: - Google Api
     @objc func retriveDataForRestaurants(){
-        MBProgressHUD.showAdded(to: self.view, animated: true)
-        latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
-        longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
-        setData(latitude: latitude, longitude: longitude)
+        if self.latitude == nil && self.longitude == nil
+        {
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+            self.latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as? String
+            self.longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as? String
+//            setData(latitude: latitude!, longitude: longitude!)
+            
+            self.setZomatoRest(latitude: "\(latitude!)", longitude: "\(longitude!)", StrtCounty: 0, EndCount: 10)
+            
+        }
+        
+        
     }
     func getPlaceDetail(googlePlaceID:String) {
         
@@ -122,7 +176,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                     if let loc = dict!["location"] as? NSDictionary{
                         self.latitude = String(describing:loc["lat"]!)
                         self.longitude = String(describing:loc["lng"]!)
-                        self.setData(latitude: self.latitude, longitude: self.longitude)
+                        self.setData(latitude: self.latitude!, longitude: self.longitude!)
                     }
                 }
                 self.dismiss(animated: true, completion: nil)
@@ -143,7 +197,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     
     func fetchBusinessFromGoogle (_ searchname : String){
         if searchname.count > 0 {
-            WebService.GetAutoCompletePlaces(searchname, locationString: "\(latitude),\(longitude)", radiusString: "20000", CompletionHandler: { (success, response) in
+            WebService.GetAutoCompletePlaces(searchname, locationString: "\(latitude!),\(longitude!)", radiusString: "20000", CompletionHandler: { (success, response) in
                 if success == true {
                     self.tblViewAddress.isHidden = false
                     self.collectionViewFoodSearch.isHidden = true
@@ -168,7 +222,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     @objc func retriveDataForRestaurant(strType : String){
         MBProgressHUD.showAdded(to: self.view, animated: true)
         var myUrl = String()
-        myUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(latitude),\(longitude)&radius=20000&type=\("restaurant")&keyword=\(strType)&key=\(Constants.GoogleKey.kGoogle_Key)"
+        myUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(latitude!),\(longitude!)&radius=20000&type=\("restaurant")&keyword=\(strType)&key=\(Constants.GoogleKey.kGoogle_Key)"
         WebService.CallRequestUrl(myUrl) { (success, response) -> () in
             print(response)
             if success == true {
@@ -197,17 +251,22 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                 
                 self.arrDuration.add(NSDictionary())
                 self.arrTime.add(NSDictionary())
-                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lat")! as AnyObject).doubleValue)!)
                 
-                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lng")! as AnyObject).doubleValue)!)
+//                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lat")! as AnyObject).doubleValue)!)
+//
+//                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lng")! as AnyObject).doubleValue)!)
+                
+                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "restaurant") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "latitude")! as AnyObject).doubleValue)!)
+
+                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "restaurant") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "longitude")! as AnyObject).doubleValue)!)
                 
                 var firstStartLat = ""
                 var firstStartLong = ""
                 var secondStartLat = ""
                 var secondStartLong = ""
                 var myURL = ""
-                firstStartLat = latitude
-                firstStartLong = longitude
+                firstStartLat = latitude!
+                firstStartLong = longitude!
                 secondStartLat = latOfPlace
                 secondStartLong = longOfPlace
                 
@@ -267,11 +326,17 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
             
             if let BudsDict = self.arrDuration.object(at: i) as? NSDictionary
             {
-                let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
-                MuteBudsDict.setValue(self.arrData.object(at: i) as? NSDictionary, forKey: "isSelected")
-                arrData.replaceObject(at: i, with: MuteBudsDict)
+                if let dataDict = self.arrData.object(at: i) as? NSDictionary
+                {
+                    if let dict = dataDict.object(forKey: "restaurant") as? NSDictionary
+                    {
+                        let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
+                        MuteBudsDict.setValue(dict, forKey: "isSelected")
+                        arrData.replaceObject(at: i, with: MuteBudsDict)
+
+                    }
+                }
             }
-            
         }
         
         for i in arrData{
@@ -303,19 +368,45 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                 if let str = dict["Difference"] as? String{
                     cell.btnFoodDistanceForCarOut.setTitle("\(str)", for: .normal)}}
             
-            if let dict1 = arrForRestaurants[indexPath.row]["isSelected"] as? NSDictionary{
-                cell.lblSearchFood.text = dict1["name"] as? String
-                if let photos = dict1["photos"] as? [[String:Any]]{
-                    let strRefre = photos.first
-                    let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
-                    cell.imgViewFoodRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)}}}
+//            if let dict1 = arrForRestaurants[indexPath.row]["isSelected"] as? NSDictionary{
+//                cell.lblSearchFood.text = dict1["name"] as? String
+//                if let photos = dict1["photos"] as? [[String:Any]]{
+//                    let strRefre = photos.first
+//                    let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
+//                    cell.imgViewFoodRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)}}
+            
+            print(arrForRestaurants[indexPath.row])
+            if let dict1 = arrForRestaurants[indexPath.row]["isSelected"] as? NSDictionary
+            {
+                
+                if let name = dict1.object(forKey: "name") as? String
+                {
+                    cell.lblSearchFood.text = name
+                }
+                
+                if let thumb = dict1.object(forKey: "thumb") as? String
+                {
+                    if thumb != ""
+                    {
+                        cell.imgViewFoodRestro.sd_setImage(with: URL.init(string: thumb)!, placeholderImage: UIImage(named: ""), options: .retryFailed)
+                    }
+                    else
+                    {
+                        cell.imgViewFoodRestro.image = UIImage.init(named: "placeHolderRestraunt")
+                    }
+                    
+                }
+                
+            }
+            
+        }
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
         obj.arrOfRestaurantData = arrForRestaurants[indexPath.row]
-        if let dict = (arrTime.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
-            if let str = dict["TimeDifference"] as? String{
+        if let dict = arrForRestaurants[indexPath.row]["CarFirst"] as? NSDictionary{
+            if let str = dict["Difference"] as? String{
                 obj.strTime = str }}
         self.navigationController?.pushViewController(obj, animated: false)
     }

@@ -102,21 +102,21 @@ class loginScreenVC: UIViewController {
                         }
                         _ = "http://graph.facebook.com/\(id)/picture?type=large"
                 
-                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token":   UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) as! String
-                            ,"device_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) as! String,"mobile":"986562323"]
+//                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token": "\(UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) ?? 123456)"
+//                            ,"device_id":"\(UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) ?? 123465)","mobile":"986562323"]
                         
-//                        let param = ["email":email,"dob":birthDay,"gender":gender,"first_name":firstName,"last_name":lastName,"devicetype":"ios","action":"socialsignin","device_token":   "B80B5CF9BE91FE1D6AD5DD7BABA282E5F1A009A6A0AE0A292026A3A745A17E40","mobile":"986562323"]
+                        let param = NSDictionary.init(dictionary: ["social_flag":"1","social_id":id,"email":email,"first_name":firstName,"last_name":lastName,"device_type":"0","device_token": "\(UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceToken) ?? 123456)","device_id":"\(UserDefaults.standard.object(forKey: Constants.UserDefaults.deviceID) ?? 123465)","phone":"986562323"])
                         
 
                        print(param)
-                       self.SocioLoginApi(param as NSDictionary)
+                       self.SocioLoginApi(param )
                     }
                     
                 } else {
                     print(error?.localizedDescription ?? "Error in fb user detail")
                     
                 }
-                
+                Constants.GlobalConstants.appDelegate.deleteAllCoreData()
             })
         }
     }
@@ -125,58 +125,113 @@ class loginScreenVC: UIViewController {
     func SocioLoginApi(_ param:NSDictionary) {
         
         
-        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param, CompletionHandler: { (success, response) -> () in
+        Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.LOGIN, param: param, key: "", successStatusCode: 200) { (success, response) in
             
-            //MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-            if success == true {
-               // if (response.object(forKey: "response") as! String) == "success" {
-                    if (response.object(forKey: "data") != nil)  {
-                        let data1 = response.object(forKey: "data") as! [[String:AnyObject]]
-                        let data : NSDictionary = data1[0] as NSDictionary
-                        //UserDefaults.standard.set(data, forKey: Constants.UserDefaults.LoginData)
-                        let id_str = "\(data.object(forKey: "id")!)"
-                        let id_session = "\(data.object(forKey: "sessionid")!)"
-                        
-                        
-                        UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
-                        UserDefaults.standard.set(data.object(forKey: "last_name") as! String, forKey: Constants.UserDefaults.User_Last_Name)
-                        UserDefaults.standard.set((data.object(forKey: "first_name") as AnyObject) as! String, forKey: Constants.UserDefaults.User_First_Name)
-                        UserDefaults.standard.set(data.object(forKey: "email") as! String, forKey: Constants.UserDefaults.User_Email)
-                        UserDefaults.standard.set(id_str, forKey: Constants.UserDefaults.user_ID)
-                        UserDefaults.standard.set(id_session, forKey: Constants.UserDefaults.session_ID)
-
-//                        if data.object(forKey: "image") != nil && (data.object(forKey: "image") as! String).count > 0 {
-//                            UserDefaults.standard.set((data.object(forKey: "image") as! String), forKey: "USERIMAGE")
-//                            SDWebImageManager.shared().downloadImage(with: URL(string: data.object(forKey: "image") as! String), options: SDWebImageOptions.allowInvalidSSLCertificates, progress: nil, completed: { (image, error, SDImageCacheType, finished, url) in
-//
-//                                if (image != nil) {
-//                                    UserDefaults.standard.set(UIImagePNGRepresentation(image!), forKey: "USER_IMG_DATA")
-//                                    UserDefaults.standard.synchronize()
-//                                }
-//                            })
-//                        }
-                       UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
-                        let obj = self.storyboard?.instantiateViewController(withIdentifier: "interestedScreenVC")  as! interestedScreenVC //as! testBudsScreenVC
-                        if self.userCurrentLocation != nil
-                        {
-                            obj.userLocation = self.userCurrentLocation!
-                        }
-                        
-                        self.navigationController?.pushViewController(obj, animated: false)
-                        UserDefaults.standard.synchronize()
-                    Constants.GlobalConstants.appDelegate.isFbSignIn = true
-                        
-                }
-                //}
-                } else if response.object(forKey: "message") != nil {
-                    //self.view.makeToast(response.object(forKey: "message") as! String)
+            if success == true
+            {
+                if let dict = response.object(forKey: "response_data") as? NSDictionary
+                {
+                    if let user_id = dict.object(forKey: "user_id")
+                    {
+                        UserDefaults.standard.set("\(user_id)", forKey: Constants.UserDefaults.user_ID)
+                    }
+                    
+                    if let email = dict.object(forKey: "email")
+                    {
+                        UserDefaults.standard.set("\(email)", forKey: Constants.UserDefaults.User_Email)
+                    }
+                    
+                    if let first_name = dict.object(forKey: "first_name"),let last_name = dict.object(forKey: "last_name")
+                    {
+                        UserDefaults.standard.set("\(last_name)", forKey: Constants.UserDefaults.User_Last_Name)
+                        UserDefaults.standard.set("\(first_name)", forKey: Constants.UserDefaults.User_First_Name)
+                    }
                 }
                 
-             else {
-                if response.object(forKey: "message") != nil {
-                    //self.view.makeToast(response.object(forKey: "message") as! String)
+                
+                
+                UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
+               
+                
+                let obj = self.storyboard?.instantiateViewController(withIdentifier: "interestedScreenVC")  as! interestedScreenVC //as! testBudsScreenVC
+                if self.userCurrentLocation != nil
+                {
+                    obj.userLocation = self.userCurrentLocation!
                 }
-            }})}
+                
+                self.navigationController?.pushViewController(obj, animated: false)
+                UserDefaults.standard.synchronize()
+                Constants.GlobalConstants.appDelegate.isFbSignIn = true
+                
+            }
+            else{
+                if let msg = response.object(forKey: "message") as? String
+                {
+                    print("\(msg)")
+                }
+                else
+                {
+                    
+                }
+                
+            }
+            
+        }
+        
+//        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param, CompletionHandler: { (success, response) -> () in
+//
+//            //MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+//            if success == true {
+//               // if (response.object(forKey: "response") as! String) == "success" {
+//                    if (response.object(forKey: "data") != nil)  {
+//                        let data1 = response.object(forKey: "data") as! [[String:AnyObject]]
+//                        let data : NSDictionary = data1[0] as NSDictionary
+//                        //UserDefaults.standard.set(data, forKey: Constants.UserDefaults.LoginData)
+//                        let id_str = "\(data.object(forKey: "id")!)"
+//                        let id_session = "\(data.object(forKey: "sessionid")!)"
+//
+//
+//                        UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
+//                        UserDefaults.standard.set(data.object(forKey: "last_name") as! String, forKey: Constants.UserDefaults.User_Last_Name)
+//                        UserDefaults.standard.set((data.object(forKey: "first_name") as AnyObject) as! String, forKey: Constants.UserDefaults.User_First_Name)
+//                        UserDefaults.standard.set(data.object(forKey: "email") as! String, forKey: Constants.UserDefaults.User_Email)
+//                        UserDefaults.standard.set(id_str, forKey: Constants.UserDefaults.user_ID)
+//                        UserDefaults.standard.set(id_session, forKey: Constants.UserDefaults.session_ID)
+//
+////                        if data.object(forKey: "image") != nil && (data.object(forKey: "image") as! String).count > 0 {
+////                            UserDefaults.standard.set((data.object(forKey: "image") as! String), forKey: "USERIMAGE")
+////                            SDWebImageManager.shared().downloadImage(with: URL(string: data.object(forKey: "image") as! String), options: SDWebImageOptions.allowInvalidSSLCertificates, progress: nil, completed: { (image, error, SDImageCacheType, finished, url) in
+////
+////                                if (image != nil) {
+////                                    UserDefaults.standard.set(UIImagePNGRepresentation(image!), forKey: "USER_IMG_DATA")
+////                                    UserDefaults.standard.synchronize()
+////                                }
+////                            })
+////                        }
+//                       UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
+//                        let obj = self.storyboard?.instantiateViewController(withIdentifier: "interestedScreenVC")  as! interestedScreenVC //as! testBudsScreenVC
+//                        if self.userCurrentLocation != nil
+//                        {
+//                            obj.userLocation = self.userCurrentLocation!
+//                        }
+//
+//                        self.navigationController?.pushViewController(obj, animated: false)
+//                        UserDefaults.standard.synchronize()
+//                    Constants.GlobalConstants.appDelegate.isFbSignIn = true
+//
+//                }
+//                //}
+//                } else if response.object(forKey: "message") != nil {
+//                    //self.view.makeToast(response.object(forKey: "message") as! String)
+//                }
+//
+//             else {
+//                if response.object(forKey: "message") != nil {
+//                    //self.view.makeToast(response.object(forKey: "message") as! String)
+//                }
+//            }})
+        
+    }
 
     
     @IBAction func btnExploreAct(_ sender: Any) {

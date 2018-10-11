@@ -37,6 +37,10 @@ class FoFTabBarScreenVC: UITabBarController {
         self.tabBar.layer.addSublayer(topBoder)
         UITabBar.appearance().barTintColor = UIColor.white
         self.tabBar.clipsToBounds = true
+            let obj = getFriendsScreen()
+            obj.wsSetFriendsList { (isNewUser, arrFrndData) in}
+        
+        
     }
 
     override func didReceiveMemoryWarning() {

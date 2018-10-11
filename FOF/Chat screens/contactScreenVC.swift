@@ -6,22 +6,31 @@
 
 import UIKit
 import MBProgressHUD
+import Firebase
+import FirebaseDatabase
+import FirebaseStorage
 
-class contactScreenVC: UIViewController , UITableViewDelegate , UITableViewDataSource {
+
+class contactScreenVC: UIViewController , UITableViewDelegate , UITableViewDataSource,FirebaseDelegate {
    
+    let objSendMessage = sendMessageServicesScreenVC()
+    
+
+    var arrPendingUserDetails = NSMutableArray()
     var arrContactList = NSMutableArray()
     var ArrayFriendData = NSMutableArray()
-    var arrFriendData = [[String:AnyObject]]()
-
+    var isFirstTime = true
     @IBOutlet weak var tblViewFrndList: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-self.navigationController?.isNavigationBarHidden = true
-        // Do any additional setup after loading the view.
+        setWsGetPendingList()
+        self.navigationController?.isNavigationBarHidden = true
+        objSendMessage.delegate = self
     }
     override func viewWillAppear(_ animated: Bool) {
         wsSetFriendsList()
+        
 
     }
     override func didReceiveMemoryWarning() {
@@ -30,67 +39,118 @@ self.navigationController?.isNavigationBarHidden = true
     }
     
     // MARK: - webService
+   
     func wsSetFriendsList(){
-        let param = ["action":"myfriends","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID)]
-        MBProgressHUD.showAdded(to: self.view, animated: true)
-        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param as NSDictionary, CompletionHandler: { (success, response) -> () in
-            
-            if success == true
-            {
+    MBProgressHUD.showAdded(to: self.view, animated: true)
+        let obj = getFriendsScreen()
+        obj.wsSetFriendsList { (isNewUser, arrFrndData) in
+            print(isNewUser,arrFrndData)
+            if isNewUser || self.isFirstTime{
+                self.isFirstTime = false
                 self.ArrayFriendData.removeAllObjects()
-                if let dataArray = response.object(forKey: "data") as? NSArray
-                {
-                    if dataArray.count != 0
-                    {
-                        for i in 0..<dataArray.count
-                        {
-                            if let dict = dataArray.object(at: i) as? NSDictionary
-                            {
-                                self.arrFriendData.append(dict as! [String : AnyObject])
-                             
-                                
-                                if let details = dict.object(forKey: "details") as? NSArray
-                                {
-                                    if details.count != 0
-                                    {
-                                        if let detailsDict = details.object(at: 0) as? NSDictionary
-                                        {
-                                            self.ArrayFriendData.add(detailsDict)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                    }
-                    
-                    
+                for i in arrFrndData{
+                    self.addDictionaryToUserArray(dict: i as! NSDictionary)
                 }
-                print(self.ArrayFriendData)
                 self.tblViewFrndList.reloadData()
                 MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
 
-            }
-            else if response.object(forKey: "message") != nil
-            {
+            }else{
                 MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                self.ArrayFriendData.removeAllObjects()
+
+                for i in arrFrndData{
+                    self.addDictionaryToUserArray(dict: i as! NSDictionary)
             }
-            else
-            {
-                if response.object(forKey: "message") != nil
-                {
-                    MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-                }
-            }
-            
-            
-        })
-        
+            }}
+
     }
+    // MARK: - Get pending List
+    func setWsGetPendingList(){
+        let param = ["action":"myfriendrequests","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID)]
+        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param as NSDictionary, CompletionHandler: { (success, response) -> () in
+            let arrData : NSArray  = response.object(forKey: "data") as! NSArray
+            let cdm = CoreDataManage()
+            for i in 0..<arrData.count{
+                let dictArr = arrData[i] as! NSDictionary
+                if dictArr["friend1"] as! String == UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String{
+                    continue
+                }
+                
+  if let details = dictArr.object(forKey: "details") as? NSArray{
+      let dictuserData = details.object(at: 0) as! NSDictionary
+    
+    
+    let arrFrnd = cdm.fetchFriendOtherDetailWithChatId(userId: dictuserData["id"] as! NSString)
+    if arrFrnd.count != 0{
+    let frnd : FriendOtherDetail = arrFrnd.firstObject as! FriendOtherDetail
+    if let str = frnd.lastmsg as? String{
+        self.objSendMessage.getAllMessagesDetailWithChatID(chatId: dictArr["id"] as! NSString)
+        }
+        self.addToArrayPendingUserWithUserDetail(dict: dictuserData)
+    }else{
+        self.addToArrayPendingUserWithUserDetail(dict: dictuserData)
+    }}}
+          
+        })
+    }
+    func addToArrayPendingUserWithUserDetail(dict : NSDictionary){
+        arrPendingUserDetails.removeAllObjects()
+        let mutDict = NSMutableDictionary.init(dictionary: dict)
+            let dictFetchdMsg = getLastMessageWithUserId(userId:dict["id"] as! NSString)
+            if var lastMsg = dictFetchdMsg.object(forKey: "msg") as? String{
+                if lastMsg == ""{
+                    lastMsg = ""
+                }
+                mutDict.setValue(lastMsg, forKey: "lastmsg")
+            }
+      
+            //            CoreDataManage *cdm = [[CoreDataManage alloc] init];
+            //            NSArray *arrUndelivered = [cdm getUndeliveredMsgsForUserId:dict[@"details"][0][@"id"]];
+            //            [mutDict setObject:@(arrUndelivered.count) forKey:@"unreadCounts"];
+            mutDict.setObject(dict["id"], forKey: "otherId" as NSCopying)
+
+        let predict = NSPredicate(format: "(id contains[c] %@)", (dict["id"] as! String))
+        let arrpredicated : NSArray = arrPendingUserDetails.filtered(using: predict) as NSArray
+        if arrpredicated.count == 0{
+            arrPendingUserDetails.add(mutDict.mutableCopy())
+        }else{
+            arrPendingUserDetails.remove(arrpredicated.firstObject ?? 0)
+            arrPendingUserDetails.add(mutDict.mutableCopy())
+       }
+        tblViewFrndList.reloadData()
+    }
+    func addDictionaryToUserArray(dict : NSDictionary){
+       let mutDict = NSMutableDictionary.init(dictionary: dict)
+        if let details = dict.object(forKey: "details") as? NSArray
+        { if details.count != 0
+        {
+        let uDetail = details.object(at: 0) as! NSDictionary
+            let dictFetchdMsg = getLastMessageWithUserId(userId:uDetail["id"] as! NSString)
+            if var lastMsg = dictFetchdMsg.object(forKey: "msg") as? String{
+            if lastMsg == ""{
+                lastMsg = ""
+            }
+            mutDict.setValue(lastMsg, forKey: "lastmsg")
+            }
+            if String(describing:mutDict.object(forKey: "lastmsgtimestamp")) != ""{
+                mutDict.setValue(mutDict.object(forKey: "lastmsgtimestamp") as! String, forKey: "lastmsgtimestamp")
+
+            }
+            if String(describing:mutDict.object(forKey: "lastmsgtimestamp")) == "0" || String(describing:mutDict.object(forKey: "lastmsgtimestamp")) == "" {
+                   mutDict.setValue(mutDict.object(forKey: "lastmsgtimestamp") as! String, forKey: "lastmsgtimestamp")
+            }
+//            CoreDataManage *cdm = [[CoreDataManage alloc] init];
+//            NSArray *arrUndelivered = [cdm getUndeliveredMsgsForUserId:dict[@"details"][0][@"id"]];
+//            [mutDict setObject:@(arrUndelivered.count) forKey:@"unreadCounts"];
+            mutDict.setObject(uDetail["id"], forKey: "otherId" as NSCopying)
+            ArrayFriendData.add(mutDict)
+            tblViewFrndList.reloadData()
+            }}}
+
     // MARK: - Uitableview delegate
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return 1
+            return arrPendingUserDetails.count
         }else{
             return ArrayFriendData.count}
     }
@@ -105,24 +165,38 @@ self.navigationController?.isNavigationBarHidden = true
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! chatTableviewCell
+        cell.selectionStyle = .none
         if indexPath.section == 0{
-          cell.lblPersonName.text = "Rachel Green"
+            if let dataDict = self.arrPendingUserDetails.object(at: indexPath.row) as? NSDictionary{
+        if let first_name = dataDict.object(forKey: "first_name"),let last_name = dataDict.object(forKey: "last_name"),let profilepic1 = dataDict.object(forKey: "profilepic1")
+                {
+          cell.lblPersonName.text = "\(first_name) \(last_name)"
             cell.imgViewProfile.cornerRadius = cell.imgViewProfile.frame.width / 2
             cell.imgViewProfile.clipsToBounds = true
-            cell.imgViewProfile.image = UIImage(named: "rachel.jpg")
+            cell.imgViewProfile.image = UIImage.init(named: "disableSingle")
+                    if "\(profilepic1)" != ""
+                    {
+                        if let proURL = URL.init(string: "\(profilepic1)")
+                        {
+                            cell.imgViewProfile.sd_setImage(with: proURL)
+                        }
+                        if cell.imgViewProfile.image == nil{
+                            cell.imgViewProfile.image = UIImage.init(named: "disableSingle")
+                        }
+                    }
             cell.lblMessage.text = "New York, USA"
             cell.btnAcceptRequestOut.isHidden = false
             cell.btnCancelRequestOut.isHidden = false
             cell.lblTiming.isHidden = true
             cell.btnNotificationOut.isHidden = true
-        }else{
+                }}}else{
             if indexPath.row == 2 {
                 cell.btnNotificationOut.isHidden = false
                 cell.btnNotificationOut.setTitle("1", for: .normal)}else{cell.btnNotificationOut.isHidden = true}
-            if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
+            if let dataDict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
             {
-                
-                if let first_name = dict.object(forKey: "first_name"),let last_name = dict.object(forKey: "last_name"),let profilepic1 = dict.object(forKey: "profilepic1")
+                let dict = (dataDict.object(forKey: "details") as! NSArray)[0] as! NSDictionary
+        if let first_name = dict.object(forKey: "first_name"),let last_name = dict.object(forKey: "last_name"),let profilepic1 = dict.object(forKey: "profilepic1")
                 {
         cell.btnAcceptRequestOut.isHidden = true
         cell.btnCancelRequestOut.isHidden = true
@@ -136,39 +210,93 @@ self.navigationController?.isNavigationBarHidden = true
                         {
                             cell.imgViewProfile.sd_setImage(with: proURL)
                         }
+                        if cell.imgViewProfile.image == nil{
+                            cell.imgViewProfile.image = UIImage.init(named: "disableSingle")
+                        }
                     }
-        cell.lblTiming.text = "4.55 am"
-        cell.lblPersonName.text =  "\(first_name) \(last_name)"
-        cell.lblMessage.text = "Hello , Hi how are you?"
                     
+                    if let strTime = dataDict.object(forKey: "lastmsgtimestamp") as? String{
+                        if strTime == "Optional(1536236239)" || strTime == "" {
+                            cell.lblTiming.text = ""
+                        }else{
+                            cell.lblTiming.text = getTimeFromTimeStamp(timestamp: NSNumber(integerLiteral: Int(strTime)!))}}
+        cell.lblPersonName.text =  "\(first_name) \(last_name)"
+                    if let strlastMsg = dataDict.object(forKey: "lastmsg") as? String{
+                        cell.lblMessage.text = strlastMsg}
                 }}
         }
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
-        {if let dataDict = self.arrFriendData[indexPath.row] as? NSDictionary{
-                if dataDict.object(forKey: "status") as! String == "0"{
-                        let obj = self.storyboard?.instantiateViewController(withIdentifier: "sentRequestRestaurantScreenVC") as! sentRequestRestaurantScreenVC
-                       
-                    obj.dictUserDetails = arrFriendData[indexPath.row] as NSDictionary
+        {
+        if dict.object(forKey: "status") as! String == "0"{
+            let obj = self.storyboard?.instantiateViewController(withIdentifier: "sentRequestRestaurantScreenVC") as! sentRequestRestaurantScreenVC
+            if let dataDict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
+            {
+                obj.isSent = true
+                obj.dictUserDetails = (dataDict.object(forKey: "details") as! NSArray)[0] as! NSDictionary
+                
+            }
                         self.navigationController?.pushViewController(obj, animated: false)
                 }else{
                 let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
-            UserDefaults.standard.set(dataDict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
-            UserDefaults.standard.set(dataDict.object(forKey: "friend1"), forKey: Constants.UserDefaults.senderId)
-                UserDefaults.standard.set(dataDict.object(forKey: "friend2"), forKey: Constants.UserDefaults.receiverId)
-            obj.strReceiverName = "\(dict.object(forKey: "first_name")!) \(dict.object(forKey: "last_name")!)"
+            UserDefaults.standard.set(dict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
+            obj.dictUserDetail = self.ArrayFriendData.object(at: indexPath.row) as! NSDictionary
+          
+            let dataDict = (dict.object(forKey: "details") as! NSArray)[0] as! NSDictionary
+                    
                     obj.isFreind = true
-           if let profilepic1 = dict.object(forKey: "profilepic1") as? String{
+           if let profilepic1 = dataDict.object(forKey: "profilepic1") as? String{
             UserDefaults.standard.setValue(profilepic1, forKey: Constants.UserDefaults.receiverDP)}else{
             UserDefaults.standard.setValue("", forKey: Constants.UserDefaults.receiverDP)
                     }
             self.navigationController?.pushViewController(obj, animated: false)
-        }}
+        }
         }
      
     }
-   
+    func getLastMessageWithUserId(userId : NSString) -> NSDictionary{
+        let cdm = CoreDataManage()
+        let fetchLastMessage : NSDictionary = cdm.fetchLastMessageWithOtherUserId(otherId: userId)
+        return fetchLastMessage
+    }
 
+    
+    func FireDataBaseAllMessagesDetail(snapshot: DataSnapshot, isAllMsgs: Bool) {
+        
+        let cdm = CoreDataManage ()
+        var arrValues = NSMutableArray.init(array: (snapshot.value as! NSDictionary).allKeys)
+        let dict : NSDictionary = arrValues.firstObject as! NSDictionary
+        var otherid : String = dict["senderId"] as! String
+        if otherid == UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String{
+            otherid = dict["recieverId"] as! String
+        }
+       // let highesttoLowest : NSSortDescriptor = NSSortDescriptor(key: "timeStamp", ascending: true,selector: #selector(NSString.localizedStandardCompare))
+       //arrValues = arrValues.sort { $0.highesttoLowest < $1.highesttoLowest }
+        for i in 0..<arrValues.count{
+            if let dict = arrValues[i] as? NSDictionary{
+                let frnd : FriendOtherDetail = ((cdm.fetchFriendOtherDetailWithUserId(userId: otherid as NSString) as! NSMutableArray).firstObject as! FriendOtherDetail)
+                print(frnd)
+            }
+        }
+        
+        
+        
+        
+        
+    }
+    
+    func setCurrentUpdatedStatusOfOtherUser(snapshot: DataSnapshot) {
+    }
+    func otherUserIdStatusDetail(snapshot: DataSnapshot) {
+    }
+    func setMsgseenTickMarkForMessage(snapshot: DataSnapshot) {
+    }
+    
+    
+    
+    
+    
+    
 }

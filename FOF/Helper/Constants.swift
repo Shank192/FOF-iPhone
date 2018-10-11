@@ -22,10 +22,19 @@ struct Constants {
     }
     
     struct WebServiceUrl {
-        static let mainUrl    = "http://entrega.in/projects/fof/api/post.php"
-
+//    static let mainUrl    = "http://entrega.in/projects/fof/api/post.php"
+        static let mainUrl = "http://54.177.127.170/api/"
+//        static let mainUrl = "http://192.168.1.14/fof/api/"
     }
 
+    struct APIName {
+        //    static let mainUrl    = "http://entrega.in/projects/fof/api/post.php"
+        static let LOGIN = "user/login"
+        static let GetTestBuds = "user/getTastebuds"
+        static let GetUserProfile  = "user/getUserProfile"
+        static let SaveUserTestbuds  = "user/addUsersTastebuds"
+    }
+    
     
     
     // MARK: - Message's
@@ -84,10 +93,9 @@ struct Constants {
         static let isregistered = "isregistered"
         static let isLoging = "isUserLoging"
         static let MyTestBuds = "MyTestBuds"
+        static let MySelectedTEstBudsID = "MySelectedTEstBudsID"
         static let ProfileData = "ProfileData"
-        
-        
-        static let senderId = "senderId"
+        static let CurrentCity = "CurrentCity"
         static let receiverId = "receiverId"
         static let receiverDP = "receiverDP"
         static let matchId = "matchId"

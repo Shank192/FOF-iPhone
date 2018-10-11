@@ -169,10 +169,8 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
                 if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isFriend){
                     self.wsSetFriendsList()
                 }else{
-                ///self.GetSuggestedFriend()
-                    self.wsSetFriendsList()
+                self.GetSuggestedFriend()
                 }
-
             }else{
                 MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
             }
@@ -201,12 +199,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
     
     // MARK: - TextField delegate method
     @objc func myTargetFunction(textField: UITextField) {
-        UIView.animate(withDuration: 0.5) {
-            let transition = CATransition()
-            transition.duration = 0.5
-            transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-            transition.type = kCATransitionPush;
-            transition.subtype = kCATransitionFromRight;
+        UIView.animate(withDuration: 2.5) {
            self.nslcHightOfButton.constant = 30
             self.btnCancelOut.setTitle("Cancel", for: .normal)
             self.btnSearchOut.setTitle("Search", for: .normal)
@@ -324,14 +317,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
 //                }
 //                else
 //                {
-//    let param = ["action":"sendfriendrequest","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID),"friendid":frndID]
-//
-//    WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param as NSDictionary, CompletionHandler: { (success, response) in
-//
-//
-//
-//
-//                    })
+
 //                }
 //            }
 //        }
@@ -382,64 +368,13 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
             }
         }}
     func wsSetFriendsList(){
-        let param = ["action":"myfriends","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID)]
-        MBProgressHUD.showAdded(to: self.view, animated: true)
-        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param as NSDictionary, CompletionHandler: { (success, response) -> () in
-             let cdm = CoreDataManage()
-           let arrOldFriends : NSArray = cdm.fetchWithEntityName(entity: "FriendOtherDetail")
-            if success == true
-            {
-                if let dataArray = response.object(forKey: "data") as? NSArray
-                {
-                    if dataArray.count != 0
-                    {
-                        for i in 0..<dataArray.count
-                        {
-                            if let dict = dataArray.object(at: i) as? NSDictionary
-                            {
-                                if let details = dict.object(forKey: "details") as? NSArray
-                                {
-                                    if details.count != 0
-                                    {
-                                        if let detailsDict = details.object(at: 0) as? NSDictionary
-                                        {
-                                        cdm.updateEntity(entity: "FriendOtherDetail", arrUdetails: dataArray)
-                                           
-                                             let arrFetchedFriendDetails : NSArray = cdm.fetchWithEntityName(entity: "FriendOtherDetail")
-                                            
-                                            self.ArrayFriendData.add(detailsDict)
-                                            
-                                        }
-                                        
-                                        
-                                    }
-                                }
-                            }
-                        }
-                        
-                    }
-                    
-                    
-                }
-                
-            }
-            else if response.object(forKey: "message") != nil
-            {
-                //self.view.makeToast(response.object(forKey: "message") as! String)
-            }
-            else
-            {
-                if response.object(forKey: "message") != nil
-                {
-                    //self.view.makeToast(response.object(forKey: "message") as! String)
-                }
-            }
-            self.setFriendOrSuggestArray()
+        MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
 
-            //self.GetSuggestedFriend()
-            
-        })
-        
+        let obj = getFriendsScreen()
+        obj.wsSetFriendsList { (isNewUser, arrFrndData) in
+            print(isNewUser,arrFrndData)
+        }
+
     }
     
     func GetSuggestedFriend(){
@@ -650,10 +585,28 @@ extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataS
             {
                 if let friendstatus = dict.object(forKey: "friendstatus")
                 {
-                    if "\(friendstatus)" == "Friends"
+                    if "\(friendstatus)" == "Friend"
                     {
                     
                         cell.btnMEssage.setImage(UIImage.init(named: "chatIcon"), for: .normal)
+                        if let matchBuds = dict.object(forKey: "matchBuds")
+                        {
+                            cell.viewMatchProfileRate.value = CGFloat.init(Double("\(matchBuds)")!)
+                            cell.viewMatchProfileRate.progressStrokeColor = Constants.color.friendMatchProgressColor
+                            cell.viewMatchProfileRate.fontColor = Constants.color.friendMatchProgressColor
+                        }
+                        else
+                        {
+                            cell.viewMatchProfileRate.value = 0
+                            cell.viewMatchProfileRate.progressStrokeColor = Constants.color.friendMatchProgressColor
+                            cell.viewMatchProfileRate.fontColor = Constants.color.friendMatchProgressColor
+                        }
+                        //matchBuds
+                        
+                    }else if "\(friendstatus)" == "Sent"
+                    {
+                        
+                        cell.btnMEssage.setImage(UIImage.init(named: "requestSent"), for: .normal)
                         if let matchBuds = dict.object(forKey: "matchBuds")
                         {
                             cell.viewMatchProfileRate.value = CGFloat.init(Double("\(matchBuds)")!)
