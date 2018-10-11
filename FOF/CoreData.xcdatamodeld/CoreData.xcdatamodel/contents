@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14135" systemVersion="17D102" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="FriendOtherDetail" representedClassName="FriendOtherDetail" syncable="YES" codeGenerationType="class">
+        <attribute name="chatId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdat" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="friendId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isRecieved" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="lastmsg" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastmsgtimestamp" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="scheduleat" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedat" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="userData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserData" syncable="YES"/>
+    </entity>
+    <entity name="MessagesDetail" representedClassName="MessagesDetail" syncable="YES" codeGenerationType="class">
+        <attribute name="contentType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="delivered" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="imgUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="key" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="msg" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="raddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rcuisine" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rdescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="reciept" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="recieverDP" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="recieverId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rformatted_address" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rformatted_phone_number" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="risSelected" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rlatitude" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rlongitude" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rmSnippet" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rname" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ropen_now" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rphoneNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rphotoReference" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rplaceid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rposInList" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rpriceRange" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rratings" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rreference" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rselected" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rtimeToReach" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rtimings" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rurl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rvicinity" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rwebsite" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rwebsiteUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="senderDp" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="senderId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="UserData" representedClassName="UserData" syncable="YES" codeGenerationType="class">
+        <attribute name="about_me" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="account_type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdat" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dob" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="education" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ethnicity" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="first_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="gender" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="last_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="location" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="location_string" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mobile" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="occupation" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic1" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic2" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic3" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic4" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic5" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic6" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic7" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic8" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="profilepic9" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="relationship" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="social_id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="testbuds" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedat" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="FriendOtherDetail" positionX="-63" positionY="-18" width="128" height="195"/>
+        <element name="MessagesDetail" positionX="-36" positionY="153" width="128" height="585"/>
+        <element name="UserData" positionX="-54" positionY="63" width="128" height="450"/>
+    </elements>
+</model>
