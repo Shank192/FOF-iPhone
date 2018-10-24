@@ -2,7 +2,6 @@
 
 
 import UIKit
-import MBProgressHUD
 var hud:MBProgressHUD = MBProgressHUD()
 
 struct Utility{

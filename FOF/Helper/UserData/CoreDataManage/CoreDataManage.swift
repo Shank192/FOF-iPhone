@@ -28,21 +28,34 @@ class CoreDataManage: NSObject {
     func insertUserDetailDataWithDictionary(dictUserDeatail : NSDictionary){
         let context : NSManagedObjectContext = managedObjectContext()
         let userDetail : UserData = NSEntityDescription.insertNewObject(forEntityName: "UserData", into: context) as! UserData
-        if let details = dictUserDeatail.object(forKey: "details") as? NSArray
-        {if details.count != 0
-            {
-         let uDetail = details.object(at: 0) as! NSDictionary
+        
         //let uDetail = dictUserDeatail.object(forKey: "details") as! NSDictionary
-                let keys = uDetail.allKeys as NSArray
+        let muteDict = NSMutableDictionary(dictionary: dictUserDeatail)
+        muteDict.setValue(dictUserDeatail["friend_id"]!, forKey: "id")
+        muteDict.setValue("\(dictUserDeatail["latitude"]!,dictUserDeatail["longitude"]!)", forKey: "location")
+//        muteDict.setValue("\(dictUserDeatail["location_string"]!)", forKey: "location_string")
+        muteDict.removeObject(forKey: "mutual_friends_count")
+        muteDict.removeObject(forKey: "latitude")
+        muteDict.removeObject(forKey: "longitude")
+        muteDict.removeObject(forKey: "mutual_friends")
+        muteDict.removeObject(forKey: "friend_id")
+        muteDict.removeObject(forKey: "email")
+        muteDict.removeObject(forKey: "address")
+        muteDict.removeObject(forKey: "status")
+        let keys = muteDict.allKeys as NSArray
+       
         for i in keys{
-            if let str = uDetail[i] as? String {}else{
+            if (muteDict[i] as? String) != nil
+            {
+                
+            }else{
                  userDetail.setValue("", forKey: i as! String)
                 continue
             }
-            userDetail.setValue(uDetail[i], forKey: i as! String)
-        }}}
+            userDetail.setValue(muteDict[i], forKey: i as! String)
+        }
         let frnddeatil = NSEntityDescription.insertNewObject(forEntityName: "FriendOtherDetail", into: context) as! FriendOtherDetail
-        var frndId = dictUserDeatail.object(forKey: "friend1")
+        var frndId = dictUserDeatail.object(forKey: "friend_id")
         var isRecieved = true
         if frndId as! String == UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String{
             frndId = dictUserDeatail.object(forKey: "friend2")
@@ -91,28 +104,32 @@ class CoreDataManage: NSObject {
             if arrPredicated.count == 0{
                 self.insertUserDetailDataWithDictionary(dictUserDeatail: dict)
             }else{
-                let friendOtherDetail = arrFetchedData.object(at: i) as! FriendOtherDetail
-                let dictDetail = arrUdetails.object(at: i) as! NSDictionary
-                friendOtherDetail.updatedat = dictDetail.object(forKey: "updatedat") as? String
-                friendOtherDetail.status = dictDetail.object(forKey: "status") as? String
-                if friendOtherDetail.lastmsgtimestamp == nil{
-                    let lastmsg : NSDictionary = fetchLastMessageWithOtherUserId(otherId: friendOtherDetail.friendId as! NSString)
-                }
-                let udict = arrUdetails.object(at: i) as! NSDictionary
-                
-                if let details = udict.object(forKey: "details") as? NSArray
-                {if details.count != 0
+                if arrFetchedData.count > i
                 {
-             let uDetail = details.object(at: 0) as! NSDictionary
-                    let keys : NSArray = uDetail.allKeys as NSArray
-                for i in keys{
-                        if let str = uDetail[i] as? String {}else{
-                            friendOtherDetail.userData?.setValue("", forKey: i as! String)
-                            continue
-                        }
-                        friendOtherDetail.userData?.setValue(uDetail[i], forKey: i as! String)
-                    } }}
-                mutArrFatchedData.remove(arrPredicated.firstObject!)
+                    let friendOtherDetail = arrFetchedData.object(at: i) as! FriendOtherDetail
+                    let dictDetail = arrUdetails.object(at: i) as! NSDictionary
+                    friendOtherDetail.updatedat = dictDetail.object(forKey: "updatedat") as? String
+                    friendOtherDetail.status = dictDetail.object(forKey: "status") as? String
+                    if friendOtherDetail.lastmsgtimestamp == nil{
+                        let lastmsg : NSDictionary = fetchLastMessageWithOtherUserId(otherId: friendOtherDetail.friendId as! NSString)
+                    }
+                    let udict = arrUdetails.object(at: i) as! NSDictionary
+                    
+                    if let details = udict.object(forKey: "details") as? NSArray
+                    {if details.count != 0
+                    {
+                        let uDetail = details.object(at: 0) as! NSDictionary
+                        let keys : NSArray = uDetail.allKeys as NSArray
+                        for i in keys{
+                            if let str = uDetail[i] as? String {}else{
+                                friendOtherDetail.userData?.setValue("", forKey: i as! String)
+                                continue
+                            }
+                            friendOtherDetail.userData?.setValue(uDetail[i], forKey: i as! String)
+                        } }}
+                    mutArrFatchedData.remove(arrPredicated.firstObject!)
+                }
+                
             }
         }
        for frnd in mutArrFatchedData {
@@ -285,6 +302,7 @@ class CoreDataManage: NSObject {
             arrFetchedData = try context.fetch(fetchRequest) as NSArray        } catch let error as NSError {
             print("Error fetching Item objects: \(error.localizedDescription), \(error.userInfo)")
         }
+        print(arrFetchedData)
         return arrFetchedData
     }
     func fetchFriendOtherDetailWithChatId(userId : NSString) -> NSArray{

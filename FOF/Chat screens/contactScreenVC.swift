@@ -5,7 +5,6 @@
 //
 
 import UIKit
-import MBProgressHUD
 import Firebase
 import FirebaseDatabase
 import FirebaseStorage
@@ -66,32 +65,57 @@ class contactScreenVC: UIViewController , UITableViewDelegate , UITableViewDataS
     }
     // MARK: - Get pending List
     func setWsGetPendingList(){
-        let param = ["action":"myfriendrequests","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID)]
-        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param as NSDictionary, CompletionHandler: { (success, response) -> () in
-            let arrData : NSArray  = response.object(forKey: "data") as! NSArray
-            let cdm = CoreDataManage()
-            for i in 0..<arrData.count{
-                let dictArr = arrData[i] as! NSDictionary
-                if dictArr["friend1"] as! String == UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String{
-                    continue
+        let param = ["user_id":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID)!]
+        
+        Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.GetFriendRequestList, param: param as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
+            
+            if success == true
+            {
+                if let response_data = response.object(forKey: "response_data") as? NSDictionary
+                {
+                    if let arrData : NSArray  = response_data.object(forKey: "friends_requests") as? NSArray
+                    {
+                        let cdm = CoreDataManage()
+                        for i in 0..<arrData.count{
+                            let dictArr = arrData[i] as! NSDictionary
+                            if dictArr["friend_id"] as! String == UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String{
+                                continue
+                            }
+                            
+                            if let frndID = dictArr.object(forKey: "friend_id")
+                            {
+                                let arrFrnd = cdm.fetchFriendOtherDetailWithChatId(userId: "\(frndID)" as NSString)
+                                if arrFrnd.count != 0{
+                                    let frnd : FriendOtherDetail = arrFrnd.firstObject as! FriendOtherDetail
+                                    if frnd.lastmsg != nil{
+                                        self.objSendMessage.getAllMessagesDetailWithChatID(chatId: dictArr["id"] as! NSString)
+                                    }
+                                    self.addToArrayPendingUserWithUserDetail(dict: dictArr)
+                                }else{
+                                    self.addToArrayPendingUserWithUserDetail(dict: dictArr)
+                                }}
+                            }
+                        }
+                    }
                 }
-                
-  if let details = dictArr.object(forKey: "details") as? NSArray{
-      let dictuserData = details.object(at: 0) as! NSDictionary
-    
-    
-    let arrFrnd = cdm.fetchFriendOtherDetailWithChatId(userId: dictuserData["id"] as! NSString)
-    if arrFrnd.count != 0{
-    let frnd : FriendOtherDetail = arrFrnd.firstObject as! FriendOtherDetail
-    if let str = frnd.lastmsg as? String{
-        self.objSendMessage.getAllMessagesDetailWithChatID(chatId: dictArr["id"] as! NSString)
+            else
+            {
+                if let msg = response.object(forKey: "message") as? String
+                {
+                    
+                }
+                else
+                {
+                    self.view.makeToast("Something went to wrong. Please try after sometime.")
+                }
+            }
+            
         }
-        self.addToArrayPendingUserWithUserDetail(dict: dictuserData)
-    }else{
-        self.addToArrayPendingUserWithUserDetail(dict: dictuserData)
-    }}}
-          
-        })
+        
+//        WebService.postURL(Constants.WebServiceUrl.mainUrl , param: param as NSDictionary, CompletionHandler: { (success, response) -> () in
+//            
+//          
+//        })
     }
     func addToArrayPendingUserWithUserDetail(dict : NSDictionary){
         arrPendingUserDetails.removeAllObjects()
@@ -147,6 +171,13 @@ class contactScreenVC: UIViewController , UITableViewDelegate , UITableViewDataS
             tblViewFrndList.reloadData()
             }}}
 
+    //MARK:- Button Action
+    func btnActionAcceptREquest(sender : UIButton)
+    {
+        
+    }
+    
+    
     // MARK: - Uitableview delegate
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
@@ -184,7 +215,11 @@ class contactScreenVC: UIViewController , UITableViewDelegate , UITableViewDataS
                             cell.imgViewProfile.image = UIImage.init(named: "disableSingle")
                         }
                     }
-            cell.lblMessage.text = "New York, USA"
+                    if let address = dataDict.object(forKey: "location_string") as? String
+                    {
+                        cell.lblMessage.text = address//"New York, USA"
+                    }
+            
             cell.btnAcceptRequestOut.isHidden = false
             cell.btnCancelRequestOut.isHidden = false
             cell.lblTiming.isHidden = true
@@ -228,33 +263,43 @@ class contactScreenVC: UIViewController , UITableViewDelegate , UITableViewDataS
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
+        
+        if indexPath.section == 0
         {
-        if dict.object(forKey: "status") as! String == "0"{
-            let obj = self.storyboard?.instantiateViewController(withIdentifier: "sentRequestRestaurantScreenVC") as! sentRequestRestaurantScreenVC
-            if let dataDict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
+            
+        }
+        else if indexPath.section == 1
+        {
+            if let dict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
             {
-                obj.isSent = true
-                obj.dictUserDetails = (dataDict.object(forKey: "details") as! NSArray)[0] as! NSDictionary
-                
-            }
-                        self.navigationController?.pushViewController(obj, animated: false)
+                if dict.object(forKey: "status") as! String == "0"{
+                    let obj = self.storyboard?.instantiateViewController(withIdentifier: "sentRequestRestaurantScreenVC") as! sentRequestRestaurantScreenVC
+                    if let dataDict = self.ArrayFriendData.object(at: indexPath.row) as? NSDictionary
+                    {
+                        obj.isSent = true
+                        obj.dictUserDetails = (dataDict.object(forKey: "details") as! NSArray)[0] as! NSDictionary
+                        
+                    }
+                    self.navigationController?.pushViewController(obj, animated: false)
                 }else{
-                let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
-            UserDefaults.standard.set(dict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
-            obj.dictUserDetail = self.ArrayFriendData.object(at: indexPath.row) as! NSDictionary
-          
-            let dataDict = (dict.object(forKey: "details") as! NSArray)[0] as! NSDictionary
+                    let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
+                    UserDefaults.standard.set(dict.object(forKey: "id"), forKey: Constants.UserDefaults.matchId)
+                    obj.dictUserDetail = self.ArrayFriendData.object(at: indexPath.row) as! NSDictionary
+                    
+                    let dataDict = (dict.object(forKey: "details") as! NSArray)[0] as! NSDictionary
                     
                     obj.isFreind = true
-           if let profilepic1 = dataDict.object(forKey: "profilepic1") as? String{
-            UserDefaults.standard.setValue(profilepic1, forKey: Constants.UserDefaults.receiverDP)}else{
-            UserDefaults.standard.setValue("", forKey: Constants.UserDefaults.receiverDP)
+                    if let profilepic1 = dataDict.object(forKey: "profilepic1") as? String{
+                        UserDefaults.standard.setValue(profilepic1, forKey: Constants.UserDefaults.receiverDP)}else{
+                        UserDefaults.standard.setValue("", forKey: Constants.UserDefaults.receiverDP)
                     }
-            self.navigationController?.pushViewController(obj, animated: false)
+                    self.navigationController?.pushViewController(obj, animated: false)
+                }
+            }
         }
-        }
-     
+        
+
+        
     }
     func getLastMessageWithUserId(userId : NSString) -> NSDictionary{
         let cdm = CoreDataManage()

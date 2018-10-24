@@ -5,12 +5,13 @@
 //
 
 import UIKit
-import MBProgressHUD
+
 
 class filterScreenVC: UIViewController {
     
     @IBOutlet weak var rangeSlider: NMRangeSlider!
-    @IBOutlet weak var rangeDistanceSlider: UISlider!
+    @IBOutlet weak var rangeDistanceSliderFriend: UISlider!
+    @IBOutlet weak var rangeDistanceSliderResturant: UISlider!
     
 //    @IBOutlet weak var btnLowerAgeOut: UIButton!
    // @IBOutlet weak var btnHigherAgeOut: UIButton!
@@ -22,12 +23,26 @@ class filterScreenVC: UIViewController {
    
     @IBOutlet weak var lblGenderLimit: UILabel!
     @IBOutlet weak var lblAgeLimit: UILabel!
-    @IBOutlet weak var lblDistanceUnitOut: UILabel!
+    @IBOutlet weak var lblDistanceUnitOutFriend: UILabel!
+    @IBOutlet weak var lblDistanceUnitOutResturant: UILabel!
     @IBOutlet weak var lblMaleOut: UILabel!
     @IBOutlet weak var lblLgbtOut: UILabel!
     @IBOutlet weak var lblFemaleOut: UILabel!
     
+    @IBOutlet weak var SwitchShowOnlyyFriend: UISwitch!
+    @IBOutlet weak var viewFilterResturant: UIView!
+    @IBOutlet weak var viewFilterFriend: UIView!
+    
+    
     var strGender = String()
+    
+    var miInt = 0
+    var metersInt = 0
+    var AgeLowerValue = 16
+    var AgeUpperValue = 40
+    var isFilterFriend = false
+    
+    let app = UIApplication.shared.delegate as! AppDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,88 +56,174 @@ class filterScreenVC: UIViewController {
 //        }else{
 //            btnNearByPeopleOut.isSelected = true
 //        }
-        if let range = String(describing:UserDefaults.standard.object(forKey: "strDistance")!) as? String{
-            lblDistanceUnitOut.text = "\(range) mi"
-            rangeDistanceSlider.setValue(Float(range)!, animated: false)
+        
+        SwitchShowOnlyyFriend.addTarget(self, action: #selector(SwitchActionShowFriend(sender:)), for: .valueChanged)
+        
+        if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isFriend)
+        {
+            self.SwitchShowOnlyyFriend.isOn = true
         }
-        if let gender = UserDefaults.standard.object(forKey: Constants.UserDefaults.gender) as? String{
-            strGender = gender
-            switch gender{
-            case "all" :
+        else
+        {
+            self.SwitchShowOnlyyFriend.isOn = false
+        }
+        
+        if self.app.isFilterFriend == true
+        {
+            self.viewFilterFriend.isHidden = false
+            self.viewFilterResturant.isHidden = true
+        }
+        else
+        {
+            self.viewFilterFriend.isHidden = true
+            self.viewFilterResturant.isHidden = false
+        }
+        
+        if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
+        {
+            UserDefaults.standard.set(0, forKey: Constants.UserDefaults.FilterDistance)
+            UserDefaults.standard.synchronize()
+            
+        }
+        
+        
+        let range = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) as! Int
+        
+        if range == 0
+        {
+            self.lblDistanceUnitOutResturant.text = "0 mi"
+            self.lblDistanceUnitOutFriend.text = "0 mi"
+            rangeDistanceSliderResturant.setValue(0, animated: false)
+            rangeDistanceSliderFriend.setValue(0, animated: false)
+            
+            miInt = 0
+            metersInt = 0
+        }
+        else
+        {
+            metersInt = range
+            miInt = metersInt/1610
+            
+            self.lblDistanceUnitOutResturant.text = "\(miInt) mi"
+            self.lblDistanceUnitOutFriend.text = "\(miInt) mi"
+            rangeDistanceSliderResturant.setValue(Float(miInt), animated: false)
+            rangeDistanceSliderFriend.setValue(Float(miInt), animated: false)
+        }
+        
+        if let dict = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary
+        {
+            if let showme = dict.object(forKey: "showme") as? String
+            {
+                strGender = showme
                 
-                btnLGBTOut.isSelected = true
-                btnMaleOut.isSelected = true
-                btnFemaleOut.isSelected = true
-                
-                lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                break
-                
-            case "male" :
-                btnLGBTOut.isSelected = false
-                btnMaleOut.isSelected = true
-                btnFemaleOut.isSelected = false
-                
-                lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblFemaleOut.textColor = UIColor.black
-                lblLgbtOut.textColor = UIColor.black
-                break
-            case "female" :
-                btnLGBTOut.isSelected = false
-                btnMaleOut.isSelected = false
-                btnFemaleOut.isSelected = true
-                
-                lblMaleOut.textColor = UIColor.black
-                lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblLgbtOut.textColor = UIColor.black
-                break
-            case "lgbt" :
-                btnLGBTOut.isSelected = true
-                btnMaleOut.isSelected = false
-                btnFemaleOut.isSelected = false
-                
-                lblMaleOut.textColor = UIColor.black
-                lblFemaleOut.textColor = UIColor.black
-                lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                break
-            case "lgbt,male" :
-                btnLGBTOut.isSelected = true
-                btnMaleOut.isSelected = true
-                btnFemaleOut.isSelected = false
-                
-                lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblFemaleOut.textColor = UIColor.black
-                lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
-
-                break
-            case "lgbt,femal" :
-                btnLGBTOut.isSelected = true
-                btnMaleOut.isSelected = false
-                btnFemaleOut.isSelected = true
-                
-                lblMaleOut.textColor = UIColor.black
-                lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                break
-            case "female,mal" :
-                btnLGBTOut.isSelected = false
-                btnMaleOut.isSelected = true
-                btnFemaleOut.isSelected = true
-                
-                lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
-                lblLgbtOut.textColor = UIColor.black
-                break
-            default:
-                break
+                switch strGender{
+                case "all" :
+                    
+                    btnLGBTOut.isSelected = true
+                    btnMaleOut.isSelected = true
+                    btnFemaleOut.isSelected = true
+                    
+                    lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    break
+                    
+                case "male" :
+                    btnLGBTOut.isSelected = false
+                    btnMaleOut.isSelected = true
+                    btnFemaleOut.isSelected = false
+                    
+                    lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblFemaleOut.textColor = UIColor.black
+                    lblLgbtOut.textColor = UIColor.black
+                    break
+                case "female" :
+                    btnLGBTOut.isSelected = false
+                    btnMaleOut.isSelected = false
+                    btnFemaleOut.isSelected = true
+                    
+                    lblMaleOut.textColor = UIColor.black
+                    lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblLgbtOut.textColor = UIColor.black
+                    break
+                case "lgbt" :
+                    btnLGBTOut.isSelected = true
+                    btnMaleOut.isSelected = false
+                    btnFemaleOut.isSelected = false
+                    
+                    lblMaleOut.textColor = UIColor.black
+                    lblFemaleOut.textColor = UIColor.black
+                    lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    break
+                case "lgbt,male" :
+                    btnLGBTOut.isSelected = true
+                    btnMaleOut.isSelected = true
+                    btnFemaleOut.isSelected = false
+                    
+                    lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblFemaleOut.textColor = UIColor.black
+                    lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    
+                    break
+                case "lgbt,femal" :
+                    btnLGBTOut.isSelected = true
+                    btnMaleOut.isSelected = false
+                    btnFemaleOut.isSelected = true
+                    
+                    lblMaleOut.textColor = UIColor.black
+                    lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblLgbtOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    break
+                case "female,mal" :
+                    btnLGBTOut.isSelected = false
+                    btnMaleOut.isSelected = true
+                    btnFemaleOut.isSelected = true
+                    
+                    lblMaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblFemaleOut.textColor = Utility.UIColorFromHex(0xAC192E)
+                    lblLgbtOut.textColor = UIColor.black
+                    break
+                default:
+                    break
+                    
+                }
                 
             }
             
+            
+            if let showsearch_max_ageme = dict.object(forKey: "shosearch_max_agewme"),let search_min_age = dict.object(forKey: "search_min_age")
+            {
+                if "\(showsearch_max_ageme)" != "" && "\(showsearch_max_ageme)" != "0"
+                {
+                    self.AgeUpperValue = Int("\(showsearch_max_ageme)")!
+                }
+                
+                if "\(search_min_age)" != "" && "\(search_min_age)" != "0"
+                {
+                    self.AgeLowerValue = Int("\(search_min_age)")!
+                }
+                
             }
+        }
+        
+
         configureMetalTheme(slider: rangeSlider)
         setSlider()
     }
+    
+    @objc func SwitchActionShowFriend(sender : UISwitch)
+    {
+        if sender.isOn
+        {
+            self.SwitchShowOnlyyFriend.isOn = true
+        }
+        else
+        {
+            self.SwitchShowOnlyyFriend.isOn = false
+        }
+    }
+    
+    
     func configureMetalTheme(slider : NMRangeSlider){
         var image = UIImage(named: "imgSeprator")
         //slider back ground image
@@ -158,14 +259,16 @@ class filterScreenVC: UIViewController {
         return image!
     }
     func setSlider(){
+        
         rangeSlider.maximumValue = 84
         rangeSlider.minimumRange = -100
-        if let str3 = UserDefaults.standard.object(forKey: "strLowerValue") as? String{
-            rangeSlider .lowerValue = Float(Int(str3)! - 16)
-            if let str2 = UserDefaults.standard.object(forKey: "strUpperValue") as? String{
-                lblAgeLimit.text = "\(str3) - \(str2) Years"
-                rangeSlider.upperValue = Float(Int(str2)! - 16)
-            }}
+       
+        rangeSlider .lowerValue = Float(self.AgeLowerValue - 16)
+        rangeSlider.upperValue = Float(self.AgeUpperValue - 16)
+        
+        lblAgeLimit.text = "\(self.AgeLowerValue) - \(self.AgeUpperValue) Years"
+        
+   
     }
 
 //    @IBAction func btnFriendsAct(_ sender: Any) {
@@ -238,8 +341,11 @@ class filterScreenVC: UIViewController {
         let strUpperValue = "\(String(describing: Int(intUpperValue) + 16))"
         let strLowerValue =
         "\(String(describing: Int(intLowerValue) + 16))"
-        UserDefaults.standard.set(strLowerValue, forKey:"strLowerValue")
-        UserDefaults.standard.set(strUpperValue, forKey:"strUpperValue")
+        
+        self.AgeLowerValue = Int(intLowerValue) + 16
+        self.AgeUpperValue = Int(intUpperValue) + 16
+        
+
        // btnHigherAgeOut.setTitle("  \(strUpperValue) Years  ", for: .normal)
        // btnLowerAgeOut.setTitle("  \(strLowerValue) Years  ", for: .normal)
         lblAgeLimit.text = "\(strLowerValue) - \(strUpperValue) Years"
@@ -247,48 +353,121 @@ class filterScreenVC: UIViewController {
    
     @IBAction func rangeSlider(_ sender: Any) {
         
-        lblDistanceUnitOut.text = "\(Int(rangeDistanceSlider.value)) mi"
-        //UserDefaults.standard.set(Int(rangeDistanceSlider.value), forKey:"strDistance")
-
+        if self.app.isFilterFriend == true
+        {
+            lblDistanceUnitOutFriend.text = "\(Int(rangeDistanceSliderFriend.value)) mi"
+            miInt = Int(rangeDistanceSliderFriend.value)
+        }
+        else
+        {
+            lblDistanceUnitOutResturant.text = "\(Int(rangeDistanceSliderResturant.value)) mi"
+            miInt = Int(rangeDistanceSliderResturant.value)
+        }
+        
+        
+        metersInt = miInt * 1610
+        
     }
     
     @IBAction func btnCloseAct(_ sender: Any) {
         NotificationCenter.default.post(name: Notification.Name(rawValue: "Cancel"), object: nil)
     }
     @IBAction func btnApplyAct(_ sender: Any) {
-        if btnLGBTOut.isSelected && btnFemaleOut.isSelected  && btnMaleOut.isSelected {
-          strGender = "all"
-        }else if btnLGBTOut.isSelected == false && btnFemaleOut.isSelected  && btnMaleOut.isSelected{
-             strGender = "female,male"
-        }else if btnFemaleOut.isSelected == false && btnLGBTOut.isSelected  && btnMaleOut.isSelected{
-            strGender = "lgbt,male"
-        }else if btnMaleOut.isSelected == false && btnLGBTOut.isSelected  && btnFemaleOut.isSelected{
-            strGender = "lgbt,female"
-        }else if btnLGBTOut.isSelected == false && btnFemaleOut.isSelected == false && btnMaleOut.isSelected{
-           strGender = "male"
-        }else if btnLGBTOut.isSelected == false && btnMaleOut.isSelected == false && btnFemaleOut.isSelected{
-            strGender = "female"
-        }else if btnFemaleOut.isSelected == false && btnMaleOut.isSelected == false && btnLGBTOut.isSelected{
-            strGender = "lgbt"
-        }else{
-            strGender = "all"
-        }
-        UserDefaults.standard.set(strGender, forKey: Constants.UserDefaults.gender)
        
+       //user_id,first_name,last_name,about_me,dob,gender,relationship,ethnicity,occupation,education , showme,search_min_age,search_max_age,distance_unit,search_distance,is_show_location,is_receive_messages_notifications,is_receive_invitation_notifications
         
-        let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID),"showme":strGender,"distance_unit":"miles","search_min_age": UserDefaults.standard.object(forKey:"strLowerValue") as! String,"search_max_age":UserDefaults.standard.object(forKey:"strUpperValue") as! String,"search_distance":lblDistanceUnitOut.text,"isreviewed":(0),"fields":"showme,search_min_age,distance_unit,search_max_age,search_distance,isreviewed"]
-        MBProgressHUD.showAdded(to: self.view, animated: true)
-        WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
-            MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-            if success == true
+        if self.app.zomatoAPIuserKEy != nil
+        {
+            if let user_id = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),let ProfileData = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary
             {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "Cancel"), object: nil)
+                var param = [String :  AnyObject]()
+                
+                if self.app.isFilterFriend == true
+                {
+                    if btnLGBTOut.isSelected && btnFemaleOut.isSelected  && btnMaleOut.isSelected {
+                        strGender = "all"
+                    }else if btnLGBTOut.isSelected == false && btnFemaleOut.isSelected  && btnMaleOut.isSelected{
+                        strGender = "female,male"
+                    }else if btnFemaleOut.isSelected == false && btnLGBTOut.isSelected  && btnMaleOut.isSelected{
+                        strGender = "lgbt,male"
+                    }else if btnMaleOut.isSelected == false && btnLGBTOut.isSelected  && btnFemaleOut.isSelected{
+                        strGender = "lgbt,female"
+                    }else if btnLGBTOut.isSelected == false && btnFemaleOut.isSelected == false && btnMaleOut.isSelected{
+                        strGender = "male"
+                    }else if btnLGBTOut.isSelected == false && btnMaleOut.isSelected == false && btnFemaleOut.isSelected{
+                        strGender = "female"
+                    }else if btnFemaleOut.isSelected == false && btnMaleOut.isSelected == false && btnLGBTOut.isSelected{
+                        strGender = "lgbt"
+                    }else{
+                        strGender = "all"
+                    }
+                    
+                    
+                    param = ["user_id":"\(user_id)","first_name":"\(ProfileData.object(forKey: "first_name") ?? "")","last_name":"\(ProfileData.object(forKey: "last_name") ?? "")","about_me":"\(ProfileData.object(forKey: "about_me") ?? "")","dob":"\(ProfileData.object(forKey: "dob") ?? "")","gender":strGender,"relationship":"\(ProfileData.object(forKey: "relationship") ?? "")","ethnicity":"\(ProfileData.object(forKey: "ethnicity") ?? "")","occupation":"\(ProfileData.object(forKey: "occupation") ?? "")","education":"\(ProfileData.object(forKey: "education") ?? "")", "showme":strGender,"search_min_age":self.AgeLowerValue,"search_max_age":self.AgeUpperValue,"distance_unit":"\(ProfileData.object(forKey: "distance_unit") ?? "")","search_distance":self.metersInt,"is_show_location":"\(ProfileData.object(forKey: "is_show_location") ?? "")","is_receive_messages_notifications":"\(ProfileData.object(forKey: "is_receive_messages_notifications") ?? "")","is_receive_invitation_notifications":"\(ProfileData.object(forKey: "is_receive_invitation_notifications") ?? "")","show_friends":self.SwitchShowOnlyyFriend.isOn] as [String : AnyObject]
+                    
+                }
+                else
+                {
+                    param = ["user_id":"\(user_id)","first_name":"\(ProfileData.object(forKey: "first_name") ?? "")","last_name":"\(ProfileData.object(forKey: "last_name") ?? "")","about_me":"\(ProfileData.object(forKey: "about_me") ?? "")","dob":"\(ProfileData.object(forKey: "dob") ?? "")","gender":"\(ProfileData.object(forKey: "gender") ?? "")","relationship":"\(ProfileData.object(forKey: "relationship") ?? "")","ethnicity":"\(ProfileData.object(forKey: "ethnicity") ?? "")","occupation":"\(ProfileData.object(forKey: "occupation") ?? "")","education":"\(ProfileData.object(forKey: "education") ?? "")", "showme":"\(ProfileData.object(forKey: "showme") ?? "")","search_min_age":"\(ProfileData.object(forKey: "search_min_age") ?? "")","search_max_age":"\(ProfileData.object(forKey: "search_max_age") ?? "")","distance_unit":"\(ProfileData.object(forKey: "distance_unit") ?? "")","search_distance":self.metersInt,"is_show_location":"\(ProfileData.object(forKey: "is_show_location") ?? "")","is_receive_messages_notifications":"\(ProfileData.object(forKey: "is_receive_messages_notifications") ?? "")","is_receive_invitation_notifications":"\(ProfileData.object(forKey: "is_receive_invitation_notifications") ?? "")","show_friends":self.SwitchShowOnlyyFriend.isOn] as [String : AnyObject]
+                }
+                
+                UserDefaults.standard.set(strGender, forKey: Constants.UserDefaults.gender)
+                UserDefaults.standard.set(metersInt, forKey: Constants.UserDefaults.FilterDistance)
+                
+                UserDefaults.standard.synchronize()
+                
+                MBProgressHUD.showAdded(to: self.view, animated: true)
+                
+                Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.updateUserData, param: param as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
+                    MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                    
+                    if success == true
+                    {
+                        
+                        if let dataDict = response.object(forKey: "response_data") as? NSDictionary
+                        {
+                            Constants.GlobalConstants.appDelegate.userDetail = UserDetail.init(dictionary: dataDict as? [AnyHashable : Any])
+                            UserDefaults.standard.set(dataDict, forKey: Constants.UserDefaults.ProfileData)
+                            
+                            if let tastebuds = dataDict.object(forKey: "testbuds") as? NSArray
+                            {
+                                UserDefaults.standard.set(tastebuds, forKey: Constants.UserDefaults.MyTestBuds)
+                                UserDefaults.standard.synchronize()
+                            }
+                        }
+                        
+                        UserDefaults.standard.synchronize()
+                        
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "Cancel"), object: nil)
+                    }
+                    else
+                    {
+                        if let msg = response.object(forKey: "message") as? String
+                        {
+                            self.view.makeToast(msg)
+                        }
+                        else
+                        {
+                            self.view.makeToast("Something went to wrong. Please try after sometimes.")
+                        }
+                    }
+                    
+                    
+                }
+                
             }
-            
         }
-        
-       
-        
+        else
+        {
+            self.app.getZomatoKEY { (success) in
+                
+                if success == true
+                {
+                    self.btnApplyAct(sender)
+                }
+            }
+        }
         
         
     }

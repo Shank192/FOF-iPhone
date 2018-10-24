@@ -47,39 +47,38 @@ class preferencesCollectionViewCell: UICollectionViewCell {
 
     override func awakeFromNib() {
         configureMetalTheme(slider: rangeSlideOut)
-       
-        let placesData = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSData
         
-        if let placesData = placesData {
-            let placesArray = NSKeyedUnarchiver.unarchiveObject(with: placesData as Data) as? [ Any]
-            arrProfileData = placesArray![0] as! [String:AnyObject]
-            print(arrProfileData)
-            setData()
+        if let placesData = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary
+        {
+            self.arrProfileData = placesData as! [String : AnyObject]
+            print(placesData)
         }
+        
+        self.setData()
 
     }
     func setData(){
-       if let distance_unit = arrProfileData["distance_unit"] as? String{
+        if let distance_unit = arrProfileData["distance_unit"] as? String{
             lblDistanceUnitOut.text = distance_unit
-        if distance_unit == "miles"{
-            lblDistanceUnitOut.text = "Mi."
-            btnMiOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
-            btnMiOut.setTitleColor(UIColor.white, for: .normal)
-            btnKmOut.backgroundColor = UIColor.white
-            btnKmOut.setTitleColor(UIColor.black, for: .normal)
-            mutDictUserDetail.setValue("miles", forKey: "distance_unit")
-        }else{
-            lblDistanceUnitOut.text = "Km."
-            btnKmOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
-            btnKmOut.setTitleColor(UIColor.white, for: .normal)
-            btnMiOut.backgroundColor = UIColor.white
-            btnMiOut.setTitleColor(UIColor.black, for: .normal)
-            mutDictUserDetail.setValue("Km", forKey: "distance_unit")
-        }
+            if distance_unit == "miles"{
+                lblDistanceUnitOut.text = "Mi."
+                btnMiOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
+                btnMiOut.setTitleColor(UIColor.white, for: .normal)
+                btnKmOut.backgroundColor = UIColor.white
+                btnKmOut.setTitleColor(UIColor.black, for: .normal)
+                mutDictUserDetail.setValue("miles", forKey: "distance_unit")
+            }else{
+                lblDistanceUnitOut.text = "Km."
+                btnKmOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
+                btnKmOut.setTitleColor(UIColor.white, for: .normal)
+                btnMiOut.backgroundColor = UIColor.white
+                btnMiOut.setTitleColor(UIColor.black, for: .normal)
+                mutDictUserDetail.setValue("Km", forKey: "distance_unit")
+            }
         }
          setSlider()
 
-        if let recieveNoti = String(describing:   arrProfileData["is_receive_messages_notifications"]!) as? String {
+        if let recieveNoti = String(describing:   arrProfileData["is_receive_invitation_notifications"]!) as? String {
             if recieveNoti == "1"{
                 messgeSwitchOut.isOn = true
                 messageNom = NSNumber.init(value: true)
@@ -241,12 +240,21 @@ class preferencesCollectionViewCell: UICollectionViewCell {
                 mutDictUserDetail.setValue(str3, forKey: "search_min_age")
                 mutDictUserDetail.setValue(str2, forKey: "search_max_age")
             }
-    }
+        }
+        
+        if let distance = arrProfileData["search_distance"]
+        {
+            if "\(distance)" != ""
+            {
+                self.horizontalSlider.value = Float("\(distance)")!
+                lblDistanceOut.text = "\(Int(horizontalSlider.value)) mi"
+            }
+        }
     }
     @IBAction func distanceSliderAct(_ sender: Any) {
         lblDistanceOut.text = "\(Int(horizontalSlider.value)) mi"
         //mutDictUserDetail.setValue(lblDistanceOut.text, forKey: "search_distance")
-        mutDictUserDetail.setObject(lblDistanceOut.text, forKey: "search_distance" as NSCopying)
+        mutDictUserDetail.setObject("\(horizontalSlider.value)", forKey: "search_distance" as NSCopying)
         setDictionary()
 
     }

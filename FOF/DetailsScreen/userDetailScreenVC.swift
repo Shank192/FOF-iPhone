@@ -42,14 +42,34 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
         startTimer()
         collectionViewCuisine.layoutIfNeeded()
         nslcHightOfCollView.constant = self.collectionViewCuisine.contentSize.height + 10
-        
-        if let testbuds = UserDefaults.standard.object(forKey: Constants.UserDefaults.MyTestBuds) as? String
+
+        if let arrtestbuds = UserDefaults.standard.object(forKey: Constants.UserDefaults.MyTestBuds) as? NSArray
         {
-            arrTestBudsData = (testbuds as NSString).components(separatedBy: ",")
-            self.collectionViewCuisine.reloadData()
+            arrTestBudsData.removeAll()
+            for (_,i)  in arrtestbuds.enumerated()
+            {
+                let dict = i as! NSDictionary
+                
+                if let name = dict.object(forKey: "name") as? String
+                {
+                    arrTestBudsData.append(name)
+                }
+            }
             
+            self.collectionViewCuisine.reloadData()
+
         }
         
+
+        if self.app.userDetail.firstName == nil
+        {
+            if let dataDict = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData)
+            {
+                self.app.userDetail = UserDetail.init(dictionary: dataDict as? [AnyHashable : Any])
+            }
+        }
+        
+        print(self.app.userDetail.firstName)
         if self.app.userDetail.profilepic1 != ""
         {
             self.arrOfImages.append(self.app.userDetail.profilepic1)
@@ -93,10 +113,10 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                 arrOfImages.append("NoImage")
             }
         }
-        
-        
-        
-        
+
+
+
+
         self.lblName.text = "\(self.app.userDetail.firstName!) \(self.app.userDetail.lastName!)"
         self.lblEducation.text = self.app.userDetail.education
         self.lblGender.text = self.app.userDetail.gender.capitalized

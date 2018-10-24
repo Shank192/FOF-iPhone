@@ -7,7 +7,6 @@ target 'FOF' do
 pod 'GoogleMaps'
 pod 'GooglePlaces'
 pod 'GooglePlacePicker'
-pod 'MBProgressHUD', '~> 1.1.0'
 pod "MBCircularProgressBar"
 pod 'Alamofire', '~> 4.5'
 pod 'Firebase/Core'

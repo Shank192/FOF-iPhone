@@ -7,15 +7,16 @@
 import UIKit
 import GoogleMaps
 import GooglePlaces
-import MBProgressHUD
 
 class POIItem: NSObject, GMUClusterItem {
     var position: CLLocationCoordinate2D
     var name: String!
+    var arryIndex: Int!
     
-    init(position: CLLocationCoordinate2D, name: String) {
+    init(position: CLLocationCoordinate2D, name: String, arryIndex:Int) {
         self.position = position
         self.name = name
+        self.arryIndex = arryIndex
     }
 }
 
@@ -23,22 +24,31 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     
     @IBOutlet weak var tblViewAddress: UITableView!
     @IBOutlet weak var collectionViewNearByRestaurants: UICollectionView!
+    @IBOutlet weak var txtSearchTestBuds: UITextField!
     @IBOutlet weak var txtFieldLocation: UITextField!
     @IBOutlet weak var btnSearchOut: UIButton!
     @IBOutlet weak var nslcHieghtOfButton: NSLayoutConstraint!
     @IBOutlet weak var btnCancelOut: UIButton!
     @IBOutlet weak var aMapView: GMSMapView!
 
+    @IBOutlet weak var constSearchTestbudsViewHeight: NSLayoutConstraint!
     var objofFilter : filterScreenVC?
     var arrForAddress = NSMutableArray()
     var latitude = String()
     var longitude = String()
     var arrForRestaurantData = [[String:AnyObject]]()
+    var arrForAllRestaurantData = [[String:AnyObject]]()
     var clusterManager: GMUClusterManager!
     var arrPlaces = NSMutableArray()
+    var arrAllTestBudsPlaces = [[String : AnyObject]]()
+    var arrSearchTestBuds = NSMutableArray()
+    var IsSearchTestBuds = false
     var arrDuration = NSMutableArray()
     
     var currebntlyRetriveRestuarant = false
+    
+    var SearchLocationDict : NSDictionary?
+    var SearchTestbudsDict : NSDictionary?
     
     //var isCurrentLocation = true
     
@@ -57,8 +67,15 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         tblViewAddress.isHidden = true
 
        txtFieldLocation.delegate = self
-        txtFieldLocation.addTarget(self, action: #selector(myTargetFunction(textField:)), for: UIControlEvents.allTouchEvents)
+        
+        txtSearchTestBuds.delegate = self
+        
+        txtFieldLocation.addTarget(self, action: #selector(myTargetFunctionLocation(textField:)), for: UIControlEvents.allTouchEvents)
+        
+           txtSearchTestBuds.addTarget(self, action: #selector(myTargetFunctionTestBuds(textField:)), for: UIControlEvents.allTouchEvents)
+        
         txtFieldLocation.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: UIControlEvents.editingChanged)
+         txtSearchTestBuds.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: UIControlEvents.editingChanged)
         
         hideKeyboardWhenTappedAround()
         //if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isCurrentLocationRestro){
@@ -67,7 +84,10 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
    NotificationCenter.default.addObserver(self, selector: #selector(setLocation), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
       //  }
         
-       
+        if let TestArray = UserDefaults.standard.object(forKey: Constants.UserDefaults.AllTestBudsArrayFromYourLocation) as? NSArray
+        {
+            self.arrAllTestBudsPlaces = TestArray as! [[String : AnyObject]]
+        }
       
         self.objofFilter = (self.storyboard?.instantiateViewController(withIdentifier: "filterScreenVC") as! filterScreenVC)
 
@@ -78,6 +98,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         {
             latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
             longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+            MBProgressHUD.showAdded(to: self.view, animated: true)
             retriveDataForRestaurant(latitude: latitude, longitude: longitude)
         }
        
@@ -87,7 +108,14 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         nslcHieghtOfButton.constant = 10
         btnCancelOut.setTitle("", for: .normal)
         btnSearchOut.setTitle("", for: .normal)
+        self.constSearchTestbudsViewHeight.constant = 0
+        btnSearchOut.contentHorizontalAlignment = .right
+        btnCancelOut.contentHorizontalAlignment = .left
         txtFieldLocation.text = ""
+        
+        UserDefaults.standard.set("No", forKey: Constants.UserDefaults.isOpenFriendViewController)
+        UserDefaults.standard.synchronize()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(cancel), name: NSNotification.Name(rawValue: "Cancel"), object: nil)
 
     }
@@ -141,19 +169,80 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         }}
     
     // MARK: - TextField delegate method
-    @objc func myTargetFunction(textField: UITextField) {
-        UIView.animate(withDuration: 2.20) {
+    @objc func myTargetFunctionLocation(textField: UITextField) {
+        
+        self.IsSearchTestBuds = false
+        
+        UIView.animate(withDuration: 0.30) {
             self.nslcHieghtOfButton.constant = 30
             self.btnCancelOut.setTitle("Cancel", for: .normal)
             self.btnSearchOut.setTitle("Search", for: .normal)
+            self.constSearchTestbudsViewHeight.constant = 40
+            self.btnSearchOut.contentHorizontalAlignment = .right
+            self.btnCancelOut.contentHorizontalAlignment = .left
+            self.view.layoutIfNeeded()
         }
         
     }
+    
+    @objc func myTargetFunctionTestBuds(textField: UITextField) {
+        
+        self.IsSearchTestBuds = true
+    }
+    
     @objc func textFieldDidChange(textField : UITextField){
         
-        if (textField.text?.count)! > 0 {
-            self.fetchBusinessFromGoogle(textField.text!)
-        }}
+        if textField == txtSearchTestBuds
+        {
+            if self.txtSearchTestBuds.text == ""
+            {
+                self.SearchTestbudsDict = nil
+            }
+            else if self.txtSearchTestBuds.text != ""
+            {
+                if self.SearchTestbudsDict != nil
+                {
+                    if let name = self.SearchLocationDict?.object(forKey: "name") as? String
+                    {
+                        if self.txtSearchTestBuds.text != name
+                        {
+                            self.SearchTestbudsDict = nil
+                        }
+                    }
+                }
+            }
+            
+            if (textField.text?.count)! > 0 {
+            self.fetchtestBuds(textField.text!)
+            }
+            
+        }
+        else
+        {
+            
+            if self.txtFieldLocation.text == ""
+            {
+                self.SearchLocationDict = nil
+            }
+            else if self.txtFieldLocation.text != ""
+            {
+                if self.SearchLocationDict != nil
+                {
+                    if let name = self.SearchLocationDict?.object(forKey: "description") as? String
+                    {
+                        if self.txtFieldLocation.text != name
+                        {
+                            self.SearchLocationDict = nil
+                        }
+                    }
+                }
+            }
+            
+            if (textField.text?.count)! > 0 {
+                self.fetchBusinessFromGoogle(textField.text!)
+            }
+        }
+    }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
     {
@@ -166,11 +255,29 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         let obj = nearByRestaurantsScreenVC()
         txtFieldLocation.text = ""
        Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj) 
-          UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationRestro)
+//          UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationRestro)
     }
     
     @IBAction func btnSearchAct(_ sender: Any) {
        
+        if self.SearchLocationDict != nil && self.SearchTestbudsDict != nil
+        {
+            let obj = self.storyboard?.instantiateViewController(withIdentifier: "foodSearchScreenVC") as! foodSearchScreenVC
+            obj.searchLocatioData = self.SearchLocationDict!
+            obj.searchTestBuds = self.SearchTestbudsDict!
+            self.navigationController?.pushViewController(obj, animated: false)
+        }
+        else if self.SearchTestbudsDict != nil
+        {
+            let obj = self.storyboard?.instantiateViewController(withIdentifier: "foodSearchScreenVC") as! foodSearchScreenVC
+            obj.searchTestBuds = self.SearchTestbudsDict!
+            self.navigationController?.pushViewController(obj, animated: false)
+        }
+        else if self.SearchLocationDict != nil
+        {
+             self.getPlaceDetail(googlePlaceID: self.SearchLocationDict!.object(forKey: "place_id") as! String)
+        }
+        
        tblViewAddress.isHidden = true
         txtFieldLocation.resignFirstResponder()
 
@@ -180,14 +287,37 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
 
         NotificationCenter.default.addObserver(self, selector: #selector(setLocation), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
         txtFieldLocation.text = ""
+        self.SearchLocationDict = nil
         tblViewAddress.isHidden = true
     }
+    
+    @IBAction func btnActionSearchTestbudsCancel(_ sender: Any)
+    {
+        self.txtSearchTestBuds.text = ""
+        self.SearchTestbudsDict = nil
+        tblViewAddress.isHidden = true
+    }
+    
+    
     @IBAction func btnCancelAct(_ sender: Any) {
-        nslcHieghtOfButton.constant = 10
-        btnCancelOut.setTitle("", for: .normal)
-        btnSearchOut.setTitle("", for: .normal)
-       tblViewAddress.isHidden = true
-    txtFieldLocation.resignFirstResponder()
+        UIView.animate(withDuration: 0.3) {
+            
+            self.nslcHieghtOfButton.constant = 10
+            self.btnCancelOut.setTitle("", for: .normal)
+            self.btnSearchOut.setTitle("", for: .normal)
+            self.constSearchTestbudsViewHeight.constant = 0
+            self.tblViewAddress.isHidden = true
+            self.txtFieldLocation.resignFirstResponder()
+            
+            self.view.layoutIfNeeded()
+            
+        }
+        
+        self.SearchLocationDict = nil
+        self.SearchTestbudsDict = nil
+        
+        
+        
     }
     @IBAction func btnFoodAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "foodSearchScreenVC") as! foodSearchScreenVC
@@ -226,51 +356,108 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         }
     }
     @IBAction func btnFilterAct(_ sender: Any) {
+        self.app.isFilterFriend = false
         addChildViewController(objofFilter!)
         self.view.addSubview(objofFilter!.view)
+        
         objofFilter!.didMove(toParentViewController: self)
     }
     @objc func cancel(){
         objofFilter!.willMove(toParentViewController: nil)
         objofFilter!.view.removeFromSuperview()
         objofFilter!.removeFromParentViewController()
+        
+        
     }
     func retriveDataForRestaurant(latitude : String , longitude : String){
         
-        if let mytestBudsID = UserDefaults.standard.object(forKey: Constants.UserDefaults.MySelectedTEstBudsID),self.currebntlyRetriveRestuarant == false
+        if self.app.zomatoAPIuserKEy != nil
         {
-            let mainLink = "https://developers.zomato.com/api/v2.1/search?start=0&count=30&lat=\(latitude)&lon=\(longitude)&radius=20000&cuisines=\(mytestBudsID)"
-            self.currebntlyRetriveRestuarant = true
-            Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy, successStatusCode: 200) { (success, response) in
-                self.currebntlyRetriveRestuarant = false
-                if success == true
-                {
-                    print("Success : \(response)")
-                    
-                    if let restaurant = response.object(forKey: "restaurants") as? NSArray
+            if let mytestBudsID = UserDefaults.standard.object(forKey: Constants.UserDefaults.SelectedZomatoTestBudsID),let radius = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance),self.currebntlyRetriveRestuarant == false
+            {
+                
+                let mainLink = "https://developers.zomato.com/api/v2.1/search?start=0&count=30&lat=\(latitude)&lon=\(longitude)&radius=\(radius)&cuisines=\(mytestBudsID)"
+                self.currebntlyRetriveRestuarant = true
+                Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy!, successStatusCode: 200) { (success, response) in
+                    self.currebntlyRetriveRestuarant = false
+                    if success == true
                     {
-                       
-                       
-                        self.arrForRestaurantData = restaurant as! [[String : AnyObject]]
+                        if let restaurant = response.object(forKey: "restaurants") as? NSArray
+                        {
+                            
+                            if restaurant.count != 0
+                            {
+                                let openRest = NSMutableArray()
+                                let closeRest = NSMutableArray()
+                                
+                                for i in 0..<restaurant.count
+                                {
+                                    if let restDict = restaurant.object(at: i) as? NSDictionary
+                                    {
+                                        if let dict = restDict.object(forKey: "restaurant") as? NSDictionary
+                                        {
+                                            if let is_delivering_now = dict.object(forKey: "is_delivering_now") {
+                                                if "\(is_delivering_now)" == "1"{
+                                                    openRest.add(restDict)
+                                                }else{
+                                                    closeRest.add(restDict)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                openRest.addObjects(from: closeRest as! [Any])
+                                
+                                self.arrForRestaurantData = openRest as! [[String : AnyObject]]
+                                self.arrForAllRestaurantData = openRest as! [[String : AnyObject]]
+                                self.retriveTimeDataForRestaurantByCar(latitude : latitude , longitude : longitude)
+                            }
+                            else
+                            {
+                                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                                self.app.window?.rootViewController?.view.makeToast("Current no restuarant available in your area.")
+                            }
+                            
+                        }
                         
-                        self.retriveTimeDataForRestaurantByCar(latitude : latitude , longitude : longitude)
+                        
+                        self.setmap()
+                        // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                        
+                    }
+                    else
+                    {
+                        MBProgressHUD.showAdded(to: self.view, animated: true)
+                        if let msg = response.object(forKey: "message") as? String
+                        {
+                            self.view.makeToast(msg)
+                        }
+                        else
+                        {
+                            self.view.makeToast("Something went to wrong. Please try after sometime.")
+                        }
+                        
+                        print("error : \(response)")
                     }
                     
-                    
-                    self.setmap()
-                    // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-                    
                 }
-                else
-                {
-                    print("error : \(response)")
-                }
- 
+                
+                
+                
             }
-            
-           
-            
         }
+        else
+        {
+            self.app.getZomatoKEY { (success) in
+                
+                if success == true
+                {
+                    self.retriveDataForRestaurant(latitude: latitude, longitude: longitude)
+                }
+            }
+        }
+
         
 //            MBProgressHUD.showAdded(to: self.view, animated: true)
 //
@@ -358,6 +545,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
         self.collectionViewNearByRestaurants.reloadData()
     }
+    
     func fetchBusinessFromGoogle (_ searchname : String){
         if searchname.count > 0 {
             WebService.GetAutoCompletePlaces(searchname, locationString: "\(latitude),\(longitude)", radiusString: "20000", CompletionHandler: { (success, response) in
@@ -380,6 +568,43 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
            self.tblViewAddress.reloadData()
         }}
     
+    func fetchtestBuds(_ searchname : String)
+    {
+       
+        
+        let result =  self.arrAllTestBudsPlaces.filter({ (data) -> Bool in
+            let stringname = data["name"] as! String
+            return stringname.lowercased().contains(searchname.lowercased())
+            
+        })
+        
+        
+        
+        self.arrSearchTestBuds = NSMutableArray.init(array: result as [Any])
+        if self.arrSearchTestBuds.count > 0
+        {
+            self.tblViewAddress.isHidden = false
+        }
+        self.tblViewAddress.reloadData()
+    }
+    
+    
+    func getPlaceDetail(googlePlaceID:String) {
+        
+        WebService.GetPlaceDetailByPlaceId(googlePlaceID) { (success, response) -> () in
+            if success == true {
+                if (response.object(forKey: "result") != nil) {
+                    let arr = response.object(forKey: "result") as! NSDictionary
+                    let dict = arr["geometry"] as? NSDictionary
+                    if let loc = dict!["location"] as? NSDictionary{
+                        let lat = String(describing:loc["lat"]!)
+                        let lng = String(describing:loc["lng"]!)
+                        self.retriveDataForRestaurant(latitude: lat , longitude: lng)
+                    }
+                }
+                self.dismiss(animated: true, completion: nil)
+            }
+        }}
 
     // MARK: - CollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -483,7 +708,16 @@ extension nearByRestaurantsScreenVC : UITableViewDataSource, UITableViewDelegate
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return arrForAddress.count
+        
+        if IsSearchTestBuds == true
+        {
+            return arrSearchTestBuds.count
+        }
+        else
+        {
+            return arrForAddress.count
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -494,20 +728,60 @@ extension nearByRestaurantsScreenVC : UITableViewDataSource, UITableViewDelegate
         cell?.textLabel?.frame = CGRect(x: 20, y: 5, width: tableView.frame.size.width - 40, height: 21)
         cell?.textLabel?.numberOfLines = 0
         cell?.textLabel?.textColor = UIColor.white
-        if arrForAddress.count > indexPath.row {
-            cell?.textLabel?.text = (arrForAddress.object(at: indexPath.row) as AnyObject).object(forKey: "description") as? String
-        } else {
-            cell?.textLabel?.text = ""
+        
+        if IsSearchTestBuds == true
+        {
+            if let dict = self.arrSearchTestBuds.object(at: indexPath.row) as? NSDictionary
+            {
+                cell?.textLabel?.text = dict["name"] as? String
+            }
         }
+        else
+        {
+            if arrForAddress.count > indexPath.row {
+                cell?.textLabel?.text = (arrForAddress.object(at: indexPath.row) as AnyObject).object(forKey: "description") as? String
+            } else {
+                cell?.textLabel?.text = ""
+            }
+        }
+       
         cell?.textLabel?.sizeToFit()
         return cell!
         
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-          UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isCurrentLocationRestro)
-//        getPlaceDetail(googlePlaceID:(arrForAddress.object(at: indexPath.row)as AnyObject).object(forKey: "place_id") as! String)
+//          UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isCurrentLocationRestro)
+       
 //        txtFieldLocation.text = (arrForAddress.object(at: indexPath.row) as AnyObject).object(forKey: "description") as? String
-//        self.tblViewAddress.isHidden = true
+        
+        if IsSearchTestBuds == true
+        {
+            if let dict = self.arrSearchTestBuds.object(at: indexPath.row) as? NSDictionary
+            {
+                self.SearchTestbudsDict = NSDictionary.init(dictionary: dict)
+                
+                if let name = self.SearchTestbudsDict!.object(forKey: "name") as? String
+                {
+                    self.txtSearchTestBuds.text = name
+                }
+            }
+        }
+        else
+        {
+            print(arrForAddress)
+            if let dict = self.arrForAddress.object(at: indexPath.row) as? NSDictionary
+            {
+                self.SearchLocationDict = NSDictionary.init(dictionary: dict)
+                
+                if let description = self.SearchLocationDict?.object(forKey: "description") as? String
+                {
+                    self.txtFieldLocation.text = description
+                }
+            }
+            
+        }
+        
+        self.tblViewAddress.isHidden = true
         txtFieldLocation.resignFirstResponder()
     }
 }
@@ -526,8 +800,25 @@ extension nearByRestaurantsScreenVC : GMUClusterManagerDelegate,GMUClusterRender
     // MARK: - GMUMapViewDelegate
     
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
-        if let poiItem = marker.userData as? POIItem {
-            NSLog("Did tap marker for cluster item \(poiItem.name)")
+        
+        
+        if let poiItem = marker.userData as? GMUCluster {
+            print(poiItem.items.count)
+            
+            self.arrForRestaurantData.removeAll()
+            
+            for data in poiItem.items
+            {
+                if let data = data as? POIItem
+                {
+                    self.arrForRestaurantData.append(self.arrForAllRestaurantData[data.arryIndex])
+                }
+                
+            }
+            
+            self.collectionViewNearByRestaurants.reloadData()
+            
+//            NSLog("Did tap marker for cluster item \(poiItem.name)")
         } else {
             NSLog("Did tap a normal marker")
         }
@@ -547,7 +838,7 @@ extension nearByRestaurantsScreenVC : GMUClusterManagerDelegate,GMUClusterRender
                         let lat = Double("\(latitude)") ?? 0.0
                         let lng = Double("\(longitude)") ?? 0.0
                         let name = "Item \(index)"
-                        let item = POIItem(position: CLLocationCoordinate2DMake(lat, lng), name: name)
+                        let item = POIItem(position: CLLocationCoordinate2DMake(lat, lng), name: name, arryIndex: index)
                         clusterManager.add(item)
                     }
                 }

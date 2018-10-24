@@ -60,10 +60,18 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     
   func initialSetup() {
     objSendMessage.delegate = self
-    chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
+    chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as? String ?? ""
     senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
     userId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
-    receipentDp = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as! String
+    if let profilepic1_thumb = dictUserDetail.object(forKey: "profilepic1_thumb") as? String
+    {
+        if profilepic1_thumb != ""
+        {
+            receipentDp = profilepic1_thumb//UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as? String ""
+        }
+        
+    }
+    
     if dictUserDetail.count > 0{
     if let dict = dictUserDetail as? NSDictionary{
     if let strDict = (dict.object(forKey: "details") as? NSArray){
@@ -73,7 +81,11 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                 lblUserName.text = "\(str) \(dict.object(forKey: "last_name")! as! String)"
             }
         }else{
-            frndId = dictUserDetail.object(forKey: "id") as! String
+        if let friend_user_id = dictUserDetail.object(forKey: "friend_user_id")
+        {
+            frndId = "\(friend_user_id)"
+        }
+        
             if let str = dictUserDetail.object(forKey: "first_name")! as? String{
                 lblUserName.text = "\(str) \(dictUserDetail.object(forKey: "last_name")! as! String)"
             }

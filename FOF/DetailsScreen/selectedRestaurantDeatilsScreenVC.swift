@@ -5,7 +5,7 @@
 //
 
 import UIKit
-import MBProgressHUD
+
 
 
 class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout {
@@ -34,6 +34,8 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     @IBOutlet weak var btnStar1Out: UIButton!
     @IBOutlet weak var lblNumberOfImages: UILabel!
     
+    @IBOutlet weak var ViewNoReview: UIView!
+    @IBOutlet weak var btnReadAllReview: UIButton!
     
     let app = UIApplication.shared.delegate as! AppDelegate
     
@@ -108,71 +110,82 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     }
     func setReviewsDetails(){
         
-        if let dataDict = self.arrResponseForReviews.object(at: 0) as? NSDictionary
+        if self.arrResponseForReviews.count > 0
         {
-            if let reviewDict = dataDict.object(forKey: "review") as? NSDictionary
-            {
-                if let dict = reviewDict.object(forKey: "user") as? NSDictionary
-                {
-                    lblReviewerName.text = dict.object(forKey: "name") as? String
-                    lblReview.text = reviewDict.object(forKey: "review_text") as? String
-                    if let rating = reviewDict.object(forKey: "rating") as? Int
-                    {
-                        switch rating {
-                        case 1:
-                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            break
-                        case 2:
-                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            break
-                        case 3:
-                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            break
-                        case 4:
-                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                            break
-                        case 5:
-                            self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            self.btnStar5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                            break
-                        default:
-                            break
-                        }
-                    }
-                    
-                    if let str = dict.object(forKey: "profile_image") as? String
-                    {
-                        imgPrsnGiveReview.cornerRadius = imgPrsnGiveReview.frame.width/2
-                        imgPrsnGiveReview.clipsToBounds = true
-                        let url = NSURL(string:  str)!  as URL
-                        imgPrsnGiveReview.sd_setImage(with: url)
-                    }
-                    
-                }
-            }
             
+            
+            if let dataDict = self.arrResponseForReviews.object(at: 0) as? NSDictionary
+            {
+                self.ViewNoReview.isHidden = true
+                self.btnReadAllReview.isHidden = false
+                
+                if let reviewDict = dataDict.object(forKey: "review") as? NSDictionary
+                {
+                    if let dict = reviewDict.object(forKey: "user") as? NSDictionary
+                    {
+                        lblReviewerName.text = dict.object(forKey: "name") as? String
+                        lblReview.text = reviewDict.object(forKey: "review_text") as? String
+                        if let rating = reviewDict.object(forKey: "rating") as? Int
+                        {
+                            switch rating {
+                            case 1:
+                                self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                break
+                            case 2:
+                                self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                break
+                            case 3:
+                                self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                break
+                            case 4:
+                                self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                break
+                            case 5:
+                                self.btnStar1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                self.btnStar5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                break
+                            default:
+                                break
+                            }
+                        }
+                        
+                        if let str = dict.object(forKey: "profile_image") as? String
+                        {
+                            imgPrsnGiveReview.cornerRadius = imgPrsnGiveReview.frame.width/2
+                            imgPrsnGiveReview.clipsToBounds = true
+                            let url = NSURL(string:  str)!  as URL
+                            imgPrsnGiveReview.sd_setImage(with: url)
+                        }
+                        
+                    }
+                }
+                
+            }
         }
- 
-        
+        else
+        {
+            self.ViewNoReview.isHidden = false
+            self.btnReadAllReview.isHidden = true
+        }
     }
   
     func setRestuarantData(dict : NSDictionary)
@@ -237,46 +250,61 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     
     func GetRestuarantReview()
     {
-        if let dataDict = self.arrOfRestaurantData["isSelected"] as? NSDictionary
+        if self.app.zomatoAPIuserKEy != nil
         {
-            if let restID = dataDict.object(forKey: "id")
+            if let dataDict = self.arrOfRestaurantData["isSelected"] as? NSDictionary
             {
-                let mainLink = "https://developers.zomato.com/api/v2.1/reviews?res_id=\(restID)&start=0&count=10"
-                MBProgressHUD.showAdded(to: self.view, animated: true)
-                
-                Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy, successStatusCode: 200) { (success, response) in
-                   
-                    MBProgressHUD.hide(for: self.view, animated: true)
-                    if success == true
-                    {
-                        if let arryData = response.object(forKey: "user_reviews") as? [[String:AnyObject]]
+                if let restID = dataDict.object(forKey: "id")
+                {
+                    let mainLink = "https://developers.zomato.com/api/v2.1/reviews?res_id=\(restID)&start=0&count=10"
+                    MBProgressHUD.showAdded(to: self.view, animated: true)
+                    
+                    Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy!, successStatusCode: 200) { (success, response) in
+                        
+                        MBProgressHUD.hide(for: self.view, animated: true)
+                        if success == true
                         {
-                            self.arrResponseForReviews = NSMutableArray(array: arryData)
+                            if let arryData = response.object(forKey: "user_reviews") as? [[String:AnyObject]]
+                            {
+                                self.arrResponseForReviews = NSMutableArray(array: arryData)
+                                
+                            }
                             
-                        }
-                        
-                        if let dict = self.arrOfRestaurantData["isSelected"] as? NSDictionary
-                        {
-                            self.setRestuarantData(dict: dict)
-                        }
-                        
-                    }
-                    else
-                    {
-                        if let msg = response.object(forKey: "message") as? String
-                        {
-                            _ = self.navigationController?.popViewController(animated: true)
+                            if let dict = self.arrOfRestaurantData["isSelected"] as? NSDictionary
+                            {
+                                self.setRestuarantData(dict: dict)
+                            }
+                            
                         }
                         else
                         {
-                            self.GetRestuarantReview()
+                            if let msg = response.object(forKey: "message") as? String
+                            {
+                                self.view.makeToast(msg)
+                                _ = self.navigationController?.popViewController(animated: true)
+                            }
+                            else
+                            {
+                                self.GetRestuarantReview()
+                            }
+                            
                         }
                         
                     }
-                    
                 }
             }
         }
+        else
+        {
+            self.app.getZomatoKEY { (success) in
+                
+                if success == true
+                {
+                    self.GetRestuarantReview()
+                }
+            }
+        }
+        
     }
     
     

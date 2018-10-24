@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import MBProgressHUD
+
 
 class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPickerViewDataSource,UITextViewDelegate,UITextFieldDelegate {
     
@@ -35,6 +35,7 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
     @IBOutlet weak var btnFemaleOut: UIButton!
     @IBOutlet weak var btnMaleOut: UIButton!
   
+    @IBOutlet weak var cinstAboutMeHeight: NSLayoutConstraint!
     @IBOutlet weak var txtViewAboutMe: UITextView!
     
     @IBOutlet weak var txtFieldGender: UITextField!
@@ -65,15 +66,14 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
     }
     // MARK: - Set data
 
-    func initialSetUp(){
+    func initialSetUp()
+    {
 
         nslcHightOfViewGender.constant = -viewOfGender.frame.size.height
-        let placesData = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSData
-   
-        if let placesData = placesData {
-            let placesArray = NSKeyedUnarchiver.unarchiveObject(with: placesData as Data) as? [ Any]
-            arrProfileData = placesArray![0] as! [String:AnyObject]
-            print(arrProfileData)
+        if let placesData = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary
+        {
+            arrProfileData = placesData as! [String : AnyObject]
+            print(placesData)
         }
         
         self.txtFieldEducation.text = Constants.GlobalConstants.appDelegate.userDetail.education
@@ -97,7 +97,7 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
                 btnLGBTout.isSelected = false
                 btnMaleOut.isSelected = true
                 btnFemaleOut.isSelected = false
-                
+                self.strGender = "male"
                 lblMale.textColor = Utility.UIColorFromHex(0xAC192E)
                 lblFemale.textColor = UIColor.black
                 lblLGBT.textColor = UIColor.black
@@ -106,7 +106,7 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
                 btnLGBTout.isSelected = false
                 btnMaleOut.isSelected = false
                 btnFemaleOut.isSelected = true
-                
+                self.strGender = "female"
                 lblMale.textColor = UIColor.black
                 lblFemale.textColor = Utility.UIColorFromHex(0xAC192E)
                 lblLGBT.textColor = UIColor.black
@@ -115,7 +115,7 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
                 btnLGBTout.isSelected = true
                 btnMaleOut.isSelected = false
                 btnFemaleOut.isSelected = false
-                
+                self.strGender = "lgbt"
                 lblMale.textColor = UIColor.black
                 lblFemale.textColor = UIColor.black
                 lblLGBT.textColor = Utility.UIColorFromHex(0xAC192E)
@@ -293,9 +293,26 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
     }
     
     // MARK: - TextField delegate
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        if textField == txtFieldRelation || textField == txtFieldBirthDay{
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.endEditing(true)
+        return true
+    }
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if textField == txtFieldRelation || textField == txtFieldBirthDay || textField == txtFieldGender{
+            self.endEditing(true)
             
+            
+        }
+        
+        return true
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+        viewOfPicker.isHidden = true
+        if textField == txtFieldRelation || textField == txtFieldBirthDay{
+            self.endEditing(true)
             if (textField == txtFieldRelation){
                 setPickerView(txtField: txtFieldRelation)
             }else{
@@ -303,6 +320,8 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
             }
            
         }else if textField == txtFieldGender{
+            self.endEditing(true)
+            
             setKeyboard()
             if isGenderViewOpen{
                 setCloseGender()
@@ -329,8 +348,6 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
         mutDictUserDetail.setValue(strGender, forKey: "Gender")
         mutDictUserDetail.setValue(txtFieldBirthDay.text!, forKey: "Birthday")
 
-        
-        print(mutDictUserDetail)
         let data = NSKeyedArchiver.archivedData(withRootObject: mutDictUserDetail)
         let userDefaults = UserDefaults.standard
         userDefaults.set(data, forKey:"mutDictUserDetail")
@@ -349,6 +366,16 @@ class detailCollectionViewCell: UICollectionViewCell,UIPickerViewDelegate,UIPick
         textView.textColor = UIColor.black
             textView.autoresizingMask = .flexibleHeight
         }
+        
+        
+        if textView.contentSize.height > 30.0
+        {
+            cinstAboutMeHeight.constant = textView.contentSize.height
+        }
+        
+        
+        print()
+        
         setDictionary()
     }
     func textViewDidEndEditing(_ textView: UITextView) {

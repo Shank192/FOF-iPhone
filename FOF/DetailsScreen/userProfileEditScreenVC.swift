@@ -11,7 +11,7 @@
 //
 
 import UIKit
-import MBProgressHUD
+
 
 class userProfileEditScreenVC: UIViewController,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDataSource {
 
@@ -29,8 +29,11 @@ class userProfileEditScreenVC: UIViewController,UICollectionViewDelegate,UIColle
         hideKeyboardWhenTappedAround()
         NotificationCenter.default.addObserver(self, selector: #selector(self.pushController), name: Constants.UserDefaults.pushNotificationName, object: nil)
 
+        
         // Do any additional setup after loading the view.
     }
+    
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -47,43 +50,46 @@ class userProfileEditScreenVC: UIViewController,UICollectionViewDelegate,UIColle
     }
     
     @IBAction func btnSaveAct(_ sender: Any) {
+        
+        
         let data = UserDefaults.standard.object(forKey: "mutDictUserDetail") as! NSData
         let object = NSKeyedUnarchiver.unarchiveObject(with: data as Data) as! NSDictionary
-        
-        
+
+
         let dataDictUser = UserDefaults.standard.object(forKey: "mutDictUser") as! NSData
         let objectDictUser = NSKeyedUnarchiver.unarchiveObject(with: dataDictUser as Data) as! NSDictionary
-        
+
         print(objectDictUser)
         mutDictUserProfileDetail = object as! NSMutableDictionary
           print(mutDictUserProfileDetail)
         MBProgressHUD.showAdded(to: self.view, animated: true)
 
-        let dictEditProfilePara = ["action":"editprofile","userid":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String,"first_name":mutDictUserProfileDetail.object(forKey:"first_name") as! String ,"last_name":mutDictUserProfileDetail.object(forKey:"last_name") as! String ,"dob":mutDictUserProfileDetail.object(forKey:"Birthday") as! String,"sessionid":UserDefaults.standard.object(forKey: Constants.UserDefaults.session_ID) as! String,"showme":objectDictUser.object(forKey:"showme") as! String,"distance_unit":objectDictUser.object(forKey:"distance_unit") as! String,"search_min_age":objectDictUser.object(forKey:"search_min_age") as! String,"search_max_age":objectDictUser.object(forKey:"search_max_age") as! String,"search_distance":Constants.GlobalConstants.appDelegate.userDetail.searchDistance,"isreviewed":(0),"occupation":mutDictUserProfileDetail.object(forKey:"occupation") as! String,"relationship":mutDictUserProfileDetail.object(forKey:"RelationShip") as! String,"education":mutDictUserProfileDetail.object(forKey:"education") as! String,"about_me":mutDictUserProfileDetail.object(forKey:"about_me") as! String,"ethnicity":mutDictUserProfileDetail.object(forKey:"ethnicity") as! String, "is_receive_invitation_notifications":objectDictUser.object(forKey:"is_receive_invitation_notifications"),
-            "is_receive_messages_notifications":objectDictUser.object(forKey:"is_receive_messages_notifications"),
-            "is_show_location":objectDictUser.object(forKey:"is_show_location"),"fields": "first_name,last_name,dob,showme,search_distance,search_max_age,search_min_age,is_receive_invitation_notifications,is_receive_messages_notifications,distance_unit,is_show_location,isreviewed,about_me,ethnicity,education"] as [String : Any]
-                WebService.postURL(Constants.WebServiceUrl.mainUrl, param: dictEditProfilePara as NSDictionary) { (success, response) in
+        
+        
+        let dictEditProfilePara = ["user_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String,"first_name":mutDictUserProfileDetail.object(forKey:"first_name") as! String ,"last_name":mutDictUserProfileDetail.object(forKey:"last_name") as! String ,"gender":"\(mutDictUserProfileDetail.object(forKey: "Gender") ?? "")","dob":mutDictUserProfileDetail.object(forKey:"Birthday") as! String,"showme":objectDictUser.object(forKey:"showme") as! String,"distance_unit":objectDictUser.object(forKey:"distance_unit") as! String,"search_min_age":objectDictUser.object(forKey:"search_min_age") as! String,"search_max_age":objectDictUser.object(forKey:"search_max_age") as! String,"search_distance":objectDictUser.object(forKey: "search_distance") ?? "20","show_friends":"0","occupation":mutDictUserProfileDetail.object(forKey:"occupation") as! String,"relationship":mutDictUserProfileDetail.object(forKey:"RelationShip") as! String,"education":mutDictUserProfileDetail.object(forKey:"education") as! String,"about_me":mutDictUserProfileDetail.object(forKey:"about_me") as! String,"ethnicity":mutDictUserProfileDetail.object(forKey:"ethnicity") as! String, "is_receive_invitation_notifications":objectDictUser.object(forKey:"is_receive_invitation_notifications") ?? "1","is_receive_messages_notifications":objectDictUser.object(forKey:"is_receive_messages_notifications") ?? "1","is_show_location":objectDictUser.object(forKey:"is_show_location") ?? "1"] as [String : Any]
+        
+         Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.updateUserData, param: dictEditProfilePara as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
                     if success == true
                     {
+
                         MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
 
-                        if let dataArray = response.object(forKey: "data") as? NSArray
+                        if let dataDict = response.object(forKey: "response_data") as? NSDictionary
                         {
-                            if dataArray.count != 0
+                            Constants.GlobalConstants.appDelegate.userDetail = UserDetail.init(dictionary: dataDict as? [AnyHashable : Any])
+                            UserDefaults.standard.set(dataDict, forKey: Constants.UserDefaults.ProfileData)
+                            
+                            if let tastebuds = dataDict.object(forKey: "testbuds") as? NSArray
                             {
-                                if let dict = dataArray.object(at: 0) as? NSDictionary
-                                {
-                                    Constants.GlobalConstants.appDelegate.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
-                                    let placesData = NSKeyedArchiver.archivedData(withRootObject: dataArray)
-                                    UserDefaults.standard.set(placesData, forKey: Constants.UserDefaults.ProfileData)
-                                    UserDefaults.standard.set(dict.object(forKey: "testbuds"), forKey: Constants.UserDefaults.MyTestBuds)
-                                    if let sessionid = dict.object(forKey: "sessionid")
-                                    {
-                                        UserDefaults.standard.set("\(sessionid)", forKey: Constants.UserDefaults.session_ID)
-                                    }
-                                }
+                                UserDefaults.standard.set(tastebuds, forKey: Constants.UserDefaults.MyTestBuds)
+                                UserDefaults.standard.synchronize()
                             }
                         }
+                        
+                        UserDefaults.standard.synchronize()
+                        
+                        self.view.makeToast("Your profile successfully save.")
+                        
                     }else{
                         MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
 

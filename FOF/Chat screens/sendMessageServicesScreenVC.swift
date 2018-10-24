@@ -65,6 +65,7 @@ class sendMessageServicesScreenVC: NSObject {
         refChange.setValue(str)
     }
     func sendMessageToRecieverId(recieverId : String , isFriend : Bool){
+        print(mutMessageParamDictDetail)
         let refPath = "messages/\(UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String)"
         rootRef = Database.database().reference(withPath: refPath)
         let FullPath = rootRef.childByAutoId()

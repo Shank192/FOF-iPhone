@@ -33,6 +33,13 @@ struct Constants {
         static let GetTestBuds = "user/getTastebuds"
         static let GetUserProfile  = "user/getUserProfile"
         static let SaveUserTestbuds  = "user/addUsersTastebuds"
+        static let updateUserData  = "user/updateUserData"
+        static let GetUserSuggestion  = "user/getUserSuggestions"
+        static let SendFriendRequest = "user/sendFriendRequest"
+        static let AcceptFriendRequest = "user/acceptFriendRequest"
+        static let getZomatoKEey = "user/getZomatoKey"
+        static let GetFriendRequestList = "user/getFriendRequestList"
+        static let GetFriendList = "user/getFriendsList"
     }
     
     
@@ -94,18 +101,22 @@ struct Constants {
         static let isLoging = "isUserLoging"
         static let MyTestBuds = "MyTestBuds"
         static let MySelectedTEstBudsID = "MySelectedTEstBudsID"
+        static let SelectedZomatoTestBudsID = "SelectedZomatoTestBudsID"
         static let ProfileData = "ProfileData"
         static let CurrentCity = "CurrentCity"
         static let receiverId = "receiverId"
         static let receiverDP = "receiverDP"
         static let matchId = "matchId"
         
+        static let FilterDistance = "FilterDistance"
+        
         static let isCurrentLocationRestro = "isCurrentLocationRestro"
         static let isCurrentLocationFrnd = "isCurrentLocationFrnd"
         
         static let currentLatitude = "currentLatitude"
         static let currentLongitude = "currentLongitude"
-        
+        static let AllTestBudsArrayFromYourLocation = "AllTestBudsArrayFromYourLocation"
+        static let isOpenFriendViewController = "isOpenFriendViewController"
         static let notificationName = Notification.Name("NotificationIdentifier")
         static let pushNotificationName = Notification.Name("pushNotificationName")
 

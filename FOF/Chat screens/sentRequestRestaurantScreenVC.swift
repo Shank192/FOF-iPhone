@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import FirebaseDatabase
 import FirebaseStorage
-import MBProgressHUD
+
 
 class sentRequestRestaurantScreenVC: UIViewController ,FirebaseDelegate{
     
@@ -35,9 +35,13 @@ class sentRequestRestaurantScreenVC: UIViewController ,FirebaseDelegate{
     @IBOutlet weak var lblDetails: UILabel!
     @IBOutlet weak var btnRejectOut: UIButton!
     var isSent = Bool()
+    var isRequestSent = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("Friend User Dict = :- \(dictUserDetails)")
+        
         if isSent{
             setFatchedRestaurantFromCoredata()
         }else{
@@ -92,93 +96,156 @@ class sentRequestRestaurantScreenVC: UIViewController ,FirebaseDelegate{
     }
     func sendWsRequest(){
         
-        if let strReceiverId = dictUserDetails.object(forKey: "id")! as? String{
+        if let strReceiverId = dictUserDetails.object(forKey: "friend_user_id"){
             
-            let param = ["action":"sendfriendrequest","userid":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"sessionid":UserDefaults.standard.object(forKey:Constants.UserDefaults.session_ID),"friendid":strReceiverId]
+            let param = ["user_id":UserDefaults.standard.object(forKey:Constants.UserDefaults.user_ID),"friend_user_id":"\(strReceiverId)"]
             
-            WebService.postURL(Constants.WebServiceUrl.mainUrl, param: param as NSDictionary, CompletionHandler: { (success, response) in
-                self.objSendMessage.setDictFormatForWriteDataDefault()
-                let arrData = response.object(forKey: "data") as! NSArray
-                let dictdata = arrData[0] as! NSDictionary
-                if let pushData = dictdata.object(forKey: "fields") as? NSDictionary{
-                    if let dataDetail = pushData.object(forKey: "data") as? NSDictionary{
-                        if let strbody = dataDetail.object(forKey: "body")! as? String{
-                            if strbody == "Friend Request Accepted"{
-                                let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
-                                obj.isFreind = true
-                                obj.dictUserDetail = self.dictUserDetails
-                                self.navigationController?.pushViewController(obj, animated: false)
-                            }
-                        }
-                    }
-                }
-                self.strChatId = dictdata["id"] as! String
-                
-                
-               UserDefaults.standard.set(self.strChatId, forKey: Constants.UserDefaults.matchId)
-                self.objSendMessage.addObserverForRecipteCHangeWithChatId(chatId: self.strChatId)
-                
-                
-                self.objSendMessage.mutMessageParamDictDetail["contentType"] = "text";
-                self.objSendMessage.mutMessageParamDictDetail["msg"] = self.strMessage;
-                self.objSendMessage.mutMessageParamDictDetail["recieverDP"] = self.dictUserDetails["profilepic1"]
-                self.objSendMessage.mutMessageParamDictDetail["recieverId"] = strReceiverId
-                self.objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
-                self.objSendMessage.mutMessageParamDictDetail["senderId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
-                
-                self.objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp()
-                
-                self.objSendMessage.sendMessageToRecieverId(recieverId: strReceiverId, isFriend: false)
-                
-                for i in 0..<self.arrForRestaurants.count {
-                    var strPhotoUrl = String()
+            var methodName = ""
+            if isRequestSent == true
+            {
+                methodName = Constants.APIName.SendFriendRequest
+            }
+            else
+            {
+                methodName = Constants.APIName.AcceptFriendRequest
+            }
+            
+            
+            Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: methodName, param: param as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
+                if success == true
+                {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
                     
-                    if let dataDict =  (self.arrForRestaurants[i]["RestaurantData"] as? NSDictionary) {
-                        if let photos = dataDict["photos"] as? [[String:Any]]{
-                            let strRefre = photos.first
-                            strPhotoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1080&photoreference=\(strRefre!["photo_reference"] as! String)"}
+                    self.objSendMessage.setDictFormatForWriteDataDefault()
+                    if let dictdata = response.object(forKey: "response_data") as? NSDictionary
+                    {
+                        if self.isRequestSent == false
+                        {
+                            let obj = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
+                            obj.isFreind = true
+                            obj.dictUserDetail = self.dictUserDetails
+                            self.navigationController?.pushViewController(obj, animated: false)
+                        }
                         
-                        
-                        self.objSendMessage.mutMessageParamDictDetail["contentType"] = "restaurant"
-                        self.objSendMessage.mutParamDict["vicinity"] = dataDict.object(forKey: "vicinity") as! String
-                        self.objSendMessage.mutParamDict["photoReference"] = strPhotoUrl
-                        self.objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp() + i
-                        self.objSendMessage.mutMessageParamDictDetail["recieverId"] = strReceiverId
-                        self.objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
-                        if let geometry = dataDict.object(forKey: "geometry") as? NSDictionary{
-                            if let location = geometry.object(forKey: "location") as? NSDictionary{
-                                self.objSendMessage.mutParamDict["latitude"] = String(describing: location.object(forKey: "lat")!)
-                                self.objSendMessage.mutParamDict["longitude"] = String(describing: location.object(forKey: "lng")!)  }}
-                        self.objSendMessage.mutParamDict["ratings"] = String(describing: dataDict.object(forKey: "rating")!)
-                        
-                        self.objSendMessage.mutMessageParamDictDetail["senderId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
-                        self.objSendMessage.mutParamDict["phoneNumber"] = ""
-                        self.objSendMessage.mutParamDict["placeid"] = dataDict.object(forKey: "place_id") as! String
-                        self.objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
-                        self.objSendMessage.mutParamDict["url"] = ""
-                        self.objSendMessage.mutParamDict["website"] = ""
-                        self.objSendMessage.mutParamDict["websiteUrl"] = ""
-                        self.objSendMessage.mutParamDict["open_now"] = ""
-                        self.objSendMessage.mutMessageParamDictDetail["recieverDP"] = self.dictUserDetails["profilepic1"] as! String
-                        self.objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
-                        self.objSendMessage.mutParamDict["priceRange"] = NSNumber.init(integerLiteral: 1)
-                        self.objSendMessage.mutParamDict["posInList"] = NSNumber.init(integerLiteral: 0)
-                        self.objSendMessage.mutParamDict["isSelected"] = NSNumber.init(booleanLiteral: false)
-                        self.objSendMessage.mutParamDict["reference"] = dataDict.object(forKey: "reference") as! String
+                        self.strChatId = dictdata["id"] as! String
                     }
-                    if let dataTime =  (self.arrForRestaurants[i]["CarFirst"]) as? NSDictionary{
-                        self.objSendMessage.mutParamDict["timeToReach"] = dataTime.object(forKey: "Difference") as! String
+                  
+                    UserDefaults.standard.set(self.strChatId, forKey: Constants.UserDefaults.matchId)
+                    self.objSendMessage.addObserverForRecipteCHangeWithChatId(chatId: self.strChatId)
+                    
+                    
+                    self.objSendMessage.mutMessageParamDictDetail["contentType"] = "text";
+                    self.objSendMessage.mutMessageParamDictDetail["msg"] = self.strMessage;
+                    self.objSendMessage.mutMessageParamDictDetail["recieverDP"] = self.dictUserDetails["profilepic1"]
+                    self.objSendMessage.mutMessageParamDictDetail["recieverId"] = "\(strReceiverId)"
+                    self.objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
+                    self.objSendMessage.mutMessageParamDictDetail["senderId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
+                    
+                    self.objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp()
+                    
+                    self.objSendMessage.sendMessageToRecieverId(recieverId: "\(strReceiverId)", isFriend: false)
+                    
+                    for i in 0..<self.arrForRestaurants.count {
+                        var strPhotoUrl = String()
+                        
+                        if let dataDict =  (self.arrForRestaurants[i]["RestaurantData"] as? NSDictionary) {
+                            print(dataDict)
+                            
+                            if let photos = dataDict["thumb"] as? String//dataDict["photos"] as? [[String:Any]]
+                            {
+                                if photos != ""
+                                {
+                                    strPhotoUrl = photos
+                                }
+                                
+                                //                            let strRefre = photos.first
+                                //                            strPhotoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1080&photoreference=\(strRefre!["photo_reference"] as! String)"
+                                
+                            }
+                            
+                            
+                            self.objSendMessage.mutMessageParamDictDetail["contentType"] = "restaurant"
+                            self.objSendMessage.mutParamDict["vicinity"] = ""//dataDict.object(forKey: "vicinity") as! String
+                            self.objSendMessage.mutParamDict["photoReference"] = strPhotoUrl
+                            self.objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp() + i
+                            self.objSendMessage.mutMessageParamDictDetail["recieverId"] = strReceiverId
+                            self.objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
+                            
+                                if let location = dataDict.object(forKey: "location") as? NSDictionary{
+                                    self.objSendMessage.mutParamDict["latitude"] = String(describing: location.object(forKey: "latitude")!)
+                                    self.objSendMessage.mutParamDict["longitude"] = String(describing: location.object(forKey: "longitude")!)
+                                }
+                            
+                            if let rate = dataDict.object(forKey: "user_rating") as? NSDictionary
+                            {
+                                if let aggregate_rating = rate.object(forKey: "aggregate_rating")
+                                {
+                                    self.objSendMessage.mutParamDict["ratings"] = "\(aggregate_rating)"
+                                }
+                                else
+                                {
+                                    self.objSendMessage.mutParamDict["ratings"] = ""
+                                }
+                            }
+                            else
+                            {
+                                self.objSendMessage.mutParamDict["ratings"] = ""
+                            }
+                            
+                            
+                            self.objSendMessage.mutMessageParamDictDetail["senderId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
+                            self.objSendMessage.mutParamDict["phoneNumber"] = ""
+                            self.objSendMessage.mutParamDict["placeid"] = ""//dataDict.object(forKey: "place_id") as! String
+                            self.objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
+                            
+                            if let resDict = dataDict.object(forKey: "R") as? NSDictionary
+                            {
+                                if let res_id = resDict.object(forKey: "res_id")
+                                {
+                                    self.objSendMessage.mutMessageParamDictDetail["res_id"] = "\(res_id)"
+                                }
+                            }
+                            self.objSendMessage.mutParamDict["url"] = ""
+                            self.objSendMessage.mutParamDict["website"] = ""
+                            self.objSendMessage.mutParamDict["websiteUrl"] = ""
+                            self.objSendMessage.mutParamDict["open_now"] = ""
+                            self.objSendMessage.mutMessageParamDictDetail["recieverDP"] = self.dictUserDetails["profilepic1"] as! String
+                            self.objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
+                            self.objSendMessage.mutParamDict["priceRange"] = NSNumber.init(integerLiteral: 1)
+                            self.objSendMessage.mutParamDict["posInList"] = NSNumber.init(integerLiteral: 0)
+                            self.objSendMessage.mutParamDict["isSelected"] = NSNumber.init(booleanLiteral: false)
+                            self.objSendMessage.mutParamDict["reference"] = ""//dataDict.object(forKey: "reference") as! String
+                        }
+                        if let dataTime =  (self.arrForRestaurants[i]["CarFirst"]) as? NSDictionary{
+                            self.objSendMessage.mutParamDict["timeToReach"] = dataTime.object(forKey: "Difference") as! String
+                        }
+                        else
+                        {
+                            self.objSendMessage.mutParamDict["timeToReach"] = "No data available"
+                        }
+                        
+                        self.objSendMessage.sendMessageToRecieverId(recieverId:"\(strReceiverId)",isFriend : false)
                     }
-                    self.objSendMessage.sendMessageToRecieverId(recieverId:strReceiverId,isFriend : false)
                 }
-                
-                
-                
-            })
-        }}
+                else
+                {
+                    if let msg = response.object(forKey: "message") as? String
+                    {
+                        Constants.GlobalConstants.appDelegate.window?.rootViewController?.view.makeToast(msg)
+                        _ = self.navigationController?.popViewController(animated: true)
+                    }
+                    else
+                    {
+                        Constants.GlobalConstants.appDelegate.window?.rootViewController?.view.makeToast("Something went to wrong. Please try after sometime.")
+                        _ = self.navigationController?.popViewController(animated: true)
+                    }
+                }
+            }
+        }
+    }
     func setFatchedRestaurantFromCoredata(){
         let cdm = CoreDataManage()
-        
+        print(dictUserDetails)
         if let otherId = dictUserDetails["id"] as? NSString{
             
             let frnd : FriendOtherDetail =  ((cdm.fetchFriendOtherDetailWithUserId(userId: otherId)).firstObject as! FriendOtherDetail)

@@ -76,6 +76,7 @@
 		8233A577210CA5FD0013FB48 /* GMUGeoJSONParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A556210CA5FC0013FB48 /* GMUGeoJSONParser.m */; };
 		8233A578210CA5FD0013FB48 /* GQTPointQuadTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A559210CA5FC0013FB48 /* GQTPointQuadTree.m */; };
 		8233A579210CA5FD0013FB48 /* GQTPointQuadTreeChild.m in Sources */ = {isa = PBXBuildFile; fileRef = 8233A55B210CA5FC0013FB48 /* GQTPointQuadTreeChild.m */; };
+		823FFB7D21745ECA00E07837 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 823FFB7B21745ECA00E07837 /* MBProgressHUD.m */; };
 		824ADCD82135684A0032668D /* sentRestaurantsScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824ADCD72135684A0032668D /* sentRestaurantsScreenVC.swift */; };
 		824B231F2136CC06009F394C /* sendMessageServicesScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824B231E2136CC06009F394C /* sendMessageServicesScreenVC.swift */; };
 		824C4522210B42E700D273A9 /* NearbyNavigationVCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */; };
@@ -100,7 +101,6 @@
 		824C4568210B691100D273A9 /* SDImageCacheConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C454D210B691100D273A9 /* SDImageCacheConfig.m */; };
 		824C4569210B691100D273A9 /* UIView+WebCacheOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C454E210B691100D273A9 /* UIView+WebCacheOperation.m */; };
 		824C456A210B691100D273A9 /* UIView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C454F210B691100D273A9 /* UIView+WebCache.m */; };
-		824C456B210B691100D273A9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 824C4551210B691100D273A9 /* Info.plist */; };
 		824C456C210B691100D273A9 /* UIButton+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 824C4554210B691100D273A9 /* UIButton+WebCache.m */; };
 		824EC4102109AEE800FB52AC /* SSKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 824EC40F2109AEE800FB52AC /* SSKeychain.m */; };
 		824EC4132109AEF700FB52AC /* SSKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 824EC4122109AEF700FB52AC /* SSKeychainQuery.m */; };
@@ -114,6 +114,7 @@
 		8263DC132125892F00C2A65E /* detailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */; };
 		8263DC152125894C00C2A65E /* photoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */; };
 		8263DC172125897100C2A65E /* preferencesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8263DC162125897100C2A65E /* preferencesCollectionViewCell.swift */; };
+		826BFD0D21711D0A0093D61E /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826BFD0C21711D0A0093D61E /* Toast.swift */; };
 		8278A0BE20F8BF3600CF04B3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BC20F8BF3600CF04B3 /* Main.storyboard */; };
 		8278A0C020F8BF3700CF04B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0BF20F8BF3700CF04B3 /* Assets.xcassets */; };
 		8278A0C320F8BF3700CF04B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8278A0C120F8BF3700CF04B3 /* LaunchScreen.storyboard */; };
@@ -307,6 +308,8 @@
 		8233A55D210CA5FC0013FB48 /* GQTPointQuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTPointQuadTree.h; sourceTree = "<group>"; };
 		8233A55E210CA5FC0013FB48 /* GQTPointQuadTreeChild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTPointQuadTreeChild.h; sourceTree = "<group>"; };
 		8233A55F210CA5FC0013FB48 /* GQTBounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GQTBounds.h; sourceTree = "<group>"; };
+		823FFB7B21745ECA00E07837 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		823FFB7C21745ECA00E07837 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		824ADCD72135684A0032668D /* sentRestaurantsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sentRestaurantsScreenVC.swift; sourceTree = "<group>"; };
 		824B231E2136CC06009F394C /* sendMessageServicesScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sendMessageServicesScreenVC.swift; sourceTree = "<group>"; };
 		824C4521210B42E700D273A9 /* NearbyNavigationVCViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyNavigationVCViewController.swift; sourceTree = "<group>"; };
@@ -372,6 +375,7 @@
 		8263DC122125892F00C2A65E /* detailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = detailCollectionViewCell.swift; sourceTree = "<group>"; };
 		8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photoCollectionViewCell.swift; sourceTree = "<group>"; };
 		8263DC162125897100C2A65E /* preferencesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = preferencesCollectionViewCell.swift; sourceTree = "<group>"; };
+		826BFD0C21711D0A0093D61E /* Toast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		8278A0B520F8BF3600CF04B3 /* FOF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FOF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8278A0BD20F8BF3600CF04B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8278A0BF20F8BF3700CF04B3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -765,9 +769,20 @@
 			path = QuadTree;
 			sourceTree = "<group>";
 		};
+		823FFB7A21745ECA00E07837 /* MBProgressHud */ = {
+			isa = PBXGroup;
+			children = (
+				823FFB7B21745ECA00E07837 /* MBProgressHUD.m */,
+				823FFB7C21745ECA00E07837 /* MBProgressHUD.h */,
+			);
+			path = MBProgressHud;
+			sourceTree = "<group>";
+		};
 		824C4525210B690800D273A9 /* ThirdPartyClass */ = {
 			isa = PBXGroup;
 			children = (
+				823FFB7A21745ECA00E07837 /* MBProgressHud */,
+				826BFD0B21711D0A0093D61E /* Toast */,
 				82CCBD2221186ECA00A3A9CD /* NMRangeSlider */,
 				824F9EB32110761900145B59 /* reachablity */,
 				8233A516210CA5FC0013FB48 /* Google-Maps-iOS-Utils */,
@@ -865,6 +880,14 @@
 				8233A4FE210C799B0013FB48 /* ReachabilityManager.m */,
 			);
 			path = reachablity;
+			sourceTree = "<group>";
+		};
+		826BFD0B21711D0A0093D61E /* Toast */ = {
+			isa = PBXGroup;
+			children = (
+				826BFD0C21711D0A0093D61E /* Toast.swift */,
+			);
+			path = Toast;
 			sourceTree = "<group>";
 		};
 		8278A0AC20F8BF3600CF04B3 = {
@@ -1251,7 +1274,6 @@
 				82CCBD5721186ECD00A3A9CD /* slider-metal-handle@2x.png in Resources */,
 				8233A4A2210C4FB50013FB48 /* Montserrat-MediumItalic.ttf in Resources */,
 				8233A4A6210C4FB50013FB48 /* Montserrat-ExtraBold.ttf in Resources */,
-				824C456B210B691100D273A9 /* Info.plist in Resources */,
 				82CCBD5121186ECD00A3A9CD /* slider-metal-trackBackground.png in Resources */,
 				8233A49A210C4FB50013FB48 /* Montserrat-LightItalic.ttf in Resources */,
 				82CCBD5621186ECD00A3A9CD /* slider-metal-track.png in Resources */,
@@ -1379,7 +1401,6 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/GrowingTextView/GrowingTextView.framework",
 				"${BUILT_PRODUCTS_DIR}/MBCircularProgressBar/MBCircularProgressBar.framework",
-				"${BUILT_PRODUCTS_DIR}/MBProgressHUD/MBProgressHUD.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
@@ -1396,7 +1417,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GrowingTextView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MBCircularProgressBar.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MBProgressHUD.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
@@ -1520,11 +1540,13 @@
 				8233A577210CA5FD0013FB48 /* GMUGeoJSONParser.m in Sources */,
 				8233A575210CA5FD0013FB48 /* GMUPoint.m in Sources */,
 				824C4560210B691100D273A9 /* UIImage+MultiFormat.m in Sources */,
+				823FFB7D21745ECA00E07837 /* MBProgressHUD.m in Sources */,
 				824EC41C2109D5F800FB52AC /* WebService.swift in Sources */,
 				829D884A2141129400617D50 /* interestedScreenVC.swift in Sources */,
 				8222F9CD2100CAD6005F8EA4 /* chatTableviewCell.swift in Sources */,
 				8233A574210CA5FD0013FB48 /* GMUStyle.m in Sources */,
 				8233A56E210CA5FD0013FB48 /* GMUGeometryRenderer.m in Sources */,
+				826BFD0D21711D0A0093D61E /* Toast.swift in Sources */,
 				829EE59920F8DCC800F7C52D /* testBudsCollectionViewCell.swift in Sources */,
 				824C455C210B691100D273A9 /* FLAnimatedImageView+WebCache.m in Sources */,
 				8233A567210CA5FD0013FB48 /* GMUDefaultClusterRenderer.m in Sources */,

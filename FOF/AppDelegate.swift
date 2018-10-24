@@ -26,13 +26,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var currentLongitude : String = ""
     var curLocation : CLLocation?
     let objSendMessage = sendMessageServicesScreenVC()
-
+    
     var arrDetailData = NSMutableDictionary()
     @objc var userLocation = CLLocationCoordinate2D()
     @objc var searchedLocation =  CLLocationCoordinate2D()
     var strCurrentPlace = ""
+    var isFilterFriend = false
     
-    var zomatoAPIuserKEy = "ffa4b1a7f88b240a60cc050a7a603ae4"
+    var zomatoAPIuserKEy:String?//"ffa4b1a7f88b240a60cc050a7a603ae4"
     
     lazy var persistentContainer: NSPersistentContainer = {
         
@@ -60,12 +61,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         FirebaseApp.configure()
         GMSServices.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
-
+        
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         registerRemoteNotification()
         
+        if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
+        {
+            UserDefaults.standard.set(20000, forKey: Constants.UserDefaults.FilterDistance)
+            UserDefaults.standard.synchronize()
+            
+            
+        }
+        
         self.SetMyRootBy()
-     
+        
         
         //GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         // Override point for customization after application launch.
@@ -74,14 +83,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     func applicationWillResignActive(_ application: UIApplication) {
         offline()
-
+        
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
     }
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         offline()
-
+        
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     }
@@ -101,23 +110,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     }
     func managedObjectContext() -> NSManagedObjectContext{
         let context : NSManagedObjectContext = self.persistentContainer.viewContext
-
-            if context.hasChanges {
-                do {
-                    try context.save()
-                    print("saved")
-                } catch {
-                    let nserror = error as NSError
-                    NSLog("Unresolved error \(nserror), \(nserror.userInfo)")
-                    abort()
-                }
+        
+        if context.hasChanges {
+            do {
+                try context.save()
+                print("saved")
+            } catch {
+                let nserror = error as NSError
+                NSLog("Unresolved error \(nserror), \(nserror.userInfo)")
+                abort()
             }
+        }
         let managedObjectModel : NSManagedObjectModel = (context.persistentStoreCoordinator?.managedObjectModel)!
         let entities : NSDictionary = managedObjectModel.entitiesByName as NSDictionary
         let entityNames : NSArray = entities.allKeys as NSArray
         return context
     }
-
+    
     
     
     
@@ -174,9 +183,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     //MARK:- Check Online Offline
     func deleteAllCoreData(){
         let cdm = CoreDataManage()
-         cdm.deleteAllDataWithEntityName(entity: "UserData")
-         cdm.deleteAllDataWithEntityName(entity: "FriendOtherDetail")
-         cdm.deleteAllDataWithEntityName(entity: "MessagesDetail")
+        cdm.deleteAllDataWithEntityName(entity: "UserData")
+        cdm.deleteAllDataWithEntityName(entity: "FriendOtherDetail")
+        cdm.deleteAllDataWithEntityName(entity: "MessagesDetail")
     }
     func online(){
         if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as? String{
@@ -184,7 +193,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             objSendMessage.addObserverForStatusUpdateforChatId(chatId: chatGrpId)
             arrDetailData["status"] = "Online"
             arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
-           arrDetailData["senderId"] = senderId
+            arrDetailData["senderId"] = senderId
             arrDetailData["timestamp"] = ""
             arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
             objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData, chatId: chatGrpId, senderId: senderId)
@@ -198,7 +207,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             arrDetailData["senderId"] = senderId
             arrDetailData["timestamp"] = ""
             arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
-             objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData, chatId: chatGrpId, senderId: senderId)
+            objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData, chatId: chatGrpId, senderId: senderId)
         }
     }
     func Typing(){
@@ -212,32 +221,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData, chatId: chatGrpId, senderId: senderId)
         }
     }
-//    func managedObjectContext() -> NSManagedObjectContext {
-//        let context: NSManagedObjectContext? = persistentContainer.viewContext
-//        var error: Error? = nil
-//        if (context?.hasChanges)! && !(((try? context?.save()) != nil)) {
-//            // Replace this implementation with code to handle the error appropriately.
-//            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-//            //      NSLog(@"Unresolved error %@, %@", error, error.userInfo);
-//            abort()
-//        }
-//        let managedObjectModel: NSManagedObjectModel? = context?.persistentStoreCoordinator?.managedObjectModel
-//        let entities = managedObjectModel?.entitiesByName
-//        let entityNames = entities?.keys
-//        //   NSLog(@"All loaded entities are: %@", entityNames);
-//        return context ?? NSManagedObjectContext()
-//    }
-
+    //    func managedObjectContext() -> NSManagedObjectContext {
+    //        let context: NSManagedObjectContext? = persistentContainer.viewContext
+    //        var error: Error? = nil
+    //        if (context?.hasChanges)! && !(((try? context?.save()) != nil)) {
+    //            // Replace this implementation with code to handle the error appropriately.
+    //            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+    //            //      NSLog(@"Unresolved error %@, %@", error, error.userInfo);
+    //            abort()
+    //        }
+    //        let managedObjectModel: NSManagedObjectModel? = context?.persistentStoreCoordinator?.managedObjectModel
+    //        let entities = managedObjectModel?.entitiesByName
+    //        let entityNames = entities?.keys
+    //        //   NSLog(@"All loaded entities are: %@", entityNames);
+    //        return context ?? NSManagedObjectContext()
+    //    }
+    
     //MARK:- Set Root
     func SetMyRootBy() {
         
         let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         
         if UserDefaults.standard.bool(forKey: Constants.UserDefaults.alreadyLogin){
-            let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "interestedScreenVC") as! interestedScreenVC
+            if UserDefaults.standard.object(forKey: Constants.UserDefaults.isOpenFriendViewController) != nil
+            {
+                if "\(UserDefaults.standard.object(forKey: Constants.UserDefaults.isOpenFriendViewController)!)" == "Yes"
+                {
+                    let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                    let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+                    self.IsGoSingle = false
+                    nextVC.selectedIndex = 1
+                    Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+                }
+                else
+                {
+                    let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                    let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "FoFTabBarScreenVC") as! FoFTabBarScreenVC
+                    self.IsGoSingle = true
+                    nextVC.selectedIndex = 1
+                    Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+                }
+            }
+            else
+            {
+                let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "interestedScreenVC") as! interestedScreenVC//as! FoFTabBarScreenVC
+                //            nextVC.selectedIndex = 1
+                self.window?.rootViewController = nextVC
+            }
             
-            self.window?.rootViewController = nextVC
         } else {
             UNUserNotificationCenter.current().removeAllDeliveredNotifications()
             UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
@@ -288,18 +320,92 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
                 replaced.setObject(self.dictionaryByReplacingNullsWithStrings(adict: object as! NSDictionary), forKey: key as! NSCopying)
             }else if let dict = object as? NSArray{
                 for i in 0..<dict.count{
-               // dict[i] = self.dictionaryByReplacingNullsWithStrings(adict: dict[i])
+                    // dict[i] = self.dictionaryByReplacingNullsWithStrings(adict: dict[i])
                 }
             }
             
             
         }
         
-        
-        
-        
-        
     }
+    
+    
+    //MARK:- Webservice
+    func getZomatoKEY(CompletionHandler : @escaping  (Bool) -> ())
+    {
+        Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.getZomatoKEey, param: NSDictionary(), key: "", successStatusCode: 200) { (success, response) in
+            
+            if success == true
+            {
+                if let response_data = response.object(forKey: "response_data") as? NSDictionary
+                {
+                    if let zomato_key = response_data.object(forKey: "zomato_key") as? String
+                    {
+                        self.zomatoAPIuserKEy = zomato_key
+                    }
+                }
+                
+                CompletionHandler(true)
+            }
+            else
+            {
+                if let msg = response.object(forKey: "message") as? String
+                {
+                    self.window?.rootViewController?.view.makeToast(msg)
+                }
+                else
+                {
+                    self.window?.rootViewController?.view.makeToast("Something wento wrong; Please try after sometime")
+                }
+                
+                CompletionHandler(false)
+            }
+            
+        }
+    }
+    
+    
+//    func getUSerPRofileDetail()
+//    {
+//        if let userid = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)
+//        {
+//            let param = ["user_id":"\(userid)"]
+//            
+//            Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.GetUserProfile, param: param as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
+//                
+//                if success == true
+//                {
+//                    if let dataDict = response.object(forKey: "response_data") as? NSDictionary
+//                    {
+//                        self.userDetail = UserDetail.init(dictionary: dataDict as? [AnyHashable : Any])
+//                        UserDefaults.standard.set(dataDict, forKey: Constants.UserDefaults.ProfileData)
+//                        
+//                        if let tastebuds = dataDict.object(forKey: "testbuds") as? NSArray
+//                        {
+//                            UserDefaults.standard.set(tastebuds, forKey: Constants.UserDefaults.MyTestBuds)
+//                            UserDefaults.standard.synchronize()
+//                        }
+//                    }
+//                    
+//                    UserDefaults.standard.synchronize()
+//                }
+//                else
+//                {
+//                    if let msg = response.object(forKey: "message") as? String
+//                    {
+//                        self.window?.rootViewController?.view.makeToast(msg)
+//                    }
+//                    else
+//                    {
+//                        self.getUSerPRofileDetail()
+//                    }
+//                }
+//                
+//                
+//            }
+//        }
+//    }
+    
 }
 
 extension AppDelegate : CLLocationManagerDelegate

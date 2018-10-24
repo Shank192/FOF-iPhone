@@ -6,7 +6,7 @@
 
 import UIKit
 import CoreLocation
-import MBProgressHUD
+
 
 class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UICollectionViewDataSource {
     @IBOutlet weak var collectionViewIntresetedTestBuds: UICollectionView!
@@ -171,10 +171,13 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
             {
                 if let dataDict = response.object(forKey: "response_data") as? NSDictionary
                 {
+                 
                     
-                    UserDefaults.standard.set("\(dataDict)", forKey: Constants.UserDefaults.ProfileData)
+                    self.app.userDetail = UserDetail.init(dictionary: dataDict as? [AnyHashable : Any])
                     
-                    if let tastebuds = dataDict.object(forKey: "tastebuds") as? NSArray
+                    UserDefaults.standard.set(dataDict, forKey: Constants.UserDefaults.ProfileData)
+                    
+                    if let tastebuds = dataDict.object(forKey: "testbuds") as? NSArray
                     {
                         self.MyArrTestBudsData = NSMutableArray(array: tastebuds)
                         UserDefaults.standard.set(tastebuds, forKey: Constants.UserDefaults.MyTestBuds)
@@ -200,9 +203,11 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
             {
                 if let msg = response.object(forKey: "message") as? String
                 {
+                    self.view.makeToast(msg)
                 }
                 else
                 {
+                    self.view.makeToast("Something went to wring. Please try after sometime.")
                 }
             }
             
@@ -324,17 +329,19 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                         {
                             let param = ["user_id":"\(user_id)","latitude":latitude,"longitude":longitude,"city":city]
                             
-                            Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.GetTestBuds, param: param as NSDictionary, key: "", successStatusCode: 200, CompletionHandler: { (success, response) in
+                            Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.GetTestBuds, param: param as NSDictionary, key: "", successStatusCode: 200, CompletionHandler: { (success, response1) in
                                 
                                 UserDefaults.standard.set(city, forKey: Constants.UserDefaults.CurrentCity)
                                 UserDefaults.standard.synchronize()
                                 
                                 if success == true
                                 {
-                                    if let dict = response.object(forKey: "response_data") as? NSDictionary
+                                    if let dict = response1.object(forKey: "response_data") as? NSDictionary
                                     {
-                                        if let dataArray = dict.object(forKey: "tastebuds") as? NSArray
+                                        if let dataArray = dict.object(forKey: "testbuds") as? NSArray
                                         {
+                                            UserDefaults.standard.set(dataArray, forKey: Constants.UserDefaults.AllTestBudsArrayFromYourLocation)
+                                            
                                             self.arrTestBudsData = NSMutableArray(array: dataArray)
                                             
                                             for J in 0..<self.arrTestBudsData.count
@@ -352,13 +359,13 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                                 }
                                 else
                                 {
-                                    if let msg = response.object(forKey: "message") as? String
+                                    if let msg = response1.object(forKey: "message") as? String
                                     {
-                                        
+                                        self.view.makeToast(msg)
                                     }
                                     else
                                     {
-                                        
+                                        self.view.makeToast("Something went to wrong. Please try after sometime")
                                     }
                                 }
                                 
@@ -379,7 +386,14 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                     self.rightNowGetAllTEstBuds = false
                     if let msg = response.object(forKey: "message") as? String
                     {
-                        
+                        if let msg = response.object(forKey: "message") as? String
+                        {
+                            self.view.makeToast(msg)
+                        }
+                        else
+                        {
+                            self.view.makeToast("Something went to wrong. Please try after sometime")
+                        }
                     }
                 }
                 
@@ -494,6 +508,7 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
         if let userid = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)
         {
             var selectedBudsID = ""
+            var ZomatoID = ""
             let selectedBudsArray = NSMutableArray()
             for i in 0..<self.arrTestBudsData.count
             {
@@ -516,6 +531,20 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                                 }
                                 
                             }
+                            
+                            if let zomato_id = dict.object(forKey: "zomato_id")
+                            {
+                                if ZomatoID != ""
+                                {
+                                    ZomatoID = "\(ZomatoID),\(zomato_id)"
+                                }
+                                else
+                                {
+                                    ZomatoID = "\(zomato_id)"
+                                }
+                                
+                            }
+                            
                         }
                     }
                 }
@@ -538,13 +567,18 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
             
             Webservices_Alamofier.postWithURL(serverlink:Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.SaveUserTestbuds, param: param as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
                 
-                UserDefaults.standard.set(selectedBudsID, forKey: Constants.UserDefaults.MySelectedTEstBudsID)
-                UserDefaults.standard.synchronize()
-                
+               
                 MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
                 
                 if success == true
                 {
+                    UserDefaults.standard.set(selectedBudsID, forKey: Constants.UserDefaults.MySelectedTEstBudsID)
+                    
+                    UserDefaults.standard.set(ZomatoID, forKey: Constants.UserDefaults.SelectedZomatoTestBudsID)
+                    
+                    UserDefaults.standard.synchronize()
+                    
+                    
                     if isSingleGO == true
                     {
                         let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
@@ -566,11 +600,11 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                 {
                     if let msg = response.object(forKey: "message") as? String
                     {
-                        
+                        self.view.makeToast(msg)
                     }
                     else
                     {
-                        
+                        self.view.makeToast("Something went to wrong. Please try after sometime.")
                     }
                 }
                 

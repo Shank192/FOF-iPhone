@@ -45,7 +45,11 @@ class photoCollectionViewCell: UICollectionViewCell {
     }
     func initialSetup(){
       if  let str = Constants.GlobalConstants.appDelegate.userDetail.profilepic1 as? String{
-       //self.imgViewMale.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
+        if str != ""
+        {
+//            self.imgViewMale.sd_setImage(with: URL.init(string: str)!, placeholderImage: UIImage.init(named: "male"))
+        }
+       
         }
     }
 }
