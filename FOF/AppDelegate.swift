@@ -46,32 +46,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         })
         return container
     }()
+    
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
-        if launchedBefore  {
-            
-        }
-        else {
-            UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationRestro)
-            UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
-            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
-            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isFriend)
-            UserDefaults.standard.set(true, forKey: "launchedBefore")
-        }
+        
+        
         FirebaseApp.configure()
         GMSServices.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         GMSPlacesClient.provideAPIKey(Constants.GoogleKey.kGoogle_Key)
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         registerRemoteNotification()
-        
-        if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
-        {
-            UserDefaults.standard.set(20000, forKey: Constants.UserDefaults.FilterDistance)
-            UserDefaults.standard.synchronize()
-            
-            
-        }
+      
         
         self.SetMyRootBy()
         
@@ -102,6 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        online()
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
@@ -188,38 +175,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         cdm.deleteAllDataWithEntityName(entity: "MessagesDetail")
     }
     func online(){
-        if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as? String{
-            let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
-            objSendMessage.addObserverForStatusUpdateforChatId(chatId: chatGrpId)
-            arrDetailData["status"] = "Online"
-            arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
-            arrDetailData["senderId"] = senderId
-            arrDetailData["timestamp"] = ""
-            arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
-            objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData, chatId: chatGrpId, senderId: senderId)
-        }
+//        if UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) != nil,let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId)
+//        {
+            if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID){
+                
+//                objSendMessage.addObserverForStatusUpdateforChatId(chatId: chatGrpId)
+                arrDetailData["status"] = "Online"
+                arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
+                arrDetailData["senderId"] = ""//senderId
+                arrDetailData["timestamp"] = ""
+                arrDetailData["recieverId"] = ""//UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
+                objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData,user_id : "\(senderId)")
+            }
+//        }
+
     }
     func offline(){
-        if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as? String{
-            let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
-            arrDetailData["status"] = "Offline"
-            arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
-            arrDetailData["senderId"] = senderId
-            arrDetailData["timestamp"] = ""
-            arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
-            objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData, chatId: chatGrpId, senderId: senderId)
-        }
+        
+            if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID){
+                
+                arrDetailData["status"] = "Offline"
+                arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
+                arrDetailData["senderId"] = ""//senderId
+                arrDetailData["timestamp"] = ""
+                arrDetailData["recieverId"] = ""//UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
+                objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData,user_id : "\(senderId)")
+            }
+        
+        
     }
     func Typing(){
-        if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as? String{
-            let chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String
-            arrDetailData["status"] = "typing..."
-            arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
-            arrDetailData["senderId"] = senderId
-            arrDetailData["timestamp"] = ""
-            arrDetailData["recieverId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
-            objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData, chatId: chatGrpId, senderId: senderId)
-        }
+       
+            if let senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID){
+                
+                arrDetailData["status"] = "typing..."
+                arrDetailData["lastSeen"] = String(describing: setCurrentTimeToTimestamp())
+                arrDetailData["senderId"] = ""//senderId
+                arrDetailData["timestamp"] = ""
+                arrDetailData["recieverId"] = ""//UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverId)
+                objSendMessage.updateMyStatusOnFirebase(mutDictStatusDetail: arrDetailData,user_id : "\(senderId)")
+            }
+        
+        
+
     }
     //    func managedObjectContext() -> NSManagedObjectContext {
     //        let context: NSManagedObjectContext? = persistentContainer.viewContext

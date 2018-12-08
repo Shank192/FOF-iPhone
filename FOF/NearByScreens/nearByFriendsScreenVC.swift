@@ -59,7 +59,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
     
     
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
-    
+    var SearchLocationDict : NSDictionary?
      let app = UIApplication.shared.delegate as! AppDelegate
     
     // MARK: - Life cycle
@@ -110,8 +110,6 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
         {
             print("The style definition could not be loaded: %@", error);
         }
-        
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -128,8 +126,16 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
     }
     @objc func retriveLocation(){
         
+        self.txtFieldLocation.text = ""
+        
         if UserDefaults.standard.bool(forKey: Constants.UserDefaults.isFriend)
         {
+            
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+            
+            latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
+            longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+            
             self.wsSetFriendsList()
         }
         else
@@ -140,27 +146,37 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
             longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
             
             location = CLLocation(latitude: Double(latitude)!, longitude: Double(longitude)!)
-            geocoder.reverseGeocodeLocation(location!, completionHandler: { (placemarks, error) in
-                if error == nil, let placemark = placemarks, !placemark.isEmpty {
-                    self.placemark = placemark.last
-                    self.parsePlacemarks()
-                }
-                else
-                {
-                    if error != nil
-                    {
-//                        self.view.makeToast("\(error!.localizedDescription)")
-                        self.view.makeToast("Something went to wrong with geting your current location. Please try after sometime")
+            if self.SearchLocationDict != nil
+            {
+                txtFieldLocation.text = SearchLocationDict!.object(forKey: "description") as? String
+                
+                getPlaceDetail(googlePlaceID:SearchLocationDict!.object(forKey: "place_id") as! String, location: txtFieldLocation.text!)
+            }
+            else
+            {
+                geocoder.reverseGeocodeLocation(location!, completionHandler: { (placemarks, error) in
+                    if error == nil, let placemark = placemarks, !placemark.isEmpty {
+                        self.placemark = placemark.last
+                        self.parsePlacemarks()
                     }
                     else
                     {
-                        self.view.makeToast("Something went to wrong. Please try after sometime")
+                        if error != nil
+                        {
+                            //                        self.view.makeToast("\(error!.localizedDescription)")
+                            self.view.makeToast("Something went to wrong with geting your current location. Please try after sometime")
+                        }
+                        else
+                        {
+                            self.view.makeToast("Something went to wrong. Please try after sometime")
+                        }
+                        //                    self.retriveLocation()
                     }
-//                    self.retriveLocation()
-                }
-                
-                
-            })
+                    
+                    
+                })
+            }
+
         }
         
         
@@ -187,9 +203,17 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
     func setProfile(str: String , latitude : String,longitude : String){
        // latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
        // longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+        
+        if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
+        {
+            UserDefaults.standard.set("20000", forKey: Constants.UserDefaults.FilterDistance)
+            UserDefaults.standard.synchronize()
+        }
+        
         if let dict = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary,let radius = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance)
         {
            
+            
             if let profileDict = UserDefaults.standard.object(forKey:  Constants.UserDefaults.ProfileData) as? NSDictionary
             {
                 self.app.userDetail = UserDetail.init(dictionary: profileDict as? [AnyHashable : Any])
@@ -204,7 +228,11 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
                 
                 _ = UserDetail.init(dictionary: dict as? [AnyHashable : Any])
                 
-                let dictEditProfilePara = ["user_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"latitude":latitude,"longitude":longitude,"address":"\(str)","search_distance":"\(radius)","search_min_age":"\(search_min_age)","search_max_age":"\(showsearch_max_ageme)","gender":"\(showme)"]
+                var searchDictanceRange = Int("\(radius)") ?? 0
+                
+                searchDictanceRange = searchDictanceRange/1610
+                
+                let dictEditProfilePara = ["user_id":UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!,"latitude":latitude,"longitude":longitude,"address":"\(str)","search_distance":"\(searchDictanceRange)","search_min_age":"\(search_min_age)","search_max_age":"\(showsearch_max_ageme)","gender":"\(showme)"]
                 MBProgressHUD.showAdded(to: self.view, animated: true)
                 
                 Webservices_Alamofier.postWithURL(serverlink: Constants.WebServiceUrl.mainUrl, methodname: Constants.APIName.GetUserSuggestion, param: dictEditProfilePara as NSDictionary, key: "", successStatusCode: 200) { (success, response) in
@@ -226,11 +254,15 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
                             }
                         }
                         
+                        let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
+                        let camera = GMSCameraPosition.camera(withTarget: userLoacation, zoom: 14)
+                        self.aMapView.camera = camera
                         self.setFriendOrSuggestArray()
                     
                     }
                     else
                     {
+                        MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
                         if let msg = response.object(forKey: "message") as? String
                         {
                             self.view.makeToast(msg)
@@ -238,7 +270,17 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
                         else
                         
                         {
-                            self.view.makeToast("Something went to wrong. Please try after sometime.")
+                            
+                            let alert = UIAlertController.init(title: "FOF", message: "Something went to wrong. Please try after sometime.", preferredStyle: .alert)
+                            let retry = UIAlertAction(title: "Retry", style: .default, handler: { (act) in
+                                self.setProfile(str: str, latitude: latitude, longitude: longitude)
+                            })
+                            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                            
+                            alert.addAction(retry)
+                            alert.addAction(cancel)
+                            self.present(alert, animated: true, completion: nil)
+                            
                         }
                     }
                         
@@ -336,10 +378,7 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
     
     func setmap(){
         
-                
-        let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
-        let camera = GMSCameraPosition.camera(withTarget: userLoacation, zoom: 14)
-        aMapView.camera = camera
+        
         if ArrayFriendData.count > 0 {
         let arrBuckets = NSMutableArray()
         let arrPins = NSMutableArray()
@@ -394,7 +433,34 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
     {
-        textField.resignFirstResponder()
+        if self.SearchLocationDict != nil
+        {
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
+            
+            txtFieldLocation.text = SearchLocationDict!.object(forKey: "description") as? String
+            
+            nslcHightOfButton.constant = 10
+            btnCancelOut.setTitle("", for: .normal)
+            btnSearchOut.setTitle("", for: .normal)
+            txtFieldLocation.resignFirstResponder()
+            self.tblViewAddress.isHidden = true
+            
+            getPlaceDetail(googlePlaceID:SearchLocationDict!.object(forKey: "place_id") as! String, location: txtFieldLocation.text!)
+            
+            txtFieldLocation.resignFirstResponder()
+        }
+        else
+        {
+            Constants.GlobalConstants.appDelegate.window?.rootViewController?.view.makeToast("Please search proper place.")
+            
+            nslcHightOfButton.constant = 10
+            btnCancelOut.setTitle("", for: .normal)
+            btnSearchOut.setTitle("", for: .normal)
+            txtFieldLocation.resignFirstResponder()
+            self.tblViewAddress.isHidden = true
+            
+            txtFieldLocation.resignFirstResponder()
+        }
         return true
     }
      // MARK: - Button Actions
@@ -419,12 +485,46 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
     @IBAction func btnClearAct(_ sender: Any) {
         txtFieldLocation.text = ""
         tblViewAddress.isHidden = true
+        self.SearchLocationDict = nil
+        nslcHightOfButton.constant = 10
+        btnCancelOut.setTitle("", for: .normal)
+        btnSearchOut.setTitle("", for: .normal)
+        txtFieldLocation.resignFirstResponder()
+        tblViewAddress.isHidden = true
         
     }
     
     @IBAction func btnSearchAct(_ sender: Any) {
       
-        txtFieldLocation.resignFirstResponder()  
+        if self.SearchLocationDict != nil
+        {
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
+            
+            txtFieldLocation.text = SearchLocationDict!.object(forKey: "description") as? String
+            
+            nslcHightOfButton.constant = 10
+            btnCancelOut.setTitle("", for: .normal)
+            btnSearchOut.setTitle("", for: .normal)
+            txtFieldLocation.resignFirstResponder()
+            self.tblViewAddress.isHidden = true
+            
+            getPlaceDetail(googlePlaceID:SearchLocationDict!.object(forKey: "place_id") as! String, location: txtFieldLocation.text!)
+            
+            txtFieldLocation.resignFirstResponder()
+        }
+        else
+        {
+            Constants.GlobalConstants.appDelegate.window?.rootViewController?.view.makeToast("Please select a Location from the list.")
+            
+            nslcHightOfButton.constant = 10
+            btnCancelOut.setTitle("", for: .normal)
+            btnSearchOut.setTitle("", for: .normal)
+            txtFieldLocation.resignFirstResponder()
+            self.tblViewAddress.isHidden = true
+            
+            txtFieldLocation.resignFirstResponder()
+        }
+       
     }
     
     @IBAction func btnFoodAct(_ sender: Any) {
@@ -481,6 +581,12 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
         }
         let objChat = self.storyboard?.instantiateViewController(withIdentifier: "conversationScreenVC") as! conversationScreenVC
         objChat.dictUserDetail = dict
+        
+        if let chatid = dict.object(forKey: "request_id")
+        {
+            objChat.chatGrpId = "\(chatid)"
+        }
+        
         if dict.object(forKey: "friendstatus") as! String == "Friend"{
             objChat.isFreind = true
         }else{
@@ -556,6 +662,25 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
         let obj = getFriendsScreen()
         obj.wsSetFriendsList { (isNewUser, arrFrndData) in
             print(isNewUser,arrFrndData)
+            
+            self.ArrayFriendData.removeAllObjects()
+            self.ArrayAllFriendData.removeAllObjects()
+            
+            for i in arrFrndData
+            {
+                let dict = i as! NSDictionary
+                if let detailsarry = dict.object(forKey: "details") as? NSArray
+                {
+                    if detailsarry.count > 0,let detail = detailsarry.object(at: 0) as? NSDictionary
+                    {
+                        self.ArrayFriendData.add(detail)
+                        self.ArrayAllFriendData.add(detail)
+                    }
+                }
+                self.setFriendOrSuggestArray()
+
+            }
+            
         }
 
     }
@@ -638,7 +763,8 @@ class nearByFriendsScreenVC: UIViewController,GMSMapViewDelegate,UITextFieldDele
     func setFriendOrSuggestArray()
     {
         MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-
+        self.aMapView.clear()
+        
         if self.ArrayFriendData.count != 0
         {
             for i in 0..<self.ArrayFriendData.count
@@ -737,12 +863,28 @@ extension nearByFriendsScreenVC : UITableViewDataSource, UITableViewDelegate {
         
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
-
-        txtFieldLocation.text = (arrForAddress.object(at: indexPath.row) as AnyObject).object(forKey: "description") as? String
-        getPlaceDetail(googlePlaceID:(arrForAddress.object(at: indexPath.row)as AnyObject).object(forKey: "place_id") as! String, location: txtFieldLocation.text!)
-                self.tblViewAddress.isHidden = true
-                txtFieldLocation.resignFirstResponder()
+        
+        if let dict = self.arrForAddress.object(at: indexPath.row) as? NSDictionary
+        {
+            self.SearchLocationDict = dict
+            
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isCurrentLocationFrnd)
+            
+            txtFieldLocation.text = SearchLocationDict!.object(forKey: "description") as? String
+            
+            nslcHightOfButton.constant = 10
+            btnCancelOut.setTitle("", for: .normal)
+            btnSearchOut.setTitle("", for: .normal)
+            txtFieldLocation.resignFirstResponder()
+            tblViewAddress.isHidden = true
+            
+            getPlaceDetail(googlePlaceID:SearchLocationDict!.object(forKey: "place_id") as! String, location: txtFieldLocation.text!)
+            self.tblViewAddress.isHidden = true
+            txtFieldLocation.resignFirstResponder()
+            
+        }
+        
+       
     }
 }
 extension nearByFriendsScreenVC : UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout

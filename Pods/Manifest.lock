@@ -44,13 +44,13 @@ PODS:
   - FirebaseAnalytics (5.0.1):
     - FirebaseCore (~> 5.0)
     - FirebaseInstanceID (~> 3.0)
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
     - nanopb (~> 0.3)
   - FirebaseAuth (5.0.2):
     - FirebaseCore (~> 5.0)
     - GTMSessionFetcher/Core (~> 1.1)
   - FirebaseCore (5.0.6):
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
   - FirebaseDatabase (5.0.2):
     - FirebaseCore (~> 5.0)
     - leveldb-library (~> 1.18)
@@ -66,7 +66,7 @@ PODS:
     - FirebaseAnalytics (~> 5.0)
     - FirebaseCore (~> 5.0)
     - FirebaseInstanceID (~> 3.0)
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
     - Protobuf (~> 3.5)
   - FirebaseStorage (3.0.0):
     - FirebaseCore (~> 5.0)
@@ -84,7 +84,7 @@ PODS:
   - GoogleToolboxForMac/Defines (2.1.4)
   - GoogleToolboxForMac/Logger (2.1.4):
     - GoogleToolboxForMac/Defines (= 2.1.4)
-  - GoogleToolboxForMac/NSData+zlib (2.1.4):
+  - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
     - GoogleToolboxForMac/Defines (= 2.1.4)
   - GrowingTextView (0.5.6)
   - GTMSessionFetcher/Core (1.2.0)
@@ -96,6 +96,9 @@ PODS:
   - nanopb/decode (0.3.8)
   - nanopb/encode (0.3.8)
   - Protobuf (3.6.0)
+  - UberCore (0.10.0)
+  - UberRides (0.10.0):
+    - UberCore
 
 DEPENDENCIES:
   - Alamofire (~> 4.5)
@@ -111,6 +114,38 @@ DEPENDENCIES:
   - GooglePlaces
   - GrowingTextView
   - MBCircularProgressBar
+  - UberRides
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - Bolts
+    - FacebookCore
+    - FacebookLogin
+    - FBSDKCoreKit
+    - FBSDKLoginKit
+    - Firebase
+    - FirebaseABTesting
+    - FirebaseAnalytics
+    - FirebaseAuth
+    - FirebaseCore
+    - FirebaseDatabase
+    - FirebaseInstanceID
+    - FirebaseMessaging
+    - FirebaseRemoteConfig
+    - FirebaseStorage
+    - GoogleMaps
+    - GooglePlacePicker
+    - GooglePlaces
+    - GoogleToolboxForMac
+    - GrowingTextView
+    - GTMSessionFetcher
+    - leveldb-library
+    - MBCircularProgressBar
+    - nanopb
+    - Protobuf
+    - UberCore
+    - UberRides
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
@@ -139,7 +174,9 @@ SPEC CHECKSUMS:
   MBCircularProgressBar: 0b795b722a5eb5b0923822f90474e2576a1a7855
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   Protobuf: 0fc0ad8bec688b2a3017a139953e01374fedbd5f
+  UberCore: 512950407dadc8045a583e4a509da2750ae7dc21
+  UberRides: cc6d7c5232966e45229dda1534106b33e379dfbe
 
-PODFILE CHECKSUM: db7f54e8769dd78940aec1c0a4dcdc534d511fde
+PODFILE CHECKSUM: be1e88b43d5848b132174b37938c9ef70c765d42
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.3

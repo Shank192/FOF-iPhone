@@ -42,6 +42,7 @@ class CoreDataManage: NSObject {
         muteDict.removeObject(forKey: "email")
         muteDict.removeObject(forKey: "address")
         muteDict.removeObject(forKey: "status")
+        muteDict.removeObject(forKey: "friendstatus")
         let keys = muteDict.allKeys as NSArray
        
         for i in keys{
@@ -95,6 +96,7 @@ class CoreDataManage: NSObject {
             print("Error fetching Item objects: \(error.localizedDescription), \(error.userInfo)")
         }
     let mutArrFatchedData = NSMutableArray.init(array: arrFetchedData)
+        
         for i in 0..<arrUdetails.count{
            // let chatId = arrUdetails[i]["id"] as! String
             let dict = arrUdetails[i] as! NSDictionary
@@ -109,7 +111,7 @@ class CoreDataManage: NSObject {
                     let friendOtherDetail = arrFetchedData.object(at: i) as! FriendOtherDetail
                     let dictDetail = arrUdetails.object(at: i) as! NSDictionary
                     friendOtherDetail.updatedat = dictDetail.object(forKey: "updatedat") as? String
-                    friendOtherDetail.status = dictDetail.object(forKey: "status") as? String
+                    friendOtherDetail.status = dictDetail.object(forKey: "friendstatus") as? String
                     if friendOtherDetail.lastmsgtimestamp == nil{
                         let lastmsg : NSDictionary = fetchLastMessageWithOtherUserId(otherId: friendOtherDetail.friendId as! NSString)
                     }
@@ -242,13 +244,22 @@ class CoreDataManage: NSObject {
         let error : NSError? = nil
         var fetchedFriends = NSArray()
         do {
-            fetchedFriends = try context.execute(fetchRequest) as! NSArray
+            let res = try context.execute(fetchRequest)
+            if let resArray = res as? NSArray
+            {
+                fetchedFriends = resArray
+            }
         } catch let error as NSError {
             print("Error fetching Item objects: \(error.localizedDescription), \(error.userInfo)")
         }
         var fetchedMsgs = NSArray()
         do {
-            fetchedMsgs = try context.execute(fetchMessagesReq) as! NSArray
+            let res = try context.execute(fetchMessagesReq)
+            
+            if let resArray = res as? NSArray
+            {
+                fetchedMsgs = resArray
+            }
         } catch let error as NSError {
             print("Error fetching Item objects: \(error.localizedDescription), \(error.userInfo)")
         }

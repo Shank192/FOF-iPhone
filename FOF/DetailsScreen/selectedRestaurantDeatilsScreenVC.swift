@@ -5,7 +5,7 @@
 //
 
 import UIKit
-
+import UberRides
 
 
 class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout {
@@ -37,22 +37,44 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     @IBOutlet weak var ViewNoReview: UIView!
     @IBOutlet weak var btnReadAllReview: UIButton!
     
+    var usercurrentLocation : CLLocation?
+    
     let app = UIApplication.shared.delegate as! AppDelegate
+    
+    var isFromChatScreen = false
     
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(arrOfRestaurantData)
+        print(arrOfRestaurantData as NSDictionary)
         
-        if let CarFirst = self.arrOfRestaurantData["CarFirst"] as? NSDictionary
+        if isFromChatScreen == true
         {
-            if let Difference = CarFirst.object(forKey: "Difference") as? String
+            if let isSelected = arrOfRestaurantData["isSelected"] as? NSDictionary
             {
-                self.btnTimeOut.setTitle(" \(Difference)", for: .normal)
+                if let timeToReach = isSelected.object(forKey: "timeToReach")
+                {
+                    self.btnTimeOut.setTitle(" \(timeToReach)", for: .normal)
+                }
             }
-            
         }
+        else
+        {
+            if let CarFirst = self.arrOfRestaurantData["CarFirst"] as? NSDictionary
+            {
+                if let Difference = CarFirst.object(forKey: "Difference") as? String
+                {
+                    self.btnTimeOut.setTitle(" \(Difference)", for: .normal)
+                }
+                
+            }
+            else
+            {
+                self.btnTimeOut.setTitle( " \(self.strTime)", for: .normal)
+            }
+        }
+        
         
         self.GetRestuarantReview()
         
@@ -101,8 +123,31 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
     }
     @IBAction func btnInviteFrndAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "chatScreenVC") as! chatScreenVC
+        obj.restData = NSMutableDictionary(dictionary: arrOfRestaurantData)
         self.navigationController?.pushViewController(obj, animated: true)
     }
+    
+    @IBAction func btnActionUberRide(_ sender: Any)
+    {
+        if usercurrentLocation != nil,let restDict = arrOfRestaurantData["isSelected"] as? NSDictionary,let loc = restDict.object(forKey: "location") as? NSDictionary,let lat = loc.object(forKey: "latitude"),let longi = loc.object(forKey: "longitude"),"\(lat)" != "","\(longi)" != "",let address = loc.object(forKey: "address") as? String,let name = restDict.object(forKey: "name") as? String
+        {
+            let builder = RideParametersBuilder()
+            let pickupLocation = self.usercurrentLocation!
+            let dropoffLocation = CLLocation(latitude: Double("\(lat)")!, longitude: Double("\(longi)")!)
+            builder.pickupLocation = pickupLocation
+            builder.dropoffLocation = dropoffLocation
+            builder.dropoffNickname = name
+            builder.dropoffAddress = address
+            let rideParameters = builder.build()
+            
+            let deeplink = RequestDeeplink(rideParameters: rideParameters, fallbackType: .mobileWeb)
+            deeplink.execute()
+        }
+        
+    }
+    
+    
+    
     
     // MARK: - Set Details
     func startTimer() {
@@ -195,19 +240,45 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
        self.lblRestaurantWebsite.isHidden = true
         self.lblRestaurantNumber.isHidden = true
         
-        if let addDict = dict.object(forKey: "location") as? NSDictionary
+        if let name = dict.object(forKey: "name") as? String
         {
-            if let address = addDict.object(forKey: "address") as? String
+            self.lblRestaurantName.text = name
+        }
+        
+        
+        if self.isFromChatScreen == true
+        {
+            if let formatted_address = dict.object(forKey: "formatted_address") as? String
             {
-                self.lblRestaurantAddress.text = address
+                
+                self.lblRestaurantAddress.text = formatted_address
+                
+            }
+            
+            if let photoReference = dict.object(forKey: "photoReference") as? String
+            {
+                self.arrOfImages.append(photoReference)
             }
         }
-        
-        
-        if let featured_image = dict.object(forKey: "thumb") as? String
+        else
         {
-            self.arrOfImages.append(featured_image)
+            if let addDict = dict.object(forKey: "location") as? NSDictionary
+            {
+                if let address = addDict.object(forKey: "address") as? String
+                {
+                    self.lblRestaurantAddress.text = address
+                }
+            }
+            
+            if let featured_image = dict.object(forKey: "thumb") as? String
+            {
+                self.arrOfImages.append(featured_image)
+            }
         }
+
+        
+        
+        
         
         self.lblNumberOfImages.text = "\(1)/\(self.arrOfImages.count)"
         
@@ -254,8 +325,24 @@ class selectedRestaurantDeatilsScreenVC: UIViewController,UICollectionViewDataSo
         {
             if let dataDict = self.arrOfRestaurantData["isSelected"] as? NSDictionary
             {
-                if let restID = dataDict.object(forKey: "id")
+                var restID = ""
+                if isFromChatScreen == true
                 {
+                    if let restid = dataDict.object(forKey: "restid")
+                    {
+                        restID = "\(restid)"
+                    }
+                }
+                else
+                {
+                    if let restid = dataDict.object(forKey: "id")
+                    {
+                        restID = "\(restid)"
+                    }
+                }
+                if restID != ""
+                {
+                    
                     let mainLink = "https://developers.zomato.com/api/v2.1/reviews?res_id=\(restID)&start=0&count=10"
                     MBProgressHUD.showAdded(to: self.view, animated: true)
                     

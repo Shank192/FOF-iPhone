@@ -13,7 +13,7 @@ pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'FacebookLogin'
 pod 'GrowingTextView'
-
+pod 'UberRides'
 
 #Firebase
 pod 'Firebase/Database'

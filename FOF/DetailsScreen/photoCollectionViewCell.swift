@@ -20,6 +20,7 @@ class photoCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var viewBlure: UIView!
     @IBOutlet weak var viewBack: UIView!
     //photoEdit
+    @IBOutlet weak var btnEditPhoto: UIButton!
     @IBOutlet weak var imgViewMale: UIImageView!
     //SentRequest
     

@@ -12,6 +12,8 @@ import CoreLocation
 class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {
     
     @IBOutlet weak var testBudsCollectionView: UICollectionView!
+    @IBOutlet weak var btnSaveTestbuds: UIButton!
+    
     var arrTestBudsData = NSMutableArray()
     var MyArrTestBudsData = NSMutableArray()
     var userLocation : CLLocationCoordinate2D?
@@ -23,6 +25,9 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
     var rightNowGetAllTEstBuds = false
     var sizingCell = testBudsCollectionViewCell()
     var size = CGFloat()
+    
+    var isSave = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -33,7 +38,14 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
             self.GetMyTestBuds(param as NSDictionary)
         }
         
-        
+        if isSave == true
+        {
+            self.btnSaveTestbuds.setTitle("Save Testbuds", for: .normal)
+        }
+        else
+        {
+            self.btnSaveTestbuds.setTitle("GRAB A BITE", for: .normal)
+        }
     }
 
     //MARK:- Custome method
@@ -199,8 +211,6 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
     
     func showLocationEnableAlert()
     {
-        
-        
         let alert = UIAlertController(title: "FOF needs your location", message: "Please enable your location to get option of your ionterested in", preferredStyle: .alert)
         let cancel = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
         let setting = UIAlertAction.init(title: "Go to setting", style: .default) { (act) in
@@ -399,7 +409,7 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
                                 
                             }
                             
-                            if let zomato_id = dict.object(forKey: "zomato_id")
+                            if let zomato_id = dict.object(forKey: "name")//zomato_id
                             {
                                 if ZomatoID != ""
                                 {
@@ -445,7 +455,7 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
                             {
                                 if let dict = dataArray.object(at: 0) as? NSDictionary
                                 {
-                                    self.app.userDetail = UserDetail.modelObject(with: dict as! [AnyHashable : Any])
+                                    self.app.userDetail = UserDetail.modelObject(with: (dict as! [AnyHashable : Any]))
                                     
                                     
                                 }
@@ -457,18 +467,13 @@ class testBudsScreenVC: UIViewController,UICollectionViewDelegate,UICollectionVi
                     }
                     else
                     {
-                        if let settings = response.object(forKey: "settings") as? NSDictionary
+                        if let msg = response.object(forKey: "message") as? String
                         {
-                            if let  errormessage = settings.object(forKey:"errormessage") as? String
-                            {
-                                if errormessage ==  "invalid session"
-                                {
-                                    UserDefaults.standard.set(false, forKey: Constants.UserDefaults.alreadyLogin)
-                                    UserDefaults.standard.synchronize()
-                                    
-                                    self.app.SetMyRootBy()
-                                }
-                            }
+                            self.view.makeToast(msg)
+                        }
+                        else
+                        {
+                            self.view.makeToast("Something went to wrong. Please try after sometime.")
                         }
                     }
                     

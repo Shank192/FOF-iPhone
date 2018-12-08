@@ -151,7 +151,7 @@ class loginScreenVC: UIViewController {
                 
                 
                 UserDefaults.standard.set(true, forKey: Constants.UserDefaults.alreadyLogin)
-               
+               UserDefaults.standard.synchronize()
                 
                 let obj = self.storyboard?.instantiateViewController(withIdentifier: "interestedScreenVC")  as! interestedScreenVC //as! testBudsScreenVC
                 if self.userCurrentLocation != nil

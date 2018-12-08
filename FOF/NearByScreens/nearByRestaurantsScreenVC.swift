@@ -91,17 +91,19 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
       
         self.objofFilter = (self.storyboard?.instantiateViewController(withIdentifier: "filterScreenVC") as! filterScreenVC)
 
+        
+        
     }
     @objc func setLocation(){
         
-        if self.currebntlyRetriveRestuarant == false
+        if self.currebntlyRetriveRestuarant == false && self.SearchLocationDict == nil
         {
             latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
             longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
             MBProgressHUD.showAdded(to: self.view, animated: true)
             retriveDataForRestaurant(latitude: latitude, longitude: longitude)
         }
-       
+        
         
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -111,7 +113,17 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         self.constSearchTestbudsViewHeight.constant = 0
         btnSearchOut.contentHorizontalAlignment = .right
         btnCancelOut.contentHorizontalAlignment = .left
-        txtFieldLocation.text = ""
+        if self.SearchLocationDict != nil
+        {
+            if let description = self.SearchLocationDict?.object(forKey: "description") as? String
+            {
+                self.txtFieldLocation.text = description
+            }
+        }
+        else
+        {
+            self.txtFieldLocation.text = ""
+        }
         
         UserDefaults.standard.set("No", forKey: Constants.UserDefaults.isOpenFriendViewController)
         UserDefaults.standard.synchronize()
@@ -140,9 +152,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         }
     }
     func setmap(){
-        let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
-        let camera = GMSCameraPosition.camera(withTarget: userLoacation, zoom: 14)
-        aMapView.camera = camera
+       
         if arrForRestaurantData.count > 0{
         let arrBuckets = NSMutableArray()
         let arrPins = NSMutableArray()
@@ -254,6 +264,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     @IBAction func btnCurrentLocationAct(_ sender: Any) {
         let obj = nearByRestaurantsScreenVC()
         txtFieldLocation.text = ""
+        self.SearchLocationDict = nil
        Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj) 
 //          UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isCurrentLocationRestro)
     }
@@ -275,6 +286,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         }
         else if self.SearchLocationDict != nil
         {
+            MBProgressHUD.showAdded(to: self.view, animated: true)
              self.getPlaceDetail(googlePlaceID: self.SearchLocationDict!.object(forKey: "place_id") as! String)
         }
         
@@ -313,14 +325,13 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
             
         }
         
-        self.SearchLocationDict = nil
-        self.SearchTestbudsDict = nil
-        
-        
-        
     }
     @IBAction func btnFoodAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "foodSearchScreenVC") as! foodSearchScreenVC
+        if self.SearchLocationDict != nil
+        {
+            obj.searchLocatioData = self.SearchLocationDict
+        }
         self.navigationController?.pushViewController(obj, animated: false)
     }
     
@@ -371,109 +382,138 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
     }
     func retriveDataForRestaurant(latitude : String , longitude : String){
         
-        if self.app.zomatoAPIuserKEy != nil
-        {
-            if let mytestBudsID = UserDefaults.standard.object(forKey: Constants.UserDefaults.SelectedZomatoTestBudsID),let radius = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance),self.currebntlyRetriveRestuarant == false
-            {
-                
-                let mainLink = "https://developers.zomato.com/api/v2.1/search?start=0&count=30&lat=\(latitude)&lon=\(longitude)&radius=\(radius)&cuisines=\(mytestBudsID)"
-                self.currebntlyRetriveRestuarant = true
-                Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy!, successStatusCode: 200) { (success, response) in
-                    self.currebntlyRetriveRestuarant = false
-                    if success == true
-                    {
-                        if let restaurant = response.object(forKey: "restaurants") as? NSArray
-                        {
-                            
-                            if restaurant.count != 0
-                            {
-                                let openRest = NSMutableArray()
-                                let closeRest = NSMutableArray()
-                                
-                                for i in 0..<restaurant.count
-                                {
-                                    if let restDict = restaurant.object(at: i) as? NSDictionary
-                                    {
-                                        if let dict = restDict.object(forKey: "restaurant") as? NSDictionary
-                                        {
-                                            if let is_delivering_now = dict.object(forKey: "is_delivering_now") {
-                                                if "\(is_delivering_now)" == "1"{
-                                                    openRest.add(restDict)
-                                                }else{
-                                                    closeRest.add(restDict)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                openRest.addObjects(from: closeRest as! [Any])
-                                
-                                self.arrForRestaurantData = openRest as! [[String : AnyObject]]
-                                self.arrForAllRestaurantData = openRest as! [[String : AnyObject]]
-                                self.retriveTimeDataForRestaurantByCar(latitude : latitude , longitude : longitude)
-                            }
-                            else
-                            {
-                                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-                                self.app.window?.rootViewController?.view.makeToast("Current no restuarant available in your area.")
-                            }
-                            
-                        }
-                        
-                        
-                        self.setmap()
-                        // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-                        
-                    }
-                    else
-                    {
-                        MBProgressHUD.showAdded(to: self.view, animated: true)
-                        if let msg = response.object(forKey: "message") as? String
-                        {
-                            self.view.makeToast(msg)
-                        }
-                        else
-                        {
-                            self.view.makeToast("Something went to wrong. Please try after sometime.")
-                        }
-                        
-                        print("error : \(response)")
-                    }
-                    
-                }
-                
-                
-                
-            }
-        }
-        else
-        {
-            self.app.getZomatoKEY { (success) in
-                
-                if success == true
-                {
-                    self.retriveDataForRestaurant(latitude: latitude, longitude: longitude)
-                }
-            }
-        }
-
-        
-//            MBProgressHUD.showAdded(to: self.view, animated: true)
+//        if self.app.zomatoAPIuserKEy != nil
+//        {
+//            if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
+//            {
+//                UserDefaults.standard.set("20000", forKey: Constants.UserDefaults.FilterDistance)
+//                UserDefaults.standard.synchronize()
+//            }
 //
-//            var myUrl = String()
-//            myUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(latitude),\(longitude)&radius=20000&type=\("restaurant")&key=\(Constants.GoogleKey.kGoogle_Key)"
-//            WebService.CallRequestUrl(myUrl) { (success, response) -> () in
-//                print(response)
-//                if success == true {
-//                    let token = response["next_page_token"] as? String
-//                    let arr = response["results"]! as! NSArray
-//                    self.arrForRestaurantData = arr as! [[String : AnyObject]]
-//                    print(token as Any)
-//                    self.retriveTimeDataForRestaurantByCar(latitude : latitude , longitude : longitude)
-//                    self.setmap()
-//                   // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
-//                }}
+//            if let mytestBudsID = UserDefaults.standard.object(forKey: Constants.UserDefaults.SelectedZomatoTestBudsID),let radius = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance),self.currebntlyRetriveRestuarant == false
+//            {
+//
+//                let mainLink = "https://developers.zomato.com/api/v2.1/search?start=0&count=30&lat=\(latitude)&lon=\(longitude)&radius=\(radius)&cuisines=\(mytestBudsID)"
+//                self.currebntlyRetriveRestuarant = true
+//                Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy!, successStatusCode: 200) { (success, response) in
+//                    self.currebntlyRetriveRestuarant = false
+//                    if success == true
+//                    {
+//                        if let restaurant = response.object(forKey: "restaurants") as? NSArray
+//                        {
+//
+//                            if restaurant.count != 0
+//                            {
+//                                let openRest = NSMutableArray()
+//                                let closeRest = NSMutableArray()
+//
+//                                for i in 0..<restaurant.count
+//                                {
+//                                    if let restDict = restaurant.object(at: i) as? NSDictionary
+//                                    {
+//                                        if let dict = restDict.object(forKey: "restaurant") as? NSDictionary
+//                                        {
+//                                            if let is_delivering_now = dict.object(forKey: "is_delivering_now") {
+//                                                if "\(is_delivering_now)" == "1"{
+//                                                    openRest.add(restDict)
+//                                                }else{
+//                                                    closeRest.add(restDict)
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//
+//                                openRest.addObjects(from: closeRest as! [Any])
+//
+//                                self.arrForRestaurantData = openRest as! [[String : AnyObject]]
+//                                self.arrForAllRestaurantData = openRest as! [[String : AnyObject]]
+//                                self.aMapView.clear()
+//                                self.retriveTimeDataForRestaurantByCar(latitude : latitude , longitude : longitude)
+//                            }
+//                            else
+//                            {
+//                                MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+//                                self.app.window?.rootViewController?.view.makeToast("Current no restuarant available in your area.")
+//                            }
+//
+//                        }
+//
+//                        let userLoacation = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude)!, longitude: CLLocationDegrees(longitude)!)
+//                        let camera = GMSCameraPosition.camera(withTarget: userLoacation, zoom: 14)
+//                        self.aMapView.camera = camera
+//                        self.setmap()
+//                        // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+//
+//                    }
+//                    else
+//                    {
+//                        MBProgressHUD.showAdded(to: self.view, animated: true)
+//                        if let msg = response.object(forKey: "message") as? String
+//                        {
+//                            self.view.makeToast(msg)
+//                        }
+//                        else
+//                        {
+//                            self.view.makeToast("Something went to wrong. Please try after sometime.")
+//                        }
+//
+//                        print("error : \(response)")
+//                    }
+//
+//                }
+//
+//
+//
+//            }
+//            else
+//            {
+//                let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//                let nextVC  = mainStoryboard.instantiateViewController(withIdentifier: "interestedScreenVC") as! interestedScreenVC
+//
+//                Constants.GlobalConstants.appDelegate.window?.rootViewController = nextVC
+//            }
+//        }
+//        else
+//        {
+//            self.currebntlyRetriveRestuarant = true
+//            self.app.getZomatoKEY { (success) in
+//                self.currebntlyRetriveRestuarant = false
+//                if success == true
+//                {
+//                    self.retriveDataForRestaurant(latitude: latitude, longitude: longitude)
+//                }
+//            }
+//        }
+        
+        
+        if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
+        {
+            UserDefaults.standard.set("20000", forKey: Constants.UserDefaults.FilterDistance)
+            UserDefaults.standard.synchronize()
+        }
+        
+        if let mytestBudsID = UserDefaults.standard.object(forKey: Constants.UserDefaults.SelectedZomatoTestBudsID),let dist = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance)
+        {
+            MBProgressHUD.showAdded(to: self.view, animated: true)
+            print("test buds :- \(mytestBudsID), Distance :- \(dist)")
+            var myUrl = String()
+            myUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=\(latitude),\(longitude)&radius=\(dist)&type=\("restaurant")&keyword=\(mytestBudsID)&key=\(Constants.GoogleKey.kGoogle_Key)"
+            WebService.CallRequestUrl(myUrl) { (success, response) -> () in
+                print(response)
+                if success == true {
+                    let token = response["next_page_token"] as? String
+                    let arr = response["results"]! as! NSArray
+                    self.arrForRestaurantData = arr as! [[String : AnyObject]]
+                    self.arrForAllRestaurantData = arr   as! [[String : AnyObject]]
+                    print(token as Any)
+                    self.retriveTimeDataForRestaurantByCar(latitude : latitude , longitude : longitude)
+                    self.setmap()
+                    // MBProgressHUD.hideAllHUDs(for: self.view, animated: true)
+                }}
+        }
+        
+
     }
     func retriveTimeDataForRestaurantByCar(latitude : String , longitude : String){
         MBProgressHUD.showAdded(to: self.view, animated: true)
@@ -492,13 +532,13 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
                 
                 self.arrDuration.add(NSDictionary())
                 
-//                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lat")! as AnyObject).doubleValue)!)
+                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lat")! as AnyObject).doubleValue)!)
+
+                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lng")! as AnyObject).doubleValue)!)
+                
+//                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "restaurant") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "latitude")! as AnyObject).doubleValue)!)
 //
-//                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "geometry") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "lng")! as AnyObject).doubleValue)!)
-                
-                let latOfPlace : String = String(format: "%f", ((((dict.object(forKey: "restaurant") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "latitude")! as AnyObject).doubleValue)!)
-                
-                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "restaurant") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "longitude")! as AnyObject).doubleValue)!)
+//                let longOfPlace : String = String(format: "%f", ((((dict.object(forKey: "restaurant") as AnyObject).object(forKey: "location") as AnyObject).object(forKey: "longitude")! as AnyObject).doubleValue)!)
                 
                 
                 var firstStartLat = ""
@@ -527,7 +567,7 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
                                                     myData.setObject(dict, forKey: "CarFirst" as NSCopying)
                                                     self.arrDuration.replaceObject(at: index, with: myData)
                                                     self.perform(#selector(self.tempFuncForDelay), with: nil, afterDelay: 2)
-
+                                                    
                                                 }
                                             }
                                         }
@@ -618,83 +658,38 @@ class nearByRestaurantsScreenVC: UIViewController,UICollectionViewDelegate,UICol
         cell.viewBack.layer.shadowOffset = CGSize.zero
         cell.viewBack.layer.shadowRadius = 3.0
         cell.viewBack.layer.shadowColor = UIColor.lightGray.cgColor
-        print(arrForRestaurantData[indexPath.row])
-        
-        if let restDict = arrForRestaurantData[indexPath.row]["restaurant"] as? [String : AnyObject]
-        {
-            cell.lblRestroName.text = restDict["name"] as? String
-            
-            
-            if let is_delivering_now = restDict["is_delivering_now"] {
-                if "\(is_delivering_now)" == "1"{
-                    cell.lblOpenOrClose.text = "Open"
-                }else{
-                    cell.lblOpenOrClose.text = "Close"
-                }
-                
-            }else{
-                cell.lblOpenOrClose.text = "Open"
-            }
-
-            if let dict = restDict["location"] as? NSDictionary
-            {
-                if let address = dict.object(forKey: "address") as? String
-                {
-                    cell.lblDistanceFromRestro.setTitle(address, for: .normal)
-                }
-                
-            }
-            
-            
-            
-            if let photosstr = restDict["thumb"] as? String{
-                
-                let url = URL(string: photosstr)
-                cell.imgViewRestaurants.sd_setImage(with: url, placeholderImage: UIImage(named: "placeHolderRestraunt"), options: .retryFailed)
-                
-            }
-            
-        }
-        
-        
+        cell.lblRestroName.text = arrForRestaurantData[indexPath.row]["name"] as? String
         if let dict = (arrDuration.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
-            if let str = dict["Difference"] as? String
-            {
-                cell.lblAwayTiming.text = "\(str) from you"
-                
-            }
+            if let str = dict["Difference"] as? String{
+                cell.lblAwayTiming.text = "\(str) from you"}}
+        if let dict = arrForRestaurantData[indexPath.row]["opening_hours"] as? NSDictionary{
+            if dict["open_now"] as? Bool == true{
+                cell.lblOpenOrClose.text = "Open"
+            }else{
+                cell.lblOpenOrClose.text = "Close"
+            }}else{
+            cell.lblOpenOrClose.text = "Open"
+        }
+        cell.lblDistanceFromRestro.setTitle(arrForRestaurantData[indexPath.row]["vicinity"] as? String, for: .normal)
+        
+        if let photos = arrForRestaurantData[indexPath.row]["photos"] as? [[String:Any]]{
+            let strRefre = photos.first
+            let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference=\(strRefre!["photo_reference"] as! String)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
+            cell.imgViewRestaurants.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
             
         }
-        
-        
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 260, height:  self.collectionViewNearByRestaurants.frame.height)
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        
-        if let BudsDict = self.arrDuration.object(at: indexPath.row) as? NSDictionary
-        {
-            if let dict = self.arrForRestaurantData[indexPath.row]["restaurant"] as? [String : AnyObject]
-            {
-                
-                    let MuteBudsDict = NSMutableDictionary(dictionary: BudsDict)
-                    MuteBudsDict.setValue(dict, forKey: "isSelected")
-                    
-                    let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
-                    if let dict = (arrDuration.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
-                        if let str = dict["Difference"] as? String{
-                            obj.strTime = str }}
-                    obj.arrOfRestaurantData = MuteBudsDict as! [String : AnyObject]
-                    self.navigationController?.pushViewController(obj, animated: false)
-                
-            }
-        }
-        
-        
-        
+        let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
+        if let dict = (arrDuration.object(at: indexPath.row) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
+            if let str = dict["Difference"] as? String{
+                obj.strTime = str }}
+        obj.arrOfRestaurantData = arrForRestaurantData[indexPath.row]
+        self.navigationController?.pushViewController(obj, animated: false)
     }
     func reloadTableWithRestDetailArray(restDetailArray  : NSArray){
         
@@ -831,20 +826,15 @@ extension nearByRestaurantsScreenVC : GMUClusterManagerDelegate,GMUClusterRender
         for index in 0..<arrForRestaurantData.count {
             print(index)
             print(arrForRestaurantData[index])
-            if let restDict = arrForRestaurantData[index]["restaurant"] as? NSDictionary{
-                if let dict = restDict.object(forKey: "location") as? NSDictionary
-                {
-                    if let latitude = dict["latitude"] , let longitude = dict["longitude"]{
-                        let lat = Double("\(latitude)") ?? 0.0
-                        let lng = Double("\(longitude)") ?? 0.0
-                        let name = "Item \(index)"
-                        let item = POIItem(position: CLLocationCoordinate2DMake(lat, lng), name: name, arryIndex: index)
-                        clusterManager.add(item)
-                    }
+            if let dict = arrForRestaurantData[index]["geometry"] as? NSDictionary{
+                if let loc = dict["location"] as? NSDictionary{
+                    let lat = loc["lat"] as! Double
+                    let lng = loc["lng"] as! Double
+                    let name = "Item \(index)"
+                    let item = POIItem(position: CLLocationCoordinate2DMake(lat, lng), name: name, arryIndex: index)
+                    clusterManager.add(item)
                 }
-                
             }
-            
         }
     }
 }

@@ -14,10 +14,6 @@ import FirebaseStorage
 
 class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewDataSource ,GrowingTextViewDelegate,FirebaseDelegate{
    
-    
-  
-    
-   
     @IBOutlet weak var tblConversation: UITableView!
     @IBOutlet weak var textViewMessage: GrowingTextView!
     @IBOutlet weak var nslcBottomTextView: NSLayoutConstraint!
@@ -39,6 +35,8 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     var frndId = ""
     var receipentDp = ""
     var isFreind = Bool()
+    var isGroup = false
+    
     var userIsAvalable = false
     var strCount = Int()
     //Firebase
@@ -58,51 +56,75 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         // Do any additional setup after loading the view.
     }
     
-  func initialSetup() {
-    objSendMessage.delegate = self
-    chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as? String ?? ""
-    senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
-    userId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
-    if let profilepic1_thumb = dictUserDetail.object(forKey: "profilepic1_thumb") as? String
-    {
-        if profilepic1_thumb != ""
+    func initialSetup() {
+        objSendMessage.delegate = self
+        //    chatGrpId = UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as? String ?? ""
+        senderId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
+        userId = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
+        if let profilepic1_thumb = dictUserDetail.object(forKey: "profilepic1") as? String
         {
-            receipentDp = profilepic1_thumb//UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as? String ""
+            if profilepic1_thumb != ""
+            {
+                receipentDp = profilepic1_thumb//UserDefaults.standard.object(forKey: Constants.UserDefaults.receiverDP) as? String ""
+            }
+            
         }
         
-    }
-    
-    if dictUserDetail.count > 0{
-    if let dict = dictUserDetail as? NSDictionary{
-    if let strDict = (dict.object(forKey: "details") as? NSArray){
-        let dict = strDict[0] as! NSDictionary
-        frndId = dict.object(forKey: "id") as! String
-        if let str = dict.object(forKey: "first_name")! as? String{
-                lblUserName.text = "\(str) \(dict.object(forKey: "last_name")! as! String)"
-            }
-        }else{
-        if let friend_user_id = dictUserDetail.object(forKey: "friend_user_id")
-        {
-            frndId = "\(friend_user_id)"
-        }
         
-            if let str = dictUserDetail.object(forKey: "first_name")! as? String{
-                lblUserName.text = "\(str) \(dictUserDetail.object(forKey: "last_name")! as! String)"
+        if dictUserDetail.count > 0 && self.isGroup == false {
+            self.lblLastSeen.isHidden = true
+            if let dict = dictUserDetail as? NSDictionary{
+                if let strDict = (dict.object(forKey: "details") as? NSArray){
+                    let dict = strDict[0] as! NSDictionary
+                    frndId = dict.object(forKey: "id") as! String
+                    if let str = dict.object(forKey: "first_name")! as? String{
+                        lblUserName.text = "\(str) \(dict.object(forKey: "last_name")! as! String)"
+                    }
+                }else{
+                    if let friend_user_id = dictUserDetail.object(forKey: "friend_user_id")
+                    {
+                        frndId = "\(friend_user_id)"
+                    }
+                    else if let friend_user_id = dictUserDetail.object(forKey: "friend_id")
+                    {
+                        frndId = "\(friend_user_id)"
+                    }
+                    
+                    if let str = dictUserDetail.object(forKey: "first_name")! as? String{
+                        lblUserName.text = "\(str) \(dictUserDetail.object(forKey: "last_name")! as! String)"
+                    }
+                }
             }
-       }
-        }}
-    UserDefaults.standard.set(frndId, forKey: Constants.UserDefaults.receiverId)
-    hideKeyboardWhenTappedAround()
-    registerForKeyboardNotifications()
+            
+        }
+        else
+        {
+            if self.isGroup == true
+            {
+                if let member_ids = self.dictUserDetail.object(forKey: "member_ids")
+                {
+                    self.frndId = "\(member_ids)"
+                }
+                
+                if let name = dictUserDetail.object(forKey: "name") as? String{
+                    lblUserName.text = name
+                }
+                
+                self.lblLastSeen.isHidden = true
+            }
+        }
+        UserDefaults.standard.set(frndId, forKey: Constants.UserDefaults.receiverId)
+        hideKeyboardWhenTappedAround()
+        registerForKeyboardNotifications()
         rootRef = Database.database().reference()
         
         tblConversation.rowHeight = UITableViewAutomaticDimension
-    tblConversation.estimatedSectionHeaderHeight = 0
+        tblConversation.estimatedSectionHeaderHeight = 0
         tblConversation.tableFooterView = UIView()
         self.tblConversation.separatorStyle = .none
-    if  let str = receipentDp as? String{
-          imgViewUserDp.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
-    }
+        if  let str = receipentDp as? String{
+            imgViewUserDp.sd_setImage(with: URL.init(string: str), placeholderImage: UIImage.init(named: "male"))
+        }
         // Setup TextView
         self.textViewMessage.layer.cornerRadius = 13
         self.textViewMessage.clipsToBounds = true
@@ -114,23 +136,24 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         self.textViewMessage.maxHeight = 120.0
         self.textViewMessage.textContainerInset = .init(top: 15, left: 12, bottom: 13, right: 48)
         self.textViewMessage.delegate = self
-   
-    
-    
-    if isFreind{
         
-    }else{
-        addRestaurants()
-        return
-    }
-
+        
+        
+        if isFreind{
+            
+        }else{
+            addRestaurants()
+            return
+        }
+        
         // Setup Formatter
-    observeMessages()
-  objSendMessage.getStatusDetailOfUserId(otherUserId:frndId,chatId:chatGrpId)
-    objSendMessage.addObserverForStatusUpdateforChatId(chatId:chatGrpId)
-    objSendMessage.addObserverForRecipteCHangeWithChatId(chatId:chatGrpId)
-    objSendMessage.addObserverForRealTimeChatting(chatGrpId: chatGrpId)
-    Constants.GlobalConstants.appDelegate.online()
+        observeMessages()
+        
+        objSendMessage.getStatusDetailOfUserId(otherUserId:frndId,chatId:chatGrpId)
+//        objSendMessage.addObserverForStatusUpdateforChatId(chatId:self.frndId)
+        objSendMessage.addObserverForRecipteCHangeWithChatId(chatId:chatGrpId)
+        objSendMessage.addObserverForRealTimeChatting(chatGrpId: chatGrpId)
+        Constants.GlobalConstants.appDelegate.online()
     }
   
     
@@ -148,23 +171,33 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     }
     func setMsgseenTickMarkForMessage(snapshot: DataSnapshot) {
         
-        
-        
-        
     }
-    func FireDataBaseAllMessagesDetail(snapshot: DataSnapshot, isAllMsgs: Bool) {
+    func FireDataBaseAllMessagesDetail(snapshot: DataSnapshot, isAllMsgs: Bool)
+    {
+        
     }
     func otherUserIdStatusDetail(snapshot: DataSnapshot) {
         if let arr = snapshot.value as? NSDictionary{
-        let str = arr.object(forKey: "status") as! String
-        if str == "Offline"{
-        if let myInteger = Int(arr.object(forKey: "lastSeen")! as! String) {
-        let str = NSNumber(value: myInteger)
-        self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))" }
-        }else if str == "Online"{
-            lblLastSeen.text = "Online" }
+            let str = arr.object(forKey: "status") as! String
+            if str == "Offline"{
+                if let myInteger = Int(arr.object(forKey: "lastSeen")! as! String) {
+                    let str = NSNumber(value: myInteger)
+                    self.lblLastSeen.text = "Last seen \( getTimeFromTimeStamp(timestamp:str))"
+                }
+                else
+                {
+                    self.lblLastSeen.text = "Offline"
+                }
+            }else if str == "Online"{
+                lblLastSeen.text = "Online"
+                
+            }
+            else if str == "typing..."
+            {
+                lblLastSeen.text = "Typing..."
+            }
         }else{
-            lblLastSeen.text = ""
+            lblLastSeen.text = "Offline"
         }
     }
     func sendRestaurants(arrRestaurants : NSArray , strMessage : String){
@@ -187,7 +220,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
             objSendMessage.mutParamDict["priceRange"] = NSNumber.init(integerLiteral: 1)
             objSendMessage.mutParamDict["posInList"] = NSNumber.init(integerLiteral: 0)
             objSendMessage.mutParamDict["isSelected"] = NSNumber.init(booleanLiteral: false)
-            objSendMessage.sendMessageToRecieverId(recieverId: frndId, isFriend: true)
+            objSendMessage.sendMessageToRecieverId(recieverId: frndId, isFriend: true, chatGrpID: self.chatGrpId)
         }
         
     }
@@ -198,43 +231,102 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     }
     func reloadTablview(arrRestaurants : NSArray){
         objSendMessage.setDictFormatForWriteDataDefault()
+        print(arrRestaurants)
         for i in 0..<arrRestaurants.count {
             var strPhotoUrl = String()
+            
+            if let CarFirst =  (arrRestaurants.object(at: i) as AnyObject).object(forKey: "CarFirst") as? NSDictionary
+            {
+                if let Difference = CarFirst.object(forKey: "Difference")
+                {
+                    objSendMessage.mutMessageParamDictDetail["timeToReach"] = Difference
+                }
+            }
+            
             if let dataDict =  (arrRestaurants.object(at: i) as AnyObject).object(forKey: "RestaurantData") as? NSDictionary{
-                if let photos = dataDict["photos"] as? [[String:Any]]{
-                    let strRefre = photos.first
-            strPhotoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=1080&photoreference=\(strRefre!["photo_reference"] as! String)"}
-            objSendMessage.mutMessageParamDictDetail["msg"] = "you received a restaurant suggestion"
-            objSendMessage.mutParamDict["vicinity"] = dataDict.object(forKey: "vicinity") as! String
-            objSendMessage.mutParamDict["photoReference"] = strPhotoUrl
-            objSendMessage.mutMessageParamDictDetail["contentType"] = "restaurant"
-            objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp() + i
-            objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
-            if let geometry = dataDict.object(forKey: "geometry") as? NSDictionary{
-            if let location = geometry.object(forKey: "location") as? NSDictionary{
-                objSendMessage.mutParamDict["latitude"] = String(describing: location.object(forKey: "lat")!)
-            objSendMessage.mutParamDict["longitude"] = String(describing: location.object(forKey: "lng")!)  }}
-            objSendMessage.mutParamDict["ratings"] = String(describing: dataDict.object(forKey: "rating")!)
-            objSendMessage.mutMessageParamDictDetail["recieverId"] = frndId
-            objSendMessage.mutMessageParamDictDetail["senderId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
-            objSendMessage.mutParamDict["phoneNumber"] = ""
-            objSendMessage.mutParamDict["placeid"] = dataDict.object(forKey: "place_id") as! String
-            objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
-            objSendMessage.mutParamDict["url"] = ""
-            objSendMessage.mutParamDict["website"] = ""
-            objSendMessage.mutParamDict["websiteUrl"] = ""
-            objSendMessage.mutParamDict["open_now"] = ""
+                if let photourl = dataDict["thumb"] as? String
+                {
+                    strPhotoUrl = photourl
+                }
+                
+                objSendMessage.mutMessageParamDictDetail["msg"] = "you received a restaurant suggestion"
+                objSendMessage.mutParamDict["vicinity"] = dataDict.object(forKey: "vicinity") as? String
+                objSendMessage.mutParamDict["photoReference"] = strPhotoUrl
+                objSendMessage.mutMessageParamDictDetail["contentType"] = "restaurant"
+                objSendMessage.mutMessageParamDictDetail["timeStamp"] = setCurrentTimeToTimestamp() + i
+                objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
+                if let geometry = dataDict.object(forKey: "location") as? NSDictionary{
+                    if let lat = geometry.object(forKey: "latitude"),let longi = geometry.object(forKey: "longitude")
+                    {
+                        objSendMessage.mutParamDict["latitude"] = String(describing: lat)
+                        objSendMessage.mutParamDict["longitude"] = String(describing: longi)
+                        
+                    }
+                    
+                }
+                
+                if let user_rating = dataDict.object(forKey: "user_rating") as? NSDictionary
+                {
+                    if let aggregate_rating = user_rating.object(forKey: "aggregate_rating")
+                    {
+                        objSendMessage.mutParamDict["ratings"] = String(describing: aggregate_rating)
+                    }
+                }
+                
+                objSendMessage.mutMessageParamDictDetail["recieverId"] = frndId
+                objSendMessage.mutMessageParamDictDetail["senderId"] = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
+                objSendMessage.mutParamDict["phoneNumber"] = ""
+                if let rdict = dataDict.object(forKey: "R") as? NSDictionary
+                {
+                    if let rest_id = rdict.object(forKey: "res_id")
+                    {
+                        objSendMessage.mutParamDict["restid"] = "\(rest_id)"
+                    }
+                    else
+                    {
+                        if let reid = dataDict.object(forKey: "id")
+                        {
+                            objSendMessage.mutParamDict["restid"] = "\(reid)"
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    if let reid = dataDict.object(forKey: "id")
+                    {
+                        objSendMessage.mutParamDict["restid"] = "\(reid)"
+                    }
+                }
+                
+                if let location = dataDict.object(forKey: "location") as? NSDictionary
+                {
+                    if let address = location.object(forKey: "address") as? String
+                    {
+                        objSendMessage.mutParamDict["formatted_address"] = address
+                    }
+                }
+                
+                objSendMessage.mutParamDict["name"] = dataDict.object(forKey: "name") as! String
+                objSendMessage.mutParamDict["url"] = ""
+                objSendMessage.mutParamDict["website"] = ""
+                objSendMessage.mutParamDict["websiteUrl"] = ""
+                objSendMessage.mutParamDict["open_now"] = ""
                 objSendMessage.mutMessageParamDictDetail["recieverDP"] = receipentDp
-            objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
-            objSendMessage.mutParamDict["priceRange"] = NSNumber.init(integerLiteral: 1)
-            objSendMessage.mutParamDict["posInList"] = NSNumber.init(integerLiteral: 0)
-            objSendMessage.mutParamDict["isSelected"] = NSNumber.init(booleanLiteral: false)
-            objSendMessage.mutParamDict["reference"] = dataDict.object(forKey: "reference") as! String
+                objSendMessage.mutMessageParamDictDetail["senderDp"] = Constants.GlobalConstants.appDelegate.userDetail.profilepic1
+                objSendMessage.mutParamDict["priceRange"] = NSNumber.init(integerLiteral: 1)
+                objSendMessage.mutParamDict["posInList"] = NSNumber.init(integerLiteral: 0)
+                objSendMessage.mutParamDict["isSelected"] = NSNumber.init(booleanLiteral: false)
+                objSendMessage.mutParamDict["reference"] = dataDict.object(forKey: "reference") as? String ?? ""
             }
             if let dataTime =  (arrRestaurants.object(at: i) as AnyObject).object(forKey: "CarFirst") as? NSDictionary{
                 objSendMessage.mutParamDict["timeToReach"] = dataTime.object(forKey: "Difference") as! String
             }
-   objSendMessage.sendMessageToRecieverId(recieverId:frndId,isFriend : true)
+            else
+            {
+                self.objSendMessage.mutParamDict["timeToReach"] = "No data available"
+            }
+            objSendMessage.sendMessageToRecieverId(recieverId:frndId,isFriend : true, chatGrpID: self.chatGrpId)
         }
     }
    
@@ -245,6 +337,7 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         }else{
             objSentRestaurants!.isfrind = false
         }
+        
         objSentRestaurants?.dictUserDetail = dictUserDetail
         addChildViewController(objSentRestaurants!)
         objSentRestaurants!.view.frame(forAlignmentRect: CGRect(x: 0.0, y: 0.0, width: self.view.frame.size.width, height:self.view.frame.size.height))
@@ -276,21 +369,32 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                     if let sender_id = dataDict.object(forKey: "senderId") as? String {
                         if sender_id != self.senderId {
                             
-                            if let isReadFlag = dataDict.object(forKey: "is_read") {
-                                
-                                if "\(isReadFlag)" == "0" {
-                                    
-                                    let temp = NSMutableDictionary(dictionary: dataDict)
-                                    if self.userIsAvalable == true
-                                    {
-                                        temp.setValue(1, forKey: "is_read")
-                                        self.rootRef.child("messages").child(self.chatGrpId).child(snapshot.key).setValue(temp)
-                                    } } } else {
-                                let temp = NSMutableDictionary(dictionary: dataDict)
-                                if self.userIsAvalable == true{
-                                    temp.setValue(1, forKey: "is_read")
-                                    self.rootRef.child("messages").child(self.chatGrpId).child(snapshot.key).setValue(temp)}
+                            if "\(dataDict.object(forKey: "delivered") ?? "")" == ""{
+                                self.sendDeliverTimestampForChatId(chatId: self.chatGrpId, msgKey: "\(snapshot.key)" as NSString)
                             }
+                            if "\(dataDict.object(forKey: "reciept") ?? "")" == ""{
+                                self.sendRecipTimestampForChatId(chatId: self.chatGrpId, msgKey: "\(snapshot.key)" as NSString)
+                            }
+                            
+                            //                            if let isReadFlag = dataDict.object(forKey: "is_read") {
+                            //
+                            //                                if "\(isReadFlag)" == "0" {
+                            //
+                            //                                    let temp = NSMutableDictionary(dictionary: dataDict)
+                            //                                    if self.userIsAvalable == true
+                            //                                    {
+                            //                                        temp.setValue(1, forKey: "is_read")
+                            //                                        self.rootRef.child("messages").child(self.chatGrpId).child(snapshot.key).setValue(temp)
+                            //                                    }
+                            //
+                            //                                }
+                            //
+                            //                            } else {
+                            //                                let temp = NSMutableDictionary(dictionary: dataDict)
+                            //                                if self.userIsAvalable == true{
+                            //                                    temp.setValue(1, forKey: "is_read")
+                            //                                    self.rootRef.child("messages").child(self.chatGrpId).child(snapshot.key).setValue(temp)}
+                            //                            }
                         }
                     }
                     self.arrChatMsgs.add(newDict)
@@ -304,6 +408,34 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
         })
         //self.observeValueChared()
     }
+    
+    
+    func sendDeliverTimestampForChatId(chatId : String , msgKey : NSString){
+        var strPathChange = String()
+        if msgKey == ""{
+            return
+        }
+        if chatId != ""{
+            strPathChange = "messages/\(chatId)/\(msgKey)/delivered"
+        }
+        let refChange : DatabaseReference = Database.database().reference(withPath: strPathChange)
+        let str = String(describing: setCurrentTimeToTimestamp())
+        refChange.setValue(str)
+    }
+    
+    func sendRecipTimestampForChatId(chatId : String , msgKey : NSString){
+        var strPathChange = String()
+        if msgKey == ""{
+            return
+        }
+        if chatId != ""{
+            strPathChange = "messages/\(chatId)/\(msgKey)/reciept"
+        }
+        let refChange : DatabaseReference = Database.database().reference(withPath: strPathChange)
+        let str = String(describing: setCurrentTimeToTimestamp())
+        refChange.setValue(str)
+    }
+    
     
     //MARK:- Button Actions
     
@@ -325,7 +457,15 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
     }
     @IBAction func btnBackAct(_ sender: Any) {
         Constants.GlobalConstants.appDelegate.offline()
-        self.navigationController?.popViewController(animated: true)
+        if self.isGroup == true
+        {
+            self.navigationController?.popToRootViewController(animated: true)
+        }
+        else
+        {
+            self.navigationController?.popViewController(animated: true)
+        }
+        
     }
     //MARK:- Sort Array
     func sortArrayByDate(dataDict: NSDictionary) {
@@ -510,175 +650,253 @@ class conversationScreenVC: UIViewController,UITableViewDelegate,UITableViewData
                         var strTimeToShow = ""
                         
                         if let msgTime = rowDict.object(forKey: "timeStamp") {
-                           
+                            
                             strTimeToShow = getTimeFromTimeStamp(timestamp: msgTime)
                         }
-            if rowDict.object(forKey: "contentType") as? String == "restaurant"{
-                          if sender_id == userId {
-                            if let array = rowDict.object(forKey: "restoVo") as? NSDictionary{
-                                let cell = tableView.dequeueReusableCell(withIdentifier: "restroCell", for: indexPath) as! chatTableviewCell
+                        if rowDict.object(forKey: "contentType") as? String == "restaurant"{
+                            if sender_id == userId {
+                                if let array = rowDict.object(forKey: "restoVo") as? NSDictionary{
+                                    let cell = tableView.dequeueReusableCell(withIdentifier: "restroCell", for: indexPath) as! chatTableviewCell
+                                    cell.selectionStyle = .none
+                                    cell.lblRestroName.text = array.object(forKey: "name") as? String
+                                    cell.lblRestroAddress.text = array.object(forKey: "formatted_address") as? String
+                                    let rating = array.object(forKey: "ratings") as! String
+                                    var rateInt = 0
+                                    if rating != ""
+                                    {
+                                        let doubleValue = Double(rating)!
+                                        rateInt = Int(doubleValue.rounded())
+                                    }
+                                    switch rateInt {
+                                    case 1:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 2:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 3:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 4:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 5:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        break
+                                    default:
+                                        break
+                                    }
+                                    if let photos = array.object(forKey: "photoReference") as? String{
+                                        
+                                        if photos != ""
+                                        {
+                                            let url = NSURL(string: photos)!  as URL
+                                            cell.imgRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
+                                        }
+                                        else
+                                        {
+                                            cell.imgRestro.image = UIImage.init(named: "placeHolderRestraunt")
+                                        }
+                                        
+                                        
+                                    }
+                                    cell.lblRestroTime.text = strTimeToShow
+                                    cell.imgReadRestroTick.isHidden = false
+                                    if  (String(describing:rowDict.object(forKey: "reciept")!)).count != 0{
+                                        cell.imgReadRestroTick.setImage(UIImage(named: "red_double"), for: .normal)
+                                    }else if (String(describing:rowDict.object(forKey: "delivered") ?? "")).count != 0{
+                                        cell.imgReadRestroTick.setImage(UIImage(named: "red_single"), for: .normal)
+                                    }else{
+                                        cell.imgReadRestroTick.setImage(UIImage(named: "black_single"), for: .normal)
+                                    }
+                                    return cell
+                                }
+                                
+                            }else{
+                                if let array = rowDict.object(forKey: "restoVo") as? NSDictionary{
+                                    let cell = tableView.dequeueReusableCell(withIdentifier: "restroSenderCell", for: indexPath) as! chatTableviewCell
+                                    cell.selectionStyle = .none
+                                    cell.lblRestroName.text = array.object(forKey: "name") as? String
+                                    cell.lblRestroAddress.text = array.object(forKey: "formatted_address") as? String
+                                    let rating = array.object(forKey: "ratings") as! String
+                                    
+                                    var rateInt = 0
+                                    if rating != ""
+                                    {
+                                        let doubleValue = Double(rating)!
+                                        rateInt = Int(doubleValue.rounded())
+                                    }
+                                    
+                                    switch rateInt {
+                                    case 1:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 2:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 3:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 4:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
+                                        break
+                                    case 5:
+                                        cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        cell.btnSta5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
+                                        break
+                                    default:
+                                        break
+                                    }
+                                    cell.imgReadRestroTick.isHidden = true
+                                    if  (String(describing:rowDict.object(forKey: "reciept")!)).count != 0{
+                                        cell.imgReadRestroTick.setImage(UIImage(named: "red_double"), for: .normal)
+                                    }else if (String(describing:rowDict.object(forKey: "delivered") ?? "")).count != 0{
+                                        cell.imgReadRestroTick.setImage(UIImage(named: "red_single"), for: .normal)
+                                    }else{
+                                        cell.imgReadRestroTick.setImage(UIImage(named: "black_single"), for: .normal)
+                                    }
+                                    cell.lblRestroTime.text = strTimeToShow
+                                    if let photos = array.object(forKey: "photoReference") as? String{
+                                        
+                                        if photos != ""
+                                        {
+                                            let url = NSURL(string: photos)!  as URL
+                                            cell.imgRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
+                                        }
+                                        else
+                                        {
+                                            cell.imgRestro.image = UIImage.init(named: "placeHolderRestraunt")
+                                        }
+                                        
+                                    }
+                                    return cell
+                                }}}
+                        else if rowDict.object(forKey: "contentType") as? String == "text"{
+                            if sender_id == userId {
+                                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! chatTableviewCell
                                 cell.selectionStyle = .none
-                                cell.lblRestroName.text = array.object(forKey: "name") as? String
-                                cell.lblRestroAddress.text = array.object(forKey: "vicinity") as? String
-                                let rating = array.object(forKey: "ratings") as! String
-                                switch rating {
-                                case "1":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "2":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "3":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "4":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "5":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    break
-                                default:
-                                    break
-                                }
-                                if let photos = array.object(forKey: "photoReference") as? String{
-                                    
-                                    let url = NSURL(string: "\(photos)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
-                                    cell.imgRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
-                                    
-                                }
-                                cell.lblRestroTime.text = strTimeToShow
-                                if  (String(describing:rowDict.object(forKey: "reciept")!)).count != 0{
-                                    cell.imgReadRestroTick.setImage(UIImage(named: "red_double"), for: .normal)
-                                }else if (String(describing:rowDict.object(forKey: "delivered")!)).count != 0{
-                                    cell.imgReadRestroTick.setImage(UIImage(named: "red_single"), for: .normal)
+                                cell.lblReceiverMessage.text = rowDict.object(forKey: "msg") as? String
+                                cell.lblReceiverTime.text = strTimeToShow
+                                cell.imgReadTick.isHidden = false
+                                if  (String(describing:rowDict.object(forKey: "reciept") ?? "")).count != 0{
+                                    cell.imgReadTick.setImage(UIImage(named: "red_double"), for: .normal)
+                                }else if (String(describing:rowDict.object(forKey: "delivered") ?? "")).count != 0{
+                                    cell.imgReadTick.setImage(UIImage(named: "red_single"), for: .normal)
                                 }else{
-                                    cell.imgReadRestroTick.setImage(UIImage(named: "black_single"), for: .normal)
+                                    cell.imgReadTick.setImage(UIImage(named: "black_single"), for: .normal)
                                 }
+                                
                                 return cell
-                            }}else{
-            if let array = rowDict.object(forKey: "restoVo") as? NSDictionary{
-                let cell = tableView.dequeueReusableCell(withIdentifier: "restroSenderCell", for: indexPath) as! chatTableviewCell
+                            } else {
+                                let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! chatTableviewCell
                                 cell.selectionStyle = .none
-                                cell.lblRestroName.text = array.object(forKey: "name") as? String
-                                cell.lblRestroAddress.text = array.object(forKey: "vicinity") as? String
-                                let rating = array.object(forKey: "ratings") as! String
-                                switch rating {
-                                case "1":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "2":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "3":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "4":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "whiteStarButton"), for: .normal)
-                                    break
-                                case "5":
-                                    cell.btnSta1Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta2Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta3Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta4Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    cell.btnSta5Out.setImage(UIImage(named: "redStarButton"), for: .normal)
-                                    break
-                                default:
-                                    break
+                                cell.lblSenderTime.text = strTimeToShow
+                                cell.lblMessages.text = rowDict.object(forKey: "msg") as? String
+                                cell.imgSenderDp.image = UIImage.init(named: "disableSingle")
+                                if let proURL = URL.init(string: "\(receipentDp)")
+                                {
+                                    cell.imgSenderDp.sd_setImage(with: proURL)
                                 }
-                if  (String(describing:rowDict.object(forKey: "reciept")!)).count != 0{
-                    cell.imgReadRestroTick.setImage(UIImage(named: "red_double"), for: .normal)
-                }else if (String(describing:rowDict.object(forKey: "delivered")!)).count != 0{
-                    cell.imgReadRestroTick.setImage(UIImage(named: "red_single"), for: .normal)
-                }else{
-                    cell.imgReadRestroTick.setImage(UIImage(named: "black_single"), for: .normal)
-                }
-                                cell.lblRestroTime.text = strTimeToShow
-                                if let photos = array.object(forKey: "photoReference") as? String{
-                                    
-                                    let url = NSURL(string: "\(photos)&key=\(Constants.GoogleKey.kGoogle_Key)")!  as URL
-                                    cell.imgRestro.sd_setImage(with: url, placeholderImage: UIImage(named: ""), options: .retryFailed)
-                                    
+                                cell.imgSenderReadTick.isHidden = true
+                                if  (String(describing:rowDict.object(forKey: "reciept") ?? "")).count != 0{
+                                    cell.imgSenderReadTick.setImage(UIImage(named: "red_double"), for: .normal)
+                                }else if (String(describing:rowDict.object(forKey: "delivered") ?? "")).count != 0{
+                                    cell.imgSenderReadTick.setImage(UIImage(named: "red_single"), for: .normal)
+                                }else{
+                                    cell.imgSenderReadTick.setImage(UIImage(named: "black_single"), for: .normal)
                                 }
                                 return cell
-                            }}}
-            else if rowDict.object(forKey: "contentType") as? String == "text"{
-                if sender_id == userId {
-              let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! chatTableviewCell
-                cell.selectionStyle = .none
-                cell.lblReceiverMessage.text = rowDict.object(forKey: "msg") as? String
-                cell.lblReceiverTime.text = strTimeToShow
-                    if  (String(describing:rowDict.object(forKey: "reciept")!)).count != 0{
-                        cell.imgReadTick.setImage(UIImage(named: "red_double"), for: .normal)
-                    }else if (String(describing:rowDict.object(forKey: "delivered")!)).count != 0{
-                        cell.imgReadTick.setImage(UIImage(named: "red_single"), for: .normal)
-                    }else{
-                         cell.imgReadTick.setImage(UIImage(named: "black_single"), for: .normal)
+                            }}
                     }
-                    
-                return cell
-            } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! chatTableviewCell
-                cell.selectionStyle = .none
-                cell.lblSenderTime.text = strTimeToShow
-                cell.lblMessages.text = rowDict.object(forKey: "msg") as? String
-                cell.imgSenderDp.image = UIImage.init(named: "disableSingle")
-                if let proURL = URL.init(string: "\(receipentDp)")
-                    {
-                    cell.imgSenderDp.sd_setImage(with: proURL)
-                    }
-                    if  (String(describing:rowDict.object(forKey: "reciept")!)).count != 0{
-                        cell.imgSenderReadTick.setImage(UIImage(named: "red_double"), for: .normal)
-                    }else if (String(describing:rowDict.object(forKey: "delivered")!)).count != 0{
-                        cell.imgSenderReadTick.setImage(UIImage(named: "red_single"), for: .normal)
-                    }else{
-                        cell.imgSenderReadTick.setImage(UIImage(named: "black_single"), for: .normal)
-                    }
-            return cell
-                }}
-            }
-        }
+                }
             }}
-                    
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
         
         return cell!
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        if let sectionDict = arrMsgByDates.object(at: indexPath.section) as? NSDictionary {
+            
+            if let MsgRows = sectionDict.object(forKey: "MsgRows") as? NSArray {
+                
+                
+                if let rowDict = MsgRows.object(at: indexPath.row) as? NSDictionary {
+                    
+                    if rowDict.object(forKey: "contentType") as? String == "restaurant"{
+                        
+                        print(rowDict)
+                        
+                        if let dict = rowDict["restoVo"] as? [String : AnyObject]
+                        {
+                            
+                            let MuteBudsDict = NSMutableDictionary(dictionary: dict)
+                            MuteBudsDict.setValue(dict, forKey: "isSelected")
+                            
+                            let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
+                            if UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) != nil && UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) != nil
+                            {
+                                obj.usercurrentLocation = CLLocation.init(latitude: Double("\(UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude)!)")!, longitude: Double("\(UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude)!)")!)
+                            }
+                            
+                            if let timeToReach = dict["timeToReach"]{
+                                    obj.strTime = "\(timeToReach)"
+                            }
+                            obj.isFromChatScreen = true
+                            obj.arrOfRestaurantData = MuteBudsDict as! [String : AnyObject]
+                            self.navigationController?.pushViewController(obj, animated: false)
+                            
+                        }
+                        
+                    }
+                    
+                }
+            }
+        }
+        
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

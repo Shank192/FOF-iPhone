@@ -29,7 +29,7 @@
 #define LAT_VAL 23.035
 #define LAN_VAL 72.5293
 
-#define GMAP_API_KEY @"AIzaSyCCmgwexZk3S_kThFZXxZbxRcCJwElEPDw"
+#define GMAP_API_KEY @"AIzaSyDAzrcVKzabhf0u0zb7j_mvvfcG5Xlibl4"
 
 
 #define profpic(picnum, userid) [NSString stringWithFormat:@"http://entrega.in/projects/fof/api/uploads/%ldprofilepic%ld.",userid,picnum];

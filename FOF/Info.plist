@@ -29,7 +29,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5.16</string>
+	<string>5.25</string>
 	<key>FacebookAppID</key>
 	<string>1675746376078653</string>
 	<key>FacebookDisplayName</key>
@@ -40,6 +40,7 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>uberauth</string>
 		<string>uber</string>
 		<string>uberauth</string>
 		<string>fbauth2</string>
@@ -101,5 +102,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UberClientID</key>
+	<string>z-f-0WwrJuzHdqcjWzT_RjVOFHPfKXGb</string>
+	<key>UberDisplayName</key>
+	<string></string>
 </dict>
 </plist>

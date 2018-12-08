@@ -33,7 +33,7 @@ class sendMessageServicesScreenVC: NSObject {
     func setDictFormatForWriteDataDefault(){
 
         mutParamDict = NSMutableDictionary()
-        let restDict : NSDictionary = ["address":"","cuisine":"","description":"","formatted_address":"","formatted_phone_number":"","isSelected":"","latitude":"","longitude":"","mSnippet":"","name":"","open_now":"" ,"phoneNumber":"" ,"photoReference":"" ,"placeid":"" ,"posInList":"" ,"priceRange":"" ,"ratings":"" ,"reference":"","selected":"" ,"timeToReach":"" ,"timings":"" ,"url":"","vicinity":"" ,"website":"" ,"websiteUrl":"" ]
+        let restDict : NSDictionary = ["address":"","cuisine":"","description":"","formatted_address":"","formatted_phone_number":"","isSelected":"","latitude":"","longitude":"","mSnippet":"","name":"","open_now":"" ,"phoneNumber":"" ,"photoReference":"" ,"restid":"" ,"posInList":"" ,"priceRange":"" ,"ratings":"" ,"reference":"","selected":"" ,"timeToReach":"" ,"timings":"" ,"url":"","vicinity":"" ,"website":"" ,"websiteUrl":"" ]
         mutParamDict.setDictionary(restDict as! [AnyHashable : Any])
         mutMessageParamDictDetail = NSMutableDictionary()
         let messageDetail : NSDictionary = ["contentType":"","delivered":"","imgUrl":"","key":"","msg":"","reciept":"","recieverDP":"","recieverId":"","restoVo":mutParamDict,"senderDp":"","senderId":"" ,"timeStamp":""]
@@ -64,9 +64,9 @@ class sendMessageServicesScreenVC: NSObject {
         let str = String(describing: setCurrentTimeToTimestamp())
         refChange.setValue(str)
     }
-    func sendMessageToRecieverId(recieverId : String , isFriend : Bool){
+    func sendMessageToRecieverId(recieverId : String , isFriend : Bool, chatGrpID : String){
         print(mutMessageParamDictDetail)
-        let refPath = "messages/\(UserDefaults.standard.object(forKey: Constants.UserDefaults.matchId) as! String)"
+        let refPath = "messages/\(chatGrpID)"
         rootRef = Database.database().reference(withPath: refPath)
         let FullPath = rootRef.childByAutoId()
         _ = (FullPath.url).components(separatedBy: "/")
@@ -84,7 +84,7 @@ class sendMessageServicesScreenVC: NSObject {
             print("frnd : \(snapshot.key) \(String(describing: snapshot.value))")
             if let DataDict = snapshot.value as? NSDictionary
             {
-                print(DataDict)
+                self.delegate?.setMsgseenTickMarkForMessage(snapshot: snapshot)
             }
 //            if snapshot.value!["senderId"] as! String == UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String{
 //                
@@ -105,8 +105,8 @@ class sendMessageServicesScreenVC: NSObject {
             }
         })
     }
-    func updateMyStatusOnFirebase(mutDictStatusDetail : NSMutableDictionary , chatId : String , senderId : String){
-        let refPath = "messages/\(chatId)/\(senderId)"
+    func updateMyStatusOnFirebase(mutDictStatusDetail : NSMutableDictionary , user_id : String){
+        let refPath = "status/\(user_id)"
         rootRef = Database.database().reference(withPath: refPath)
         rootRef.setValue(mutDictStatusDetail)
 }
@@ -126,14 +126,16 @@ class sendMessageServicesScreenVC: NSObject {
         msgChangedHandle = rootRef.observe(.childChanged, with: { (snapshot) in
             if let DataDict = snapshot.value as? NSDictionary
             {
+                print(DataDict)
                 if (DataDict.allKeys as NSArray).contains("msg") == true{
-                let str = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
-                if (DataDict.object(forKey: "reciept") as! String).count > 0 || (DataDict.object(forKey: "delivered") as! String).count > 0 {
+//                let str = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID) as! String
+                if ("\(DataDict.object(forKey: "reciept"))" ?? "").count > 0 || ("\(DataDict.object(forKey: "delivered") ?? "")").count > 0 {
                     self.delegate?.setMsgseenTickMarkForMessage(snapshot: snapshot)
                 }
                 let cdm = CoreDataManage()
                 cdm.updateMessageEntityWithMessageDict(msg: DataDict)
-                }}
+                }
+            }
         })
     }
     func getAllMessagesDetailWithChatID(chatId : NSString){
@@ -154,7 +156,7 @@ class sendMessageServicesScreenVC: NSObject {
 }
     func getStatusDetailOfUserId(otherUserId : String,chatId : String){
         print(otherUserId)
-        rootRef = Database.database().reference(withPath: "status/\(chatId)/\(otherUserId)")
+        rootRef = Database.database().reference(withPath: "status/\(otherUserId)")
         print(rootRef)
         rootRef.observe(.value, with: { (snapshot) in
             if let DataDict = snapshot.value as? NSDictionary

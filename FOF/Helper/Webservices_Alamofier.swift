@@ -745,7 +745,7 @@ class Webservices_Alamofier: NSObject {
             var imgData = Data()
             if image != nil {
                 
-                imgData = UIImageJPEGRepresentation(image!, 1.0)!
+                imgData = UIImageJPEGRepresentation(image!, 0.5)!
             }
             
             let notallowchar : CharacterSet = CharacterSet(charactersIn: "01234").inverted

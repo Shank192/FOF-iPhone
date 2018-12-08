@@ -40,6 +40,10 @@ struct Constants {
         static let getZomatoKEey = "user/getZomatoKey"
         static let GetFriendRequestList = "user/getFriendRequestList"
         static let GetFriendList = "user/getFriendsList"
+        static let UpdateProfilePic = "user/updateProfilePic"
+        static let rejectFrinedREquest = "user/rejectFriendRequest"
+        static let CreateGroup = "user/createGroup"
+        static let GetGroupList = "user/getUsersGroups"
     }
     
     
@@ -73,7 +77,7 @@ struct Constants {
         static let InvalidCommentRange = "Please enter comment minimum 20 characters!"
     }
     struct GoogleKey {
-        static let kGoogle_Key = "AIzaSyCCmgwexZk3S_kThFZXxZbxRcCJwElEPDw"        
+        static let kGoogle_Key = "AIzaSyBeCwWhLWHD_u5LM_8hR2myNEwj8NcgS_E"//"AIzaSyCCmgwexZk3S_kThFZXxZbxRcCJwElEPDw"        
     }
     struct color {
         

@@ -32,7 +32,7 @@ func setToMessageFormatWithObject(arrData:NSArray) -> NSArray{
             var str_ropen_now = ""
             var str_rphoneNumber = ""
             var str_rphotoReference = ""
-            var str_rplaceid = ""
+            var str_rrestid = ""
             var str_rratings = ""
             var str_rreference = ""
             var str_rtimeToReach = ""
@@ -117,7 +117,7 @@ func setToMessageFormatWithObject(arrData:NSArray) -> NSArray{
         "open_now":str_ropen_now,
         "phoneNumber":str_rphoneNumber,
         "photoReference":str_rphotoReference,
-        "placeid":str_rplaceid,
+        "restid":str_rrestid,
         "posInList":(msgDetail.rposInList),
         "priceRange":(msgDetail.rpriceRange),
         "ratings":str_rratings,

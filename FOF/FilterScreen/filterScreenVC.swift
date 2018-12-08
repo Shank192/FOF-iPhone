@@ -42,6 +42,9 @@ class filterScreenVC: UIViewController {
     var AgeUpperValue = 40
     var isFilterFriend = false
     
+    var isKM = false
+    var DistanceUnit = "mi."
+    
     let app = UIApplication.shared.delegate as! AppDelegate
     
     override func viewDidLoad() {
@@ -78,21 +81,38 @@ class filterScreenVC: UIViewController {
             self.viewFilterFriend.isHidden = true
             self.viewFilterResturant.isHidden = false
         }
-        
+       
         if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
         {
-            UserDefaults.standard.set(0, forKey: Constants.UserDefaults.FilterDistance)
+            UserDefaults.standard.set("20000", forKey: Constants.UserDefaults.FilterDistance)
             UserDefaults.standard.synchronize()
-            
         }
         
         
-        let range = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) as! Int
+        if let dict = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary
+        {
+            if let distance_unit = dict.object(forKey: "distance_unit") as? String
+            {
+                if distance_unit == "miles"
+                {
+                    self.isKM = false
+                    self.DistanceUnit = "mi."
+                }
+                else
+                {
+                    self.isKM = true
+                    self.DistanceUnit = "km."
+                }
+            }
+        }
+        
+        
+        let range = Int("\(UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) ?? "20000")")!
         
         if range == 0
         {
-            self.lblDistanceUnitOutResturant.text = "0 mi"
-            self.lblDistanceUnitOutFriend.text = "0 mi"
+            self.lblDistanceUnitOutResturant.text = "0 \(self.DistanceUnit)"
+            self.lblDistanceUnitOutFriend.text = "0 \(self.DistanceUnit)"
             rangeDistanceSliderResturant.setValue(0, animated: false)
             rangeDistanceSliderFriend.setValue(0, animated: false)
             
@@ -102,16 +122,39 @@ class filterScreenVC: UIViewController {
         else
         {
             metersInt = range
-            miInt = metersInt/1610
+            if self.isKM == true
+            {
+                miInt = metersInt/1000
+            }
+            else
+            {
+                miInt = metersInt/1610
+            }
             
-            self.lblDistanceUnitOutResturant.text = "\(miInt) mi"
-            self.lblDistanceUnitOutFriend.text = "\(miInt) mi"
+            
+            self.lblDistanceUnitOutResturant.text = "\(miInt) \(self.DistanceUnit)"
+            self.lblDistanceUnitOutFriend.text = "\(miInt) \(self.DistanceUnit)"
             rangeDistanceSliderResturant.setValue(Float(miInt), animated: false)
             rangeDistanceSliderFriend.setValue(Float(miInt), animated: false)
         }
         
         if let dict = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary
         {
+            if let show_friends = dict.object(forKey: "show_friends")
+            {
+                if "\(show_friends)" == "1"
+                {
+                    self.SwitchShowOnlyyFriend.isOn = true
+                    
+                    UserDefaults.standard.set(true, forKey: Constants.UserDefaults.isFriend)
+                }
+                else
+                {
+                    self.SwitchShowOnlyyFriend.isOn = false
+                    UserDefaults.standard.set(false, forKey: Constants.UserDefaults.isFriend)
+                }
+                UserDefaults.standard.synchronize()
+            }
             if let showme = dict.object(forKey: "showme") as? String
             {
                 strGender = showme
@@ -191,7 +234,7 @@ class filterScreenVC: UIViewController {
             }
             
             
-            if let showsearch_max_ageme = dict.object(forKey: "shosearch_max_agewme"),let search_min_age = dict.object(forKey: "search_min_age")
+            if let showsearch_max_ageme = dict.object(forKey: "search_max_age"),let search_min_age = dict.object(forKey: "search_min_age")
             {
                 if "\(showsearch_max_ageme)" != "" && "\(showsearch_max_ageme)" != "0"
                 {
@@ -355,17 +398,25 @@ class filterScreenVC: UIViewController {
         
         if self.app.isFilterFriend == true
         {
-            lblDistanceUnitOutFriend.text = "\(Int(rangeDistanceSliderFriend.value)) mi"
+            lblDistanceUnitOutFriend.text = "\(Int(rangeDistanceSliderFriend.value)) \(self.DistanceUnit)"
             miInt = Int(rangeDistanceSliderFriend.value)
         }
         else
         {
-            lblDistanceUnitOutResturant.text = "\(Int(rangeDistanceSliderResturant.value)) mi"
+            lblDistanceUnitOutResturant.text = "\(Int(rangeDistanceSliderResturant.value)) \(self.DistanceUnit)"
             miInt = Int(rangeDistanceSliderResturant.value)
         }
         
         
-        metersInt = miInt * 1610
+        if self.isKM == true
+        {
+            metersInt = miInt * 1000
+        }
+        else
+        {
+            metersInt = miInt * 1610
+        }
+        
         
     }
     
@@ -375,7 +426,8 @@ class filterScreenVC: UIViewController {
     @IBAction func btnApplyAct(_ sender: Any) {
        
        //user_id,first_name,last_name,about_me,dob,gender,relationship,ethnicity,occupation,education , showme,search_min_age,search_max_age,distance_unit,search_distance,is_show_location,is_receive_messages_notifications,is_receive_invitation_notifications
-        
+        print(UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID)!)
+        print(UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as! NSDictionary)
         if self.app.zomatoAPIuserKEy != nil
         {
             if let user_id = UserDefaults.standard.object(forKey: Constants.UserDefaults.user_ID),let ProfileData = UserDefaults.standard.object(forKey: Constants.UserDefaults.ProfileData) as? NSDictionary
@@ -403,7 +455,7 @@ class filterScreenVC: UIViewController {
                     }
                     
                     
-                    param = ["user_id":"\(user_id)","first_name":"\(ProfileData.object(forKey: "first_name") ?? "")","last_name":"\(ProfileData.object(forKey: "last_name") ?? "")","about_me":"\(ProfileData.object(forKey: "about_me") ?? "")","dob":"\(ProfileData.object(forKey: "dob") ?? "")","gender":strGender,"relationship":"\(ProfileData.object(forKey: "relationship") ?? "")","ethnicity":"\(ProfileData.object(forKey: "ethnicity") ?? "")","occupation":"\(ProfileData.object(forKey: "occupation") ?? "")","education":"\(ProfileData.object(forKey: "education") ?? "")", "showme":strGender,"search_min_age":self.AgeLowerValue,"search_max_age":self.AgeUpperValue,"distance_unit":"\(ProfileData.object(forKey: "distance_unit") ?? "")","search_distance":self.metersInt,"is_show_location":"\(ProfileData.object(forKey: "is_show_location") ?? "")","is_receive_messages_notifications":"\(ProfileData.object(forKey: "is_receive_messages_notifications") ?? "")","is_receive_invitation_notifications":"\(ProfileData.object(forKey: "is_receive_invitation_notifications") ?? "")","show_friends":self.SwitchShowOnlyyFriend.isOn] as [String : AnyObject]
+                    param = ["user_id":"\(user_id)","first_name":"\(ProfileData.object(forKey: "first_name") ?? "")","last_name":"\(ProfileData.object(forKey: "last_name") ?? "")","about_me":"\(ProfileData.object(forKey: "about_me") ?? "")","dob":"\(ProfileData.object(forKey: "dob") ?? "")","gender":"\(ProfileData.object(forKey: "gender") ?? "")","relationship":"\(ProfileData.object(forKey: "relationship") ?? "")","ethnicity":"\(ProfileData.object(forKey: "ethnicity") ?? "")","occupation":"\(ProfileData.object(forKey: "occupation") ?? "")","education":"\(ProfileData.object(forKey: "education") ?? "")", "showme":strGender,"search_min_age":self.AgeLowerValue,"search_max_age":self.AgeUpperValue,"distance_unit":"\(ProfileData.object(forKey: "distance_unit") ?? "")","search_distance":self.metersInt,"is_show_location":"\(ProfileData.object(forKey: "is_show_location") ?? "")","is_receive_messages_notifications":"\(ProfileData.object(forKey: "is_receive_messages_notifications") ?? "")","is_receive_invitation_notifications":"\(ProfileData.object(forKey: "is_receive_invitation_notifications") ?? "")","show_friends":self.SwitchShowOnlyyFriend.isOn] as [String : AnyObject]
                     
                 }
                 else
@@ -411,8 +463,12 @@ class filterScreenVC: UIViewController {
                     param = ["user_id":"\(user_id)","first_name":"\(ProfileData.object(forKey: "first_name") ?? "")","last_name":"\(ProfileData.object(forKey: "last_name") ?? "")","about_me":"\(ProfileData.object(forKey: "about_me") ?? "")","dob":"\(ProfileData.object(forKey: "dob") ?? "")","gender":"\(ProfileData.object(forKey: "gender") ?? "")","relationship":"\(ProfileData.object(forKey: "relationship") ?? "")","ethnicity":"\(ProfileData.object(forKey: "ethnicity") ?? "")","occupation":"\(ProfileData.object(forKey: "occupation") ?? "")","education":"\(ProfileData.object(forKey: "education") ?? "")", "showme":"\(ProfileData.object(forKey: "showme") ?? "")","search_min_age":"\(ProfileData.object(forKey: "search_min_age") ?? "")","search_max_age":"\(ProfileData.object(forKey: "search_max_age") ?? "")","distance_unit":"\(ProfileData.object(forKey: "distance_unit") ?? "")","search_distance":self.metersInt,"is_show_location":"\(ProfileData.object(forKey: "is_show_location") ?? "")","is_receive_messages_notifications":"\(ProfileData.object(forKey: "is_receive_messages_notifications") ?? "")","is_receive_invitation_notifications":"\(ProfileData.object(forKey: "is_receive_invitation_notifications") ?? "")","show_friends":self.SwitchShowOnlyyFriend.isOn] as [String : AnyObject]
                 }
                 
+                
+                
+                
                 UserDefaults.standard.set(strGender, forKey: Constants.UserDefaults.gender)
                 UserDefaults.standard.set(metersInt, forKey: Constants.UserDefaults.FilterDistance)
+                UserDefaults.standard.set(self.SwitchShowOnlyyFriend.isOn, forKey: Constants.UserDefaults.isFriend)
                 
                 UserDefaults.standard.synchronize()
                 

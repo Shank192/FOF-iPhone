@@ -8,8 +8,12 @@ import UIKit
 
 class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
     
+    
+    
+    @IBOutlet weak var constSearchLocationTextfieldViewHeight: NSLayoutConstraint!
+    
     @IBOutlet weak var collectionViewFoodSearch: UICollectionView!
-    @IBOutlet weak var stackViewOflocation: UIStackView!
+    
     @IBOutlet weak var tblViewAddress: UITableView!
     @IBOutlet weak var viewFood: UIView!
     @IBOutlet weak var txtFieldFoodSearch: UITextField!
@@ -43,8 +47,6 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
             self.arrAllTestBudsPlaces = TestArray as! [[String : AnyObject]]
         }
         
-       
-        
         if self.searchTestBuds != nil
         {
             if let name = self.searchTestBuds?.object(forKey: "name") as? String
@@ -61,14 +63,9 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
             }
         }
         
-        
-   
-        
-        
-        
         setCurrentDeatils()
         self.hideKeyboardWhenTappedAround()
-        stackViewOflocation.isHidden = true
+        self.constSearchLocationTextfieldViewHeight.constant = 0
         tblViewAddress.layoutMargins = UIEdgeInsets.zero
         tblViewAddress.tableFooterView = UIView(frame: CGRect.zero)
         tblViewAddress.separatorInset = UIEdgeInsets.zero
@@ -103,7 +100,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
         {
             if self.latitude != nil && self.longitude != nil
             {
-                self.setZomatoRest(latitude: "\(self.latitude!)", longitude: "\(self.latitude!)", StrtCounty: 0, EndCount: 50)
+                self.setZomatoRest(latitude: "\(self.latitude!)", longitude: "\(self.longitude!)", StrtCounty: 0, EndCount: 50)
             }
             else
             {
@@ -115,7 +112,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     
     
     @IBAction func btnCancelAct(_ sender: Any) {
-        if stackViewOflocation.isHidden{
+        if self.constSearchLocationTextfieldViewHeight.constant == 0{
             self.navigationController?.popViewController(animated: true)
         }else{
             
@@ -125,11 +122,11 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
             self.txtFeildAddressSearch.text = ""
             self.txtFieldFoodSearch.text = ""
             
-            stackViewOflocation.isHidden = true
+            self.constSearchLocationTextfieldViewHeight.constant = 0
             
 //            if self.latitude != nil && self.longitude != nil
 //            {
-//                self.setZomatoRest(latitude: "\(self.latitude!)", longitude: "\(self.latitude!)", StrtCounty: 0, EndCount: 50)
+//                self.setZomatoRest(latitude: "\(self.latitude!)", longitude: "\(self.longitude!)", StrtCounty: 0, EndCount: 50)
 //            }
 //            else
 //            {
@@ -172,7 +169,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
         self.txtFeildAddressSearch.text = ""
         self.txtFieldFoodSearch.text = ""
         
-        stackViewOflocation.isHidden = true
+        self.constSearchLocationTextfieldViewHeight.constant = 0
         
         if self.latitude != nil && self.longitude != nil
         {
@@ -221,6 +218,12 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                 {
                     selectedBudsID = "\(zomato_id)"
                 }
+            }
+            
+            if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
+            {
+                UserDefaults.standard.set("20000", forKey: Constants.UserDefaults.FilterDistance)
+                UserDefaults.standard.synchronize()
             }
             
             if let mytestBudsID = UserDefaults.standard.object(forKey: Constants.UserDefaults.SelectedZomatoTestBudsID),let radius = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance)
@@ -290,7 +293,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                             }
                         }
                         
-                        self.retriveDataForRestaurantByCarAndWalking()
+                        self.retriveDataForRestaurantByCarAndWalking(lat: latitude, Longi: longitude)
                     }
                     else
                     {
@@ -422,7 +425,7 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     
     
     
-    func retriveDataForRestaurantByCarAndWalking(){
+    func retriveDataForRestaurantByCarAndWalking(lat : String, Longi : String){
         MBProgressHUD.showAdded(to: self.view, animated: true)
         self.isService = false
         
@@ -456,8 +459,8 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
                 var secondStartLat = ""
                 var secondStartLong = ""
                 var myURL = ""
-                firstStartLat = latitude!
-                firstStartLong = longitude!
+                firstStartLat = lat
+                firstStartLong = Longi
                 secondStartLat = latOfPlace
                 secondStartLong = longOfPlace
                 
@@ -598,6 +601,10 @@ class foodSearchScreenVC: UIViewController , UICollectionViewDataSource,UICollec
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let obj = storyboard?.instantiateViewController(withIdentifier: "selectedRestaurantDeatilsScreenVC") as! selectedRestaurantDeatilsScreenVC
+        if self.latitude != nil && self.longitude != nil
+        {
+            obj.usercurrentLocation = CLLocation.init(latitude: Double(self.latitude!)!, longitude: Double(self.longitude!)!)
+        }
         obj.arrOfRestaurantData = arrForRestaurants[indexPath.row]
         if let dict = arrForRestaurants[indexPath.row]["CarFirst"] as? NSDictionary{
             if let str = dict["Difference"] as? String{
@@ -615,12 +622,8 @@ extension foodSearchScreenVC : UITextFieldDelegate {
         
         self.isSearchTestBuds = false
         UIView.animate(withDuration: 0.5) {
-            let transition = CATransition()
-            transition.duration = 0.5
-            transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-            transition.type = kCATransitionPush;
-            transition.subtype = kCATransitionFromTop;
-            self.stackViewOflocation.isHidden = false
+            self.constSearchLocationTextfieldViewHeight.constant = 45
+            self.view.layoutIfNeeded()
         }
         
     }
@@ -629,12 +632,8 @@ extension foodSearchScreenVC : UITextFieldDelegate {
         
         self.isSearchTestBuds = true
         UIView.animate(withDuration: 0.5) {
-            let transition = CATransition()
-            transition.duration = 0.5
-            transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-            transition.type = kCATransitionPush;
-            transition.subtype = kCATransitionFromTop;
-            self.stackViewOflocation.isHidden = false
+            self.constSearchLocationTextfieldViewHeight.constant = 45
+            self.view.layoutIfNeeded()
         }
         
     }

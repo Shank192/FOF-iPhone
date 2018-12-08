@@ -138,9 +138,21 @@ class userDetailScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
  
     @IBAction func btnEditAct(_ sender: Any) {
         let obj = self.storyboard?.instantiateViewController(withIdentifier: "userProfileEditScreenVC") as! userProfileEditScreenVC
-       
+
         self.navigationController?.pushViewController(obj, animated: false)
+        
+        
+
+        
     }
+    
+    @IBAction func btnActionInfo(_ sender: Any)
+    {
+        let obj = self.storyboard?.instantiateViewController(withIdentifier: "ContactSettingVC") as! ContactSettingVC
+        self.navigationController?.pushViewController(obj, animated: true)
+    }
+    
+    
     
     // MARK: - CollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

@@ -11,6 +11,9 @@ class sentRestaurantsScreenVC: UIViewController,UISearchBarDelegate {
     var arrForRestaurants = [[String:AnyObject]]()
     var arrSelectedRestaurants = NSMutableArray()
 
+    @IBOutlet weak var nsTextViewBottome: NSLayoutConstraint!
+    @IBOutlet weak var tblSearch: UITableView!
+    @IBOutlet weak var lblSelectUpToFive: UILabel!
     @IBOutlet weak var btnBackOut: UIButton!
     @IBOutlet weak var viewBlure: UIView!
     var arrDuration = NSMutableArray()
@@ -21,16 +24,29 @@ class sentRestaurantsScreenVC: UIViewController,UISearchBarDelegate {
     var longitude = String()
     var dictUserDetail = NSDictionary()
 
+    var arrAllTestBudsPlaces = [[String : AnyObject]]()
+    var arrSearchTestBuds = NSMutableArray()
+    var searchTestBuds : NSDictionary?
+    
     var isService = false
     var isfrind = Bool()
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var collectionViewRestaurants: UICollectionView!
-  
+    var selectedCount = 0
     let app = UIApplication.shared.delegate as! AppDelegate
+    
+    var isREstAPICall = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tblSearch.layoutMargins = UIEdgeInsets.zero
+        tblSearch.tableFooterView = UIView(frame: CGRect.zero)
+        tblSearch.separatorInset = UIEdgeInsets.zero
+        
+        self.registerForKeyboardNotifications()
         setCurrentDeatils()
+        
     }
 
 override func didReceiveMemoryWarning() {
@@ -38,41 +54,116 @@ override func didReceiveMemoryWarning() {
     }
     func setCurrentDeatils(){
         
+        self.tblSearch.isHidden = true
+        self.collectionViewRestaurants.isHidden = false
     
         let obj = sentRestaurantsScreenVC()
         
     
         if let str = dictUserDetail.object(forKey: "first_name") as? String{
-            txtViewMessage.text = "Hi \(str) Wanna grab a bite?"}
-   
+            txtViewMessage.text = "Hi \(str) Wanna grab a bite?"
+            self.lblSelectUpToFive.text = "Select upto 5 restaurants and share with \(str)."
+        }
+        else if let str = dictUserDetail.object(forKey: "name") as? String{
+            
+            txtViewMessage.text = "Hi \(str) Wanna grab a bite?"
+            self.lblSelectUpToFive.text = "Select upto 5 restaurants and share with \(str)."
+            
+        }
+        
+        if let TestArray = UserDefaults.standard.object(forKey: Constants.UserDefaults.AllTestBudsArrayFromYourLocation) as? NSArray
+        {
+            self.arrAllTestBudsPlaces = TestArray as! [[String : AnyObject]]
+        }
+        
+        
+        
+        if self.searchTestBuds != nil
+        {
+            if let name = self.searchTestBuds?.object(forKey: "name") as? String
+            {
+                self.searchBar.text = name
+            }
+        }
+        
+        
         Constants.GlobalConstants.appDelegate.locateLocationManager(view: obj)
         NotificationCenter.default.addObserver(self, selector: #selector(retriveDataForRestaurants), name: NSNotification.Name(rawValue: "LOCATIONUPDATENOTIFY"), object: nil)
     }
     func setRestaurantScreen(){
         
     }
+    
+    //MARK:-
+    func registerForKeyboardNotifications () {
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(keyboardWasShown(_:)), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
+        nc.addObserver(self, selector: #selector(keyboardWasShown(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        nc.addObserver(self, selector: #selector(keyboardWasHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        nc.addObserver(self, selector: #selector(keyboardWasHide(_:)), name: NSNotification.Name.UIKeyboardDidHide, object: nil)
+    }
+    
+    
+    @objc func keyboardWasHide(_ aNotification: Notification) {
+        let _: NSDictionary = aNotification.userInfo! as NSDictionary
+        
+        nsTextViewBottome.constant  = 0 // Move view to original position
+        UIView.animate(withDuration: 0.1, animations: { () -> Void in
+        }, completion: { (finished : Bool) -> Void in
+            
+        })
+    }
+    
+    @objc func keyboardWasShown(_ aNotification: Notification) {
+        let info: NSDictionary = aNotification.userInfo! as NSDictionary
+        let kbSize : CGRect = (info.object(forKey: UIKeyboardFrameEndUserInfoKey)! as AnyObject).cgRectValue
+        
+        if #available(iOS 11.0, *) {
+            nsTextViewBottome.constant = kbSize.height - self.view.safeAreaInsets.bottom
+        } else {
+            nsTextViewBottome.constant = kbSize.height - 40
+            
+        }
+        
+        UIView.animate(withDuration: 0.1, animations: { () -> Void in
+            
+        }, completion: { (finished : Bool) -> Void in
+            
+        })
+    }
+    
     // MARK: - Google Api
     @objc func retriveDataForRestaurants(){
         MBProgressHUD.showAdded(to: self.view, animated: true)
         
+        latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
+        longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+        
 //        setData(latitude: latitude, longitude: longitude)
-        if longitude == "" && longitude == ""
+        if longitude != "" && longitude != "" && self.isREstAPICall == false
         {
             self.setZomatoRest(latitude: latitude, longitude: longitude, StrtCounty: 0, EndCount: 50)
         }
         
-        latitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLatitude) as! String
-        longitude = UserDefaults.standard.object(forKey: Constants.UserDefaults.currentLongitude) as! String
+        
         
     }
     
     
     func setZomatoRest(latitude: String,longitude : String,StrtCounty : Int,EndCount : Int)
     {
+        self.isREstAPICall = true
         if self.app.zomatoAPIuserKEy != nil
         {
             var selectedBudsID = ""
-            
+
+            if self.searchTestBuds != nil
+            {
+                if let zomato_id = self.searchTestBuds?.object(forKey: "zomato_id")
+                {
+                    selectedBudsID = "\(zomato_id)"
+                }
+            }
             
             if let mytestBudsID = UserDefaults.standard.object(forKey: Constants.UserDefaults.SelectedZomatoTestBudsID),let radius = UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance)
             {
@@ -86,10 +177,20 @@ override func didReceiveMemoryWarning() {
                 
                 Webservices_Alamofier.postZomatoWithURL(serverlink: mainLink, param: NSDictionary(), key: self.app.zomatoAPIuserKEy!, successStatusCode: 200)  { (success, response) in
                     MBProgressHUD.hide(for: self.view, animated: true)
+                    
+                    
+                    
                     if success == true
                     {
                         if let restaurants = response.object(forKey: "restaurants") as? NSArray
                         {
+                            
+                            if restaurants.count == 0
+                            {
+                                Constants.GlobalConstants.appDelegate.window?.rootViewController?.view.makeToast("No resturant available right now. Please try after sometime.")
+                                _ = self.navigationController?.popViewController(animated: true)
+                            }
+                            
                             if StrtCounty == 0
                             {
                                 self.arrForRestaurants.removeAll()
@@ -162,12 +263,13 @@ override func didReceiveMemoryWarning() {
                             self.view.makeToast("Something went to wrong. Please try after some time.")
                         }
                     }
-                    
+                    self.isREstAPICall = false
                 }
             }
         }
         else
         {
+            
             self.app.getZomatoKEY { (success) in
                 
                 if success == true
@@ -260,7 +362,8 @@ override func didReceiveMemoryWarning() {
                                                     let myData = NSMutableDictionary(dictionary: tempData)
                                                     myData.setObject(dict, forKey: "CarFirst" as NSCopying)
                                                     self.arrDuration.replaceObject(at: index, with: myData)
-                                                }}
+                                                }
+                                            }
                                             else
                                             {
                                                 let dict = ["Difference":"No data Available"]
@@ -268,7 +371,20 @@ override func didReceiveMemoryWarning() {
                                                 myData.setObject(dict, forKey: "CarFirst" as NSCopying)
                                                 self.arrDuration.replaceObject(at: index, with: myData)
                                             }
-                                        }}}}}}
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if let error_message = response.object(forKey: "error_message") as? String
+                                    {
+                                        Constants.GlobalConstants.appDelegate.window?.rootViewController?.view.makeToast(error_message)
+                                        _ = self.navigationController?.popViewController(animated: true)
+                                    }
+                                }
+                            }
+                        }
+                    }
                     myURL = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=\(firstStartLat),\(firstStartLong)&destinations=\(secondStartLat),\(secondStartLong)&mode=walking&language=EN&key=\(Constants.GoogleKey.kGoogle_Key)"
                     WebService.CallRequestUrl(myURL) { (success, response) in
                         if success == true {
@@ -352,6 +468,27 @@ override func didReceiveMemoryWarning() {
             
         }
     }
+    
+    //MARK:- Custome method
+    func fetchtestBuds(_ searchname : String)
+    {
+        let result =  self.arrAllTestBudsPlaces.filter({ (data) -> Bool in
+            let stringname = data["name"] as! String
+            return stringname.lowercased().contains(searchname.lowercased())
+
+        })
+
+        self.arrSearchTestBuds = NSMutableArray.init(array: result as [Any])
+        if self.arrSearchTestBuds.count > 0
+        {
+            self.tblSearch.isHidden = false
+            self.collectionViewRestaurants.isHidden = true
+            
+        }
+        self.tblSearch.reloadData()
+    }
+    
+    
 // MARK: - Button Action Method
     
     
@@ -459,15 +596,28 @@ extension sentRestaurantsScreenVC : UICollectionViewDelegate,UICollectionViewDel
             print(dict)
             if let isSelected = dict.object(forKey: "isSelected")
             { if "\(isSelected)" == "1" {
-                    let muteDict = NSMutableDictionary(dictionary: dict)
-                    muteDict.setValue("0", forKey: "isSelected")
-                    arrForRestaurants.remove(at: indexPath.row)
-                    arrForRestaurants.insert(muteDict as! [String : AnyObject], at: indexPath.row)
-                }else{
+                if selectedCount > 0
+                {
+                    selectedCount = selectedCount - 1
+                }
+                let muteDict = NSMutableDictionary(dictionary: dict)
+                muteDict.setValue("0", forKey: "isSelected")
+                arrForRestaurants.remove(at: indexPath.row)
+                arrForRestaurants.insert(muteDict as! [String : AnyObject], at: indexPath.row)
+            }else{
+                if selectedCount < 5
+                {
                     let muteDict = NSMutableDictionary(dictionary: dict)
                     muteDict.setValue("1", forKey: "isSelected")
+                    selectedCount = selectedCount + 1
                     arrForRestaurants.remove(at: indexPath.row)
                     arrForRestaurants.insert(muteDict as! [String : AnyObject], at: indexPath.row)
+                }
+                else
+                {
+                    Constants.GlobalConstants.appDelegate.window?.rootViewController!.view.makeToast("You have select only 5 restaurants.")
+                }
+                
                 }
             }
             
@@ -484,18 +634,136 @@ extension sentRestaurantsScreenVC : UICollectionViewDelegate,UICollectionViewDel
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
- 
+        
+        if searchText == ""
+        {
+            self.searchTestBuds = nil
+        }
+        else if searchText != ""
+        {
+            if self.searchTestBuds != nil
+            {
+                if let name = self.searchTestBuds?.object(forKey: "name") as? String
+                {
+                    if searchText != name
+                    {
+                        self.searchTestBuds = nil
+                    }
+                }
+            }
+            
+            self.fetchtestBuds(searchText)
+        }
+        
+        
     }
+    
+    
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
-        retriveDataForRestaurant(strType: searchBar.text!)
-        searchBar.resignFirstResponder()
+        self.searchBar.resignFirstResponder()
+        
+        if searchBar.text == ""
+        {
+           self.searchTestBuds = nil
+        }
+        
+        if self.searchTestBuds != nil
+        {
+            if self.latitude != "" && self.longitude != ""
+            {
+                self.setZomatoRest(latitude: "\(self.latitude)", longitude: "\(self.longitude)", StrtCounty: 0, EndCount: 50)
+            }
+            else
+            {
+                self.retriveDataForRestaurants()
+            }
+        }
+        
     }
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         
        searchBar.resignFirstResponder()
-        self.dismiss(animated: true, completion: nil)
+        searchBar.text = ""
+        self.searchTestBuds = nil
+        if self.latitude != "" && self.longitude != ""
+        {
+            self.setZomatoRest(latitude: "\(self.latitude)", longitude: "\(self.longitude)", StrtCounty: 0, EndCount: 50)
+        }
+        else
+        {
+            self.retriveDataForRestaurants()
+        }
+        self.tblSearch.isHidden = true
+        self.collectionViewRestaurants.isHidden = false
+        
+        
+    }
+}
+
+
+extension sentRestaurantsScreenVC : UITableViewDataSource, UITableViewDelegate {
+    
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        
+        return arrSearchTestBuds.count
+        
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell")
+        
+        cell?.textLabel?.font = UIFont.init(name: "GillSans", size: 16.0)
+        cell?.textLabel?.frame = CGRect(x: 20, y: 5, width: tableView.frame.size.width - 40, height: 21)
+        cell?.textLabel?.numberOfLines = 0
+        
+        
+        if let dict = self.arrSearchTestBuds.object(at: indexPath.row) as? NSDictionary
+        {
+            if let name = dict.object(forKey: "name") as? String
+            {
+                cell?.textLabel?.text = name
+            }
+        }
+        
+        
+        cell?.textLabel?.sizeToFit()
+        return cell!
+        
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        
+        
+        if let dict = self.arrSearchTestBuds.object(at: indexPath.row) as? NSDictionary
+        {
+            self.searchTestBuds = NSDictionary.init(dictionary: dict)
+            
+            if let description = self.searchTestBuds?.object(forKey: "name") as? String
+            {
+                self.searchBar.text = description
+            }
+        }
+        
+        if self.latitude != "" && self.longitude != ""
+        {
+            self.setZomatoRest(latitude: "\(self.latitude)", longitude: "\(self.longitude)", StrtCounty: 0, EndCount: 50)
+        }
+        else
+        {
+            self.retriveDataForRestaurants()
+        }
+        
+        self.tblSearch.isHidden = true
+        self.collectionViewRestaurants.isHidden = false
+        
+        self.searchBar.resignFirstResponder()
         
     }
 }

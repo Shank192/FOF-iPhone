@@ -170,6 +170,7 @@
 		82CCBD6921186ECD00A3A9CD /* slider-default7-trackBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 82CCBD4921186ECA00A3A9CD /* slider-default7-trackBackground@2x.png */; };
 		82CCBD6A21186ECD00A3A9CD /* slider-default7-track.png in Resources */ = {isa = PBXBuildFile; fileRef = 82CCBD4A21186ECA00A3A9CD /* slider-default7-track.png */; };
 		82CCBD6B21186ECD00A3A9CD /* NMRangeSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 82CCBD4B21186ECA00A3A9CD /* NMRangeSlider.m */; };
+		8490C9F621876929005C8008 /* ContactSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8490C9F521876929005C8008 /* ContactSettingVC.swift */; };
 		AF51F904DE058FF89752A083 /* Pods_FOFTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE1AA9747544B2F70BD046E2 /* Pods_FOFTests.framework */; };
 		BC163E7313ED62F038447A8C /* Pods_FOFUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD06B2EC901EC0A955B98157 /* Pods_FOFUITests.framework */; };
 		BE1FDF84755596D2D0066431 /* Pods_FOF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE87751FBDB2ED6E2B1DAC7 /* Pods_FOF.framework */; };
@@ -444,6 +445,7 @@
 		82CCBD4921186ECA00A3A9CD /* slider-default7-trackBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "slider-default7-trackBackground@2x.png"; sourceTree = "<group>"; };
 		82CCBD4A21186ECA00A3A9CD /* slider-default7-track.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "slider-default7-track.png"; sourceTree = "<group>"; };
 		82CCBD4B21186ECA00A3A9CD /* NMRangeSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NMRangeSlider.m; sourceTree = "<group>"; };
+		8490C9F521876929005C8008 /* ContactSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSettingVC.swift; sourceTree = "<group>"; };
 		9CE4CEFC1A8B51849BD07E3C /* Pods-FOFUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FOFUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FOFUITests/Pods-FOFUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		AD06B2EC901EC0A955B98157 /* Pods_FOFUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FOFUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD1438E1BFC9CFBD4BE34540 /* Pods-FOFTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FOFTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-FOFTests/Pods-FOFTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -539,6 +541,7 @@
 				8263DC142125894C00C2A65E /* photoCollectionViewCell.swift */,
 				8263DC162125897100C2A65E /* preferencesCollectionViewCell.swift */,
 				824EC4162109C82100FB52AC /* userProfileDetailScreenVC.swift */,
+				8490C9F521876929005C8008 /* ContactSettingVC.swift */,
 			);
 			path = DetailsScreen;
 			sourceTree = "<group>";
@@ -1126,8 +1129,6 @@
 				8278A0C520F8BF3700CF04B3 /* Sources */,
 				8278A0C620F8BF3700CF04B3 /* Frameworks */,
 				8278A0C720F8BF3700CF04B3 /* Resources */,
-				4C464569A8646CD77DED28F7 /* [CP] Embed Pods Frameworks */,
-				C1C4FB2B7E0202CC83D66B23 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1147,8 +1148,6 @@
 				8278A0D020F8BF3700CF04B3 /* Sources */,
 				8278A0D120F8BF3700CF04B3 /* Frameworks */,
 				8278A0D220F8BF3700CF04B3 /* Resources */,
-				922AD4E0B0AB83670EAD03AD /* [CP] Embed Pods Frameworks */,
-				0D742191965B6985A1D7E92A /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1318,21 +1317,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		0D742191965B6985A1D7E92A /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FOFUITests/Pods-FOFUITests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		261C5D1327ACC27A0440C90D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1369,21 +1353,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4C464569A8646CD77DED28F7 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FOFTests/Pods-FOFTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		69E8FFA0EB8E263B2B2854A3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1402,6 +1371,8 @@
 				"${BUILT_PRODUCTS_DIR}/GrowingTextView/GrowingTextView.framework",
 				"${BUILT_PRODUCTS_DIR}/MBCircularProgressBar/MBCircularProgressBar.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/UberCore/UberCore.framework",
+				"${BUILT_PRODUCTS_DIR}/UberRides/UberRides.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
@@ -1418,42 +1389,14 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GrowingTextView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MBCircularProgressBar.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/UberCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/UberRides.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FOF/Pods-FOF-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		922AD4E0B0AB83670EAD03AD /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FOFUITests/Pods-FOFUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C1C4FB2B7E0202CC83D66B23 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FOFTests/Pods-FOFTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C5DFDD9F6FD53D6358E1DEC7 /* [CP] Copy Pods Resources */ = {
@@ -1539,6 +1482,7 @@
 				8233A56C210CA5FD0013FB48 /* GMUHeatmapTileLayer.m in Sources */,
 				8233A577210CA5FD0013FB48 /* GMUGeoJSONParser.m in Sources */,
 				8233A575210CA5FD0013FB48 /* GMUPoint.m in Sources */,
+				8490C9F621876929005C8008 /* ContactSettingVC.swift in Sources */,
 				824C4560210B691100D273A9 /* UIImage+MultiFormat.m in Sources */,
 				823FFB7D21745ECA00E07837 /* MBProgressHUD.m in Sources */,
 				824EC41C2109D5F800FB52AC /* WebService.swift in Sources */,

@@ -45,6 +45,9 @@ class preferencesCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var horizontalSlider: UISlider!
     var mutDictUserDetail = NSMutableDictionary()
 
+    var isKm = false
+    var meterInt = 20000
+    
     override func awakeFromNib() {
         configureMetalTheme(slider: rangeSlideOut)
         
@@ -62,13 +65,17 @@ class preferencesCollectionViewCell: UICollectionViewCell {
             lblDistanceUnitOut.text = distance_unit
             if distance_unit == "miles"{
                 lblDistanceUnitOut.text = "Mi."
+                self.isKm = false
                 btnMiOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
                 btnMiOut.setTitleColor(UIColor.white, for: .normal)
                 btnKmOut.backgroundColor = UIColor.white
                 btnKmOut.setTitleColor(UIColor.black, for: .normal)
                 mutDictUserDetail.setValue("miles", forKey: "distance_unit")
+               
+                
             }else{
                 lblDistanceUnitOut.text = "Km."
+                self.isKm = true
                 btnKmOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
                 btnKmOut.setTitleColor(UIColor.white, for: .normal)
                 btnMiOut.backgroundColor = UIColor.white
@@ -246,15 +253,36 @@ class preferencesCollectionViewCell: UICollectionViewCell {
         {
             if "\(distance)" != ""
             {
-                self.horizontalSlider.value = Float("\(distance)")!
-                lblDistanceOut.text = "\(Int(horizontalSlider.value)) mi"
+                self.meterInt = Int("\(distance)")!
+                
+                if self.isKm == true
+                {
+                    self.horizontalSlider.value = Float(self.meterInt/1000)
+                }
+                else
+                {
+                    self.horizontalSlider.value = Float(self.meterInt/1610)
+                }
+                
+                
+                lblDistanceOut.text = "\(Int(horizontalSlider.value)) \(lblDistanceUnitOut.text!)"
             }
         }
     }
     @IBAction func distanceSliderAct(_ sender: Any) {
-        lblDistanceOut.text = "\(Int(horizontalSlider.value)) mi"
+        lblDistanceOut.text = "\(Int(horizontalSlider.value)) \(lblDistanceUnitOut.text!)"
         //mutDictUserDetail.setValue(lblDistanceOut.text, forKey: "search_distance")
-        mutDictUserDetail.setObject("\(horizontalSlider.value)", forKey: "search_distance" as NSCopying)
+        
+        if self.isKm == true
+        {
+            self.meterInt = Int(Float(self.horizontalSlider.value*1000))
+        }
+        else
+        {
+            self.meterInt = Int(Float(self.horizontalSlider.value*1610))
+        }
+        
+        mutDictUserDetail.setObject("\(self.meterInt)", forKey: "search_distance" as NSCopying)
         setDictionary()
 
     }
@@ -266,9 +294,9 @@ class preferencesCollectionViewCell: UICollectionViewCell {
         strLowerValue =
         "\(String(describing: Int(intLowerValue) + 16))"
         lblAgeLimitOut.text = "\(strLowerValue) - \(strUpperValue) Years"
+        
         mutDictUserDetail.setValue(strLowerValue, forKey: "search_min_age")
         mutDictUserDetail.setValue(strUpperValue, forKey: "search_max_age")
-
         setDictionary()
 
     }
@@ -322,23 +350,30 @@ class preferencesCollectionViewCell: UICollectionViewCell {
     @IBAction func btnkmAct(_ sender: Any) {
         
         lblDistanceUnitOut.text = "Km."
+        lblDistanceOut.text = "\(Int(horizontalSlider.value)) \(lblDistanceUnitOut.text!)"
         btnKmOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
         btnKmOut.setTitleColor(UIColor.white, for: .normal)
         btnMiOut.backgroundColor = UIColor.white
         btnMiOut.setTitleColor(UIColor.black, for: .normal)
         mutDictUserDetail.setValue("Km", forKey: "distance_unit")
-       
+       self.isKm = true
+        self.meterInt = Int(self.horizontalSlider.value*1000)
+        mutDictUserDetail.setObject("\(self.meterInt)", forKey: "search_distance" as NSCopying)
         setDictionary()
 
     }
     
     @IBAction func btnMiAct(_ sender: Any) {
         lblDistanceUnitOut.text = "Mi."
+        self.isKm = false
+        self.meterInt = Int(self.horizontalSlider.value*1610)
+        lblDistanceOut.text = "\(Int(horizontalSlider.value)) \(lblDistanceUnitOut.text!)"
         btnMiOut.backgroundColor = Utility.UIColorFromHex(0xAC192E)
         btnMiOut.setTitleColor(UIColor.white, for: .normal)
         btnKmOut.backgroundColor = UIColor.white
         btnKmOut.setTitleColor(UIColor.black, for: .normal)
         mutDictUserDetail.setValue("miles", forKey: "distance_unit")
+        mutDictUserDetail.setObject("\(self.meterInt)", forKey: "search_distance" as NSCopying)
         setDictionary()
 
     }
@@ -397,15 +432,21 @@ class preferencesCollectionViewCell: UICollectionViewCell {
             strGender = "all"
         }
         if lblDistanceUnitOut.text == "Mi."{
-        mutDictUserDetail.setValue("miles", forKey: "distance_unit")}else{
-        mutDictUserDetail.setValue("Km", forKey: "distance_unit")}
+            mutDictUserDetail.setValue("miles", forKey: "distance_unit")
+        }
+        else
+        {
+            mutDictUserDetail.setValue("Km", forKey: "distance_unit")
+        }
         mutDictUserDetail.setValue(strLowerValue, forKey: "search_min_age")
         mutDictUserDetail.setValue(strUpperValue, forKey: "search_max_age")
         mutDictUserDetail.setValue(invitationNom, forKey:"is_receive_invitation_notifications")
         mutDictUserDetail.setValue(messageNom, forKey:"is_receive_messages_notifications")
         mutDictUserDetail.setValue(locationNom, forKey:"is_show_location")
-
         mutDictUserDetail.setValue(strGender, forKey: "showme")
+        
+        
+        
         print(mutDictUserDetail)
         let data = NSKeyedArchiver.archivedData(withRootObject: mutDictUserDetail)
         let userDefaults = UserDefaults.standard

@@ -532,7 +532,7 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                                 
                             }
                             
-                            if let zomato_id = dict.object(forKey: "zomato_id")
+                            if let zomato_id = dict.object(forKey: "name")//zomato_id
                             {
                                 if ZomatoID != ""
                                 {
@@ -572,6 +572,32 @@ class interestedScreenVC: UIViewController,UICollectionViewDelegateFlowLayout,UI
                 
                 if success == true
                 {
+                    if let dataDict = response.object(forKey: "response_data") as? NSDictionary
+                    {
+                        if let search_distance = dataDict.object(forKey: "search_distance")
+                        {
+                            if "\(search_distance)" != "" && "\(search_distance)" != "0"
+                            {
+                                UserDefaults.standard.set("\(search_distance)", forKey: Constants.UserDefaults.FilterDistance)
+                            }
+                        }
+                        
+                        if UserDefaults.standard.object(forKey: Constants.UserDefaults.FilterDistance) == nil
+                        {
+                            UserDefaults.standard.set("20000", forKey: Constants.UserDefaults.FilterDistance)
+                            UserDefaults.standard.synchronize()
+                        }
+                        
+                        Constants.GlobalConstants.appDelegate.userDetail = UserDetail.init(dictionary: dataDict as? [AnyHashable : Any])
+                        UserDefaults.standard.set(dataDict, forKey: Constants.UserDefaults.ProfileData)
+                        
+                        if let tastebuds = dataDict.object(forKey: "testbuds") as? NSArray
+                        {
+                            UserDefaults.standard.set(tastebuds, forKey: Constants.UserDefaults.MyTestBuds)
+                            UserDefaults.standard.synchronize()
+                        }
+                    }
+                    
                     UserDefaults.standard.set(selectedBudsID, forKey: Constants.UserDefaults.MySelectedTEstBudsID)
                     
                     UserDefaults.standard.set(ZomatoID, forKey: Constants.UserDefaults.SelectedZomatoTestBudsID)
